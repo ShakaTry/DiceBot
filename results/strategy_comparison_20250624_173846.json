@@ -1,0 +1,568 @@
+{
+  "comparison_analysis": {
+    "rankings": {
+      "by_roi": [
+        [
+          "FlatBetting",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 1.0333333333333333e-05,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ],
+        [
+          "Martingale",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 8e-06,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ]
+      ],
+      "by_profitability_rate": [
+        [
+          "FlatBetting",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 1.0333333333333333e-05,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ],
+        [
+          "Martingale",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 8e-06,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ]
+      ],
+      "by_win_rate": [
+        [
+          "FlatBetting",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 1.0333333333333333e-05,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ],
+        [
+          "Martingale",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 8e-06,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ]
+      ],
+      "by_drawdown": [
+        [
+          "FlatBetting",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 1.0333333333333333e-05,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ],
+        [
+          "Martingale",
+          {
+            "total_sessions": 3,
+            "total_bets": 0,
+            "total_profit": 0.0,
+            "total_wagered": 0.0,
+            "overall_roi": 0.0,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.0,
+            "average_session_duration": 8e-06,
+            "stop_reasons": {
+              "error: 'DiceGame' object has no attribute 'play_round'": 3
+            },
+            "average_max_drawdown": 0.0,
+            "worst_drawdown": 0.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 15.0,
+              "total_balance": 100.0,
+              "vault_ratio": 0.85,
+              "bankroll_ratio": 0.15,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": 0.0
+            }
+          }
+        ]
+      ]
+    },
+    "statistics": {
+      "average_roi": 0.0,
+      "best_roi": 0.0,
+      "worst_roi": 0.0,
+      "average_profitability_rate": 0.0,
+      "strategies_with_positive_roi": 0,
+      "total_strategies": 2
+    },
+    "recommendations": [
+      "Best ROI: FlatBetting (0.00%)",
+      "Most consistent: FlatBetting (0.0% profitable sessions)",
+      "Lowest risk: FlatBetting (0.0% max drawdown)"
+    ]
+  },
+  "individual_results": {
+    "FlatBetting": {
+      "simulation_summary": {
+        "total_sessions": 3,
+        "total_bets": 0,
+        "total_profit": 0.0,
+        "total_wagered": 0.0,
+        "overall_roi": 0.0,
+        "profitable_sessions": 0,
+        "profitability_rate": 0.0,
+        "average_win_rate": 0.0,
+        "average_session_duration": 1.0333333333333333e-05,
+        "stop_reasons": {
+          "error: 'DiceGame' object has no attribute 'play_round'": 3
+        },
+        "average_max_drawdown": 0.0,
+        "worst_drawdown": 0.0,
+        "vault_status": {
+          "vault_balance": 85.0,
+          "bankroll_balance": 15.0,
+          "total_balance": 100.0,
+          "vault_ratio": 0.85,
+          "bankroll_ratio": 0.15,
+          "total_deposited": 100.0,
+          "total_withdrawn": 0.0,
+          "net_profit": 0.0
+        }
+      },
+      "strategy_info": {
+        "strategy_config": {
+          "strategy": "flat",
+          "base_bet": "0.001"
+        },
+        "strategy_genome": {
+          "strategy_type": "FlatBetting",
+          "base_bet": "0.001",
+          "min_bet": "0.00015",
+          "max_bet": "1000",
+          "multiplier": 2.0,
+          "max_losses": 10,
+          "default_multiplier": 2.0,
+          "confidence": 1.0,
+          "fitness": 0.0,
+          "generation": 0,
+          "mutations": []
+        },
+        "strategy_fitness": 0.0,
+        "strategy_metrics": {
+          "total_bets": 0,
+          "win_rate": 0.0,
+          "roi": 0.0,
+          "max_bet_reached": 0.0,
+          "max_consecutive_losses": 0,
+          "average_confidence": 0.0,
+          "profit_factor": 0.0
+        }
+      },
+      "sessions_data": [
+        {
+          "session_id": "a2cbee28-ef5e-42fc-8993-f4db43420809",
+          "strategy_name": "FlatBetting",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:38:46.944819",
+          "ended_at": "2025-06-24T17:38:46.944834",
+          "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+          "duration_seconds": 1.5e-05,
+          "initial_balance": 2.25,
+          "final_balance": 2.25,
+          "total_profit": 0.0,
+          "total_wagered": 0.0,
+          "roi": 0.0,
+          "bets_count": 0,
+          "wins_count": 0,
+          "losses_count": 0,
+          "win_rate": 0.0,
+          "max_consecutive_wins": 0,
+          "max_consecutive_losses": 0,
+          "max_drawdown": 0.0,
+          "sharpe_ratio": 0.0,
+          "peak_balance": 2.25,
+          "lowest_balance": 2.25,
+          "bets_per_minute": 0.0,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        },
+        {
+          "session_id": "cd954c9d-f82d-4cbd-a978-edb5b5f17eb8",
+          "strategy_name": "FlatBetting",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:38:46.944857",
+          "ended_at": "2025-06-24T17:38:46.944865",
+          "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+          "duration_seconds": 8e-06,
+          "initial_balance": 2.25,
+          "final_balance": 2.25,
+          "total_profit": 0.0,
+          "total_wagered": 0.0,
+          "roi": 0.0,
+          "bets_count": 0,
+          "wins_count": 0,
+          "losses_count": 0,
+          "win_rate": 0.0,
+          "max_consecutive_wins": 0,
+          "max_consecutive_losses": 0,
+          "max_drawdown": 0.0,
+          "sharpe_ratio": 0.0,
+          "peak_balance": 2.25,
+          "lowest_balance": 2.25,
+          "bets_per_minute": 0.0,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        },
+        {
+          "session_id": "95042b84-9faa-478d-843d-e2335ba658cb",
+          "strategy_name": "FlatBetting",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:38:46.944881",
+          "ended_at": "2025-06-24T17:38:46.944889",
+          "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+          "duration_seconds": 8e-06,
+          "initial_balance": 2.25,
+          "final_balance": 2.25,
+          "total_profit": 0.0,
+          "total_wagered": 0.0,
+          "roi": 0.0,
+          "bets_count": 0,
+          "wins_count": 0,
+          "losses_count": 0,
+          "win_rate": 0.0,
+          "max_consecutive_wins": 0,
+          "max_consecutive_losses": 0,
+          "max_drawdown": 0.0,
+          "sharpe_ratio": 0.0,
+          "peak_balance": 2.25,
+          "lowest_balance": 2.25,
+          "bets_per_minute": 0.0,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        }
+      ],
+      "simulation_metadata": {
+        "run_timestamp": "2025-06-24T17:38:46.944954",
+        "num_sessions_requested": 3,
+        "num_sessions_completed": 3,
+        "session_config": {},
+        "total_capital": 100.0
+      }
+    },
+    "Martingale": {
+      "simulation_summary": {
+        "total_sessions": 3,
+        "total_bets": 0,
+        "total_profit": 0.0,
+        "total_wagered": 0.0,
+        "overall_roi": 0.0,
+        "profitable_sessions": 0,
+        "profitability_rate": 0.0,
+        "average_win_rate": 0.0,
+        "average_session_duration": 8e-06,
+        "stop_reasons": {
+          "error: 'DiceGame' object has no attribute 'play_round'": 3
+        },
+        "average_max_drawdown": 0.0,
+        "worst_drawdown": 0.0,
+        "vault_status": {
+          "vault_balance": 85.0,
+          "bankroll_balance": 15.0,
+          "total_balance": 100.0,
+          "vault_ratio": 0.85,
+          "bankroll_ratio": 0.15,
+          "total_deposited": 100.0,
+          "total_withdrawn": 0.0,
+          "net_profit": 0.0
+        }
+      },
+      "strategy_info": {
+        "strategy_config": {
+          "strategy": "martingale",
+          "base_bet": "0.001"
+        },
+        "strategy_genome": {
+          "strategy_type": "Martingale",
+          "base_bet": "0.001",
+          "min_bet": "0.00015",
+          "max_bet": "1000",
+          "multiplier": 2.0,
+          "max_losses": 10,
+          "default_multiplier": 2.0,
+          "confidence": 1.0,
+          "fitness": 0.0,
+          "generation": 0,
+          "mutations": []
+        },
+        "strategy_fitness": 0.0,
+        "strategy_metrics": {
+          "total_bets": 0,
+          "win_rate": 0.0,
+          "roi": 0.0,
+          "max_bet_reached": 0.0,
+          "max_consecutive_losses": 0,
+          "average_confidence": 0.0,
+          "profit_factor": 0.0
+        }
+      },
+      "sessions_data": [
+        {
+          "session_id": "0d01f68e-046e-4eba-8d9a-888ba0eb8e5c",
+          "strategy_name": "Martingale",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:38:46.945019",
+          "ended_at": "2025-06-24T17:38:46.945029",
+          "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+          "duration_seconds": 1e-05,
+          "initial_balance": 2.25,
+          "final_balance": 2.25,
+          "total_profit": 0.0,
+          "total_wagered": 0.0,
+          "roi": 0.0,
+          "bets_count": 0,
+          "wins_count": 0,
+          "losses_count": 0,
+          "win_rate": 0.0,
+          "max_consecutive_wins": 0,
+          "max_consecutive_losses": 0,
+          "max_drawdown": 0.0,
+          "sharpe_ratio": 0.0,
+          "peak_balance": 2.25,
+          "lowest_balance": 2.25,
+          "bets_per_minute": 0.0,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        },
+        {
+          "session_id": "a10c3ecf-3c1e-44a8-b3df-58b5b4c8d58a",
+          "strategy_name": "Martingale",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:38:46.945048",
+          "ended_at": "2025-06-24T17:38:46.945055",
+          "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+          "duration_seconds": 7e-06,
+          "initial_balance": 2.25,
+          "final_balance": 2.25,
+          "total_profit": 0.0,
+          "total_wagered": 0.0,
+          "roi": 0.0,
+          "bets_count": 0,
+          "wins_count": 0,
+          "losses_count": 0,
+          "win_rate": 0.0,
+          "max_consecutive_wins": 0,
+          "max_consecutive_losses": 0,
+          "max_drawdown": 0.0,
+          "sharpe_ratio": 0.0,
+          "peak_balance": 2.25,
+          "lowest_balance": 2.25,
+          "bets_per_minute": 0.0,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        },
+        {
+          "session_id": "7bb9f0fa-768c-4455-805d-00ebeedbd4a6",
+          "strategy_name": "Martingale",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:38:46.945070",
+          "ended_at": "2025-06-24T17:38:46.945077",
+          "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+          "duration_seconds": 7e-06,
+          "initial_balance": 2.25,
+          "final_balance": 2.25,
+          "total_profit": 0.0,
+          "total_wagered": 0.0,
+          "roi": 0.0,
+          "bets_count": 0,
+          "wins_count": 0,
+          "losses_count": 0,
+          "win_rate": 0.0,
+          "max_consecutive_wins": 0,
+          "max_consecutive_losses": 0,
+          "max_drawdown": 0.0,
+          "sharpe_ratio": 0.0,
+          "peak_balance": 2.25,
+          "lowest_balance": 2.25,
+          "bets_per_minute": 0.0,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        }
+      ],
+      "simulation_metadata": {
+        "run_timestamp": "2025-06-24T17:38:46.945132",
+        "num_sessions_requested": 3,
+        "num_sessions_completed": 3,
+        "session_config": {},
+        "total_capital": 100.0
+      }
+    }
+  },
+  "metadata": {
+    "comparison_timestamp": "2025-06-24T17:38:46.945154",
+    "strategies_compared": 2,
+    "num_sessions_per_strategy": 3,
+    "session_config": {},
+    "total_capital": 100.0
+  }
+}

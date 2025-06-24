@@ -1,0 +1,16 @@
+# Changes here will be overwritten by Copier
+_commit: 4.0.1
+_src_path: gh:DiamondLightSource/python-copier-template
+author_email: shakatry@gmail.com
+author_name: ShakaTry
+description: Dice Bot Drived By AI
+distribution_name: DiceBot
+docker: false
+docs_type: README
+git_platform: github.com
+github_org: ShakaTry
+package_name: DiceBot
+pypi: false
+repo_name: DiceBot
+strict_typing: true
+type_checker: pyright

@@ -94,9 +94,7 @@ class CheckpointManager:
             with open(data_file, "rb") as f:
                 return pickle.load(f)
         except Exception as e:
-            progress_manager.print_error(
-                f"Failed to load checkpoint {simulation_id}: {e}"
-            )
+            progress_manager.print_error(f"Failed to load checkpoint {simulation_id}: {e}")
             return None
 
     def list_checkpoints(self) -> list[dict[str, Any]]:
@@ -114,16 +112,12 @@ class CheckpointManager:
 
                 # Add file info
                 summary["file_size"] = summary_file.stat().st_size
-                summary["file_age_hours"] = (
-                    time.time() - summary_file.stat().st_mtime
-                ) / 3600
+                summary["file_age_hours"] = (time.time() - summary_file.stat().st_mtime) / 3600
 
                 checkpoints.append(summary)
 
             except Exception as e:
-                progress_manager.print_warning(
-                    f"Failed to read checkpoint {summary_file}: {e}"
-                )
+                progress_manager.print_warning(f"Failed to read checkpoint {summary_file}: {e}")
 
         # Sort by timestamp (newest first)
         checkpoints.sort(key=lambda x: x["timestamp"], reverse=True)
@@ -175,9 +169,7 @@ class CheckpointManager:
                     cleaned_count += 1
 
         if cleaned_count > 0:
-            progress_manager.print_info(
-                f"Cleaned up {cleaned_count} old checkpoint files"
-            )
+            progress_manager.print_info(f"Cleaned up {cleaned_count} old checkpoint files")
 
     def get_recovery_suggestions(self) -> list[str]:
         """Get suggestions for recovery based on available checkpoints.
@@ -265,9 +257,7 @@ class AutoCheckpoint:
         self.completed_sessions.append(session)
 
         # Check if we need to checkpoint
-        if (
-            len(self.completed_sessions) - self.last_checkpoint_count
-        ) >= self.checkpoint_interval:
+        if (len(self.completed_sessions) - self.last_checkpoint_count) >= self.checkpoint_interval:
             remaining = max(0, self.total_sessions - len(self.completed_sessions))
 
             self.checkpoint_manager.create_checkpoint(
@@ -278,8 +268,7 @@ class AutoCheckpoint:
                 self.session_config,
                 {
                     "status": "in_progress",
-                    "progress": len(self.completed_sessions)
-                    / max(1, self.total_sessions),
+                    "progress": len(self.completed_sessions) / max(1, self.total_sessions),
                 },
             )
 

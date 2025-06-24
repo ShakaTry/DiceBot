@@ -26,9 +26,7 @@ class SessionState:
     end_time: datetime | None = None
     initial_bankroll: Decimal = Decimal("0")
     final_bankroll: Decimal | None = None
-    game_state: GameState = field(
-        default_factory=lambda: GameState(balance=Decimal("0"))
-    )
+    game_state: GameState = field(default_factory=lambda: GameState(balance=Decimal("0")))
     stop_reason: str | None = None
 
     @property
@@ -75,8 +73,7 @@ class Session:
         # Check stop loss
         current_balance = self.state.game_state.balance
         loss_ratio = float(
-            (current_balance - self.state.initial_bankroll)
-            / self.state.initial_bankroll
+            (current_balance - self.state.initial_bankroll) / self.state.initial_bankroll
         )
         if loss_ratio <= self.config.stop_loss:
             return True, f"Stop loss triggered ({loss_ratio:.2%})"
@@ -88,13 +85,11 @@ class Session:
         # Check consecutive losses
         if (
             self.config.max_consecutive_losses is not None
-            and self.state.game_state.consecutive_losses
-            >= self.config.max_consecutive_losses
+            and self.state.game_state.consecutive_losses >= self.config.max_consecutive_losses
         ):
             return (
                 True,
-                f"Max consecutive losses reached "
-                f"({self.state.game_state.consecutive_losses})",
+                f"Max consecutive losses reached ({self.state.game_state.consecutive_losses})",
             )
 
         # Check if bankroll is too low to bet
@@ -129,9 +124,7 @@ class Session:
             "session_id": self.state.session_id,
             "is_active": self.state.is_active,
             "start_time": self.state.start_time.isoformat(),
-            "end_time": (
-                self.state.end_time.isoformat() if self.state.end_time else None
-            ),
+            "end_time": (self.state.end_time.isoformat() if self.state.end_time else None),
             "duration": self.state.duration,
             "initial_bankroll": float(self.state.initial_bankroll),
             "final_bankroll": (
@@ -149,10 +142,7 @@ class Session:
             "max_balance": float(game_state.max_balance),
             "min_balance": float(game_state.min_balance),
             "max_drawdown": (
-                float(
-                    (game_state.max_balance - game_state.min_balance)
-                    / game_state.max_balance
-                )
+                float((game_state.max_balance - game_state.min_balance) / game_state.max_balance)
                 if game_state.max_balance > 0
                 else 0
             ),

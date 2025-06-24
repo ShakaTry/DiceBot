@@ -106,9 +106,7 @@ class TestParoliStrategy:
             assert bet == expected
 
             # Simuler un gain pour continuer la progression
-            result = BetResult(
-                roll=40.0, won=True, threshold=49.5, amount=bet, payout=bet * 2
-            )
+            result = BetResult(roll=40.0, won=True, threshold=49.5, amount=bet, payout=bet * 2)
             strategy.update_after_result(result)
 
     def test_get_info_methods(self):

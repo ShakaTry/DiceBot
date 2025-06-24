@@ -165,9 +165,7 @@ class ProvablyFairGenerator:
             True si le résultat est correct
         """
         message = f"{client_seed},{nonce}"
-        seed_hash = hmac.new(
-            server_seed.encode(), message.encode(), hashlib.sha512
-        ).hexdigest()
+        seed_hash = hmac.new(server_seed.encode(), message.encode(), hashlib.sha512).hexdigest()
 
         number = self._extract_valid_number(seed_hash)
         calculated_result = (number % 10000) / 100
@@ -227,9 +225,7 @@ class BitslerVerifier:
         """
         # Recalculer le résultat
         message = f"{client_seed},{nonce}"
-        seed_hash = hmac.new(
-            server_seed.encode(), message.encode(), hashlib.sha512
-        ).hexdigest()
+        seed_hash = hmac.new(server_seed.encode(), message.encode(), hashlib.sha512).hexdigest()
 
         # Extraire le nombre valide
         generator = ProvablyFairGenerator()

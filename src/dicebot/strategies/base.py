@@ -23,9 +23,7 @@ class StrategyConfig:
     # Paramètres OVER/UNDER
     default_bet_type: BetType = BetType.UNDER
     default_target: float = 50.0
-    allow_bet_type_switching: bool = (
-        False  # Permet aux stratégies de changer OVER/UNDER
-    )
+    allow_bet_type_switching: bool = False  # Permet aux stratégies de changer OVER/UNDER
     allow_target_adjustment: bool = False  # Permet aux stratégies d'ajuster le target
 
 
@@ -233,9 +231,7 @@ class BaseStrategy(ABC):
             return 0.0
 
         # Fitness basé sur plusieurs critères
-        roi_score = max(
-            0, min(1, (self.metrics.roi + 1) / 2)
-        )  # Normaliser ROI entre 0-1
+        roi_score = max(0, min(1, (self.metrics.roi + 1) / 2))  # Normaliser ROI entre 0-1
         win_rate_score = self.metrics.win_rate
         survival_score = 1.0 if self.metrics.total_bets > 0 else 0.0
 
@@ -244,10 +240,7 @@ class BaseStrategy(ABC):
 
         # Score composite
         fitness = (
-            roi_score * 0.4
-            + win_rate_score * 0.2
-            + survival_score * 0.2
-            + drawdown_penalty * 0.2
+            roi_score * 0.4 + win_rate_score * 0.2 + survival_score * 0.2 + drawdown_penalty * 0.2
         )
 
         return fitness
@@ -297,16 +290,12 @@ class BaseStrategy(ABC):
         if game_state.consecutive_wins >= 3:
             self.on_winning_streak(game_state.consecutive_wins, game_state)
             if game_state.consecutive_wins % 5 == 0:  # Tous les 5 gains
-                self.event_bus.emit(
-                    StreakEvent("win", game_state.consecutive_wins, game_state)
-                )
+                self.event_bus.emit(StreakEvent("win", game_state.consecutive_wins, game_state))
 
         if game_state.consecutive_losses >= 3:
             self.on_losing_streak(game_state.consecutive_losses, game_state)
             if game_state.consecutive_losses % 5 == 0:  # Toutes les 5 pertes
-                self.event_bus.emit(
-                    StreakEvent("loss", game_state.consecutive_losses, game_state)
-                )
+                self.event_bus.emit(StreakEvent("loss", game_state.consecutive_losses, game_state))
 
     def _update_confidence(self, game_state: GameState) -> None:
         """Met à jour le niveau de confiance basé sur les performances récentes."""
@@ -370,8 +359,4 @@ class StrategyMetrics:
         loss_ratio = Decimal(str(self.total_losses)) / Decimal(str(self.total_bets))
         total_win_amount = self.total_profit + self.total_wagered * loss_ratio
         total_loss_amount = self.total_wagered * loss_ratio
-        return (
-            float(total_win_amount / total_loss_amount)
-            if total_loss_amount > 0
-            else 0.0
-        )
+        return float(total_win_amount / total_loss_amount) if total_loss_amount > 0 else 0.0

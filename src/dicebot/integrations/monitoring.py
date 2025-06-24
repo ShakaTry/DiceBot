@@ -96,9 +96,7 @@ class PerformanceMonitor:
             session_state: Session to monitor
         """
         self.session_stats[session_state.session_id] = session_state
-        self.logger.info(
-            f"Registered session for monitoring: {session_state.session_id}"
-        )
+        self.logger.info(f"Registered session for monitoring: {session_state.session_id}")
 
     def update_session(self, session_state: SessionState) -> None:
         """Update session state and check for alerts.
@@ -125,13 +123,9 @@ class PerformanceMonitor:
             # CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
             if cpu_percent >= self.thresholds["cpu_critical"]:
-                self._send_alert(
-                    "error", f"Critical CPU usage: {cpu_percent:.1f}%", "critical"
-                )
+                self._send_alert("error", f"Critical CPU usage: {cpu_percent:.1f}%", "critical")
             elif cpu_percent >= self.thresholds["cpu_warning"]:
-                self._send_alert(
-                    "warning", f"High CPU usage: {cpu_percent:.1f}%", "warning"
-                )
+                self._send_alert("warning", f"High CPU usage: {cpu_percent:.1f}%", "warning")
 
             # Memory usage
             memory = psutil.virtual_memory()
@@ -140,20 +134,14 @@ class PerformanceMonitor:
                     "error", f"Critical memory usage: {memory.percent:.1f}%", "critical"
                 )
             elif memory.percent >= self.thresholds["memory_warning"]:
-                self._send_alert(
-                    "warning", f"High memory usage: {memory.percent:.1f}%", "warning"
-                )
+                self._send_alert("warning", f"High memory usage: {memory.percent:.1f}%", "warning")
 
             # Disk usage
             disk = psutil.disk_usage("/")
             if disk.percent >= self.thresholds["disk_critical"]:
-                self._send_alert(
-                    "error", f"Critical disk usage: {disk.percent:.1f}%", "critical"
-                )
+                self._send_alert("error", f"Critical disk usage: {disk.percent:.1f}%", "critical")
             elif disk.percent >= self.thresholds["disk_warning"]:
-                self._send_alert(
-                    "warning", f"High disk usage: {disk.percent:.1f}%", "warning"
-                )
+                self._send_alert("warning", f"High disk usage: {disk.percent:.1f}%", "warning")
 
             # Store performance data
             self.performance_history.append(
@@ -274,8 +262,7 @@ class PerformanceMonitor:
             # Session stats
             active_sessions = len(self.session_stats)
             total_profit = sum(
-                float(session.game_state.total_profit)
-                for session in self.session_stats.values()
+                float(session.game_state.total_profit) for session in self.session_stats.values()
             )
 
             # Recent alerts

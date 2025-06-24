@@ -99,7 +99,7 @@ commands =
 
 [tool.ruff]
 src = ["src", "tests"]
-line-length = 88
+line-length = 100
 lint.select = [
     "B",   # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
     "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
@@ -115,4 +115,8 @@ lint.select = [
 # By default, private member access is allowed in tests
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
 # Remove this line to forbid private member access in tests
-"tests/**/*" = ["SLF001"]
+"tests/**/*" = ["SLF001", "E501"]  # Allow long lines in tests
+# Allow long lines in integration modules for alert messages and API calls
+"src/dicebot/integrations/*" = ["E501"]
+# Allow long lines in CLI module for help strings and messages
+"src/DiceBot/__main__.py" = ["E501"]

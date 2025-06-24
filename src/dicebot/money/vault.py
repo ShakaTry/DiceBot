@@ -74,9 +74,7 @@ class Vault:
             raise ValueError("Transfer amount must be positive")
 
         if amount > self.state.bankroll_balance:
-            raise ValueError(
-                f"Insufficient bankroll balance: {self.state.bankroll_balance}"
-            )
+            raise ValueError(f"Insufficient bankroll balance: {self.state.bankroll_balance}")
 
         self.state.bankroll_balance -= amount
         self.state.vault_balance += amount
@@ -94,9 +92,7 @@ class Vault:
 
         return session_amount
 
-    def return_session_profit(
-        self, initial_amount: Decimal, final_amount: Decimal
-    ) -> None:
+    def return_session_profit(self, initial_amount: Decimal, final_amount: Decimal) -> None:
         profit = final_amount - initial_amount
 
         if profit > 0:
@@ -148,8 +144,6 @@ class Vault:
             "total_deposited": float(self.state.total_deposited),
             "total_withdrawn": float(self.state.total_withdrawn),
             "net_profit": float(
-                self.state.total_balance
-                - self.state.total_deposited
-                + self.state.total_withdrawn
+                self.state.total_balance - self.state.total_deposited + self.state.total_withdrawn
             ),
         }

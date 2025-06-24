@@ -34,9 +34,7 @@ class LogType:
     ANALYSIS_VALIDATION = "analysis_validation"
 
 
-def get_log_path(
-    base_dir: str | Path, filename: str, log_type: str | None = None
-) -> Path:
+def get_log_path(base_dir: str | Path, filename: str, log_type: str | None = None) -> Path:
     """
     Determine the appropriate log path based on filename and log type.
 
@@ -239,9 +237,7 @@ class JSONLinesLogger:
                 "threshold": result.threshold,
                 "amount": str(result.amount),
                 "payout": str(result.payout),
-                "profit": str(
-                    result.payout - result.amount if result.won else -result.amount
-                ),
+                "profit": str(result.payout - result.amount if result.won else -result.amount),
                 "bet_type": result.bet_type.value if result.bet_type else None,
                 "target": result.target,
                 "multiplier": result.multiplier,
@@ -286,9 +282,7 @@ class JSONLinesLogger:
             "strategy_name": session_state.strategy_name,
             "initial_balance": str(session_state.game_state.session_start_balance),
             "session_config": {
-                "stop_loss": str(session_state.stop_loss)
-                if session_state.stop_loss
-                else None,
+                "stop_loss": str(session_state.stop_loss) if session_state.stop_loss else None,
                 "take_profit": str(session_state.take_profit)
                 if session_state.take_profit
                 else None,
@@ -325,9 +319,7 @@ class JSONLinesLogger:
                 "losses_count": session_state.game_state.losses_count,
                 "win_rate": session_state.game_state.win_rate,
                 "max_consecutive_wins": session_state.game_state.max_consecutive_wins,
-                "max_consecutive_losses": (
-                    session_state.game_state.max_consecutive_losses
-                ),
+                "max_consecutive_losses": (session_state.game_state.max_consecutive_losses),
                 "max_drawdown": str(session_state.game_state.max_drawdown),
                 "sharpe_ratio": session_state.game_state.sharpe_ratio,
                 "peak_balance": str(session_state.peak_balance),
@@ -582,12 +574,8 @@ class LogAnalyzer:
             return {"error": "No events found for session"}
 
         bet_results = [e for e in events if e.get("event_type") == "bet_result"]
-        session_start = next(
-            (e for e in events if e.get("event_type") == "session_start"), None
-        )
-        session_end = next(
-            (e for e in events if e.get("event_type") == "session_end"), None
-        )
+        session_start = next((e for e in events if e.get("event_type") == "session_start"), None)
+        session_end = next((e for e in events if e.get("event_type") == "session_end"), None)
 
         if not bet_results:
             return {"error": "No bet results found for session"}

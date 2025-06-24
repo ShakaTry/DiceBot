@@ -93,10 +93,7 @@ class ParkingStrategy(BaseStrategy):
     def should_rotate_seed(self, game_state: GameState, current_nonce: int) -> bool:
         """Détermine si on doit faire une rotation de seed."""
         # Rotation préventive
-        if (
-            current_nonce - self.last_seed_rotation_nonce
-            >= self.config.auto_seed_rotation_after
-        ):
+        if current_nonce - self.last_seed_rotation_nonce >= self.config.auto_seed_rotation_after:
             return True
 
         # Rotation sur pertes importantes
@@ -163,9 +160,7 @@ class ParkingStrategy(BaseStrategy):
                 game_state.bet_type_toggles += 1
                 # Toggle le type actuel
                 new_type = (
-                    BetType.OVER
-                    if game_state.current_bet_type == BetType.UNDER
-                    else BetType.UNDER
+                    BetType.OVER if game_state.current_bet_type == BetType.UNDER else BetType.UNDER
                 )
                 return BetDecision(
                     amount=Decimal("0"),
@@ -173,10 +168,7 @@ class ParkingStrategy(BaseStrategy):
                     bet_type=new_type,
                     skip=True,
                     action="toggle_bet_type",
-                    reason=(
-                        f"Toggle {self.toggles_count}/"
-                        f"{self.config.max_toggles_before_bet}"
-                    ),
+                    reason=(f"Toggle {self.toggles_count}/{self.config.max_toggles_before_bet}"),
                 )
 
             # Option 3: Pari parking forcé
@@ -209,10 +201,7 @@ class ParkingStrategy(BaseStrategy):
     def _update_strategy_state(self, result: BetResult) -> None:
         """Met à jour l'état après un résultat."""
         # Tracker les pertes de parking
-        if (
-            hasattr(result, "metadata")
-            and result.metadata.get("action") == "forced_parking_bet"
-        ):
+        if hasattr(result, "metadata") and result.metadata.get("action") == "forced_parking_bet":
             if not result.won:
                 # Ajouter aux pertes de parking dans GameState
                 # (nécessite accès au GameState, à implémenter dans l'intégration)

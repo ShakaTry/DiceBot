@@ -73,20 +73,12 @@ class CompositeStrategy(BaseStrategy):
     def select_bet_type(self, game_state: GameState) -> BetType:
         """Sélectionne le type de pari en combinant les stratégies."""
         combined_decision = self._get_combined_decision(game_state)
-        return (
-            combined_decision.bet_type
-            if combined_decision
-            else self.config.default_bet_type
-        )
+        return combined_decision.bet_type if combined_decision else self.config.default_bet_type
 
     def select_target(self, game_state: GameState) -> float:
         """Sélectionne le target en combinant les stratégies."""
         combined_decision = self._get_combined_decision(game_state)
-        return (
-            combined_decision.target
-            if combined_decision
-            else self.config.default_target
-        )
+        return combined_decision.target if combined_decision else self.config.default_target
 
     def _get_combined_decision(self, game_state: GameState) -> BetDecision | None:
         """Obtient la décision combinée de toutes les stratégies."""
@@ -153,9 +145,7 @@ class CompositeStrategy(BaseStrategy):
         self.confidence = 1.0
 
     # Modes de combinaison complets (OVER/UNDER)
-    def _average_mode_full(
-        self, decisions: list[tuple[BaseStrategy, BetDecision]]
-    ) -> BetDecision:
+    def _average_mode_full(self, decisions: list[tuple[BaseStrategy, BetDecision]]) -> BetDecision:
         """Calcule la moyenne des décisions."""
         # Moyenne des montants
         avg_amount = sum(decision.amount for _, decision in decisions) / len(decisions)
@@ -168,9 +158,7 @@ class CompositeStrategy(BaseStrategy):
         majority_type = Counter(bet_types).most_common(1)[0][0]
 
         # Confiance moyenne
-        avg_confidence = sum(decision.confidence for _, decision in decisions) / len(
-            decisions
-        )
+        avg_confidence = sum(decision.confidence for _, decision in decisions) / len(decisions)
 
         return BetDecision(
             amount=avg_amount,
@@ -181,9 +169,7 @@ class CompositeStrategy(BaseStrategy):
         )
 
     # Méthodes legacy pour compatibilité
-    def _average_mode(
-        self, decisions: list[tuple[BaseStrategy, BetDecision]]
-    ) -> Decimal:
+    def _average_mode(self, decisions: list[tuple[BaseStrategy, BetDecision]]) -> Decimal:
         """Calcule la moyenne simple des mises (legacy)."""
         total = sum(decision.amount for _, decision in decisions)
         return total / len(decisions)
@@ -197,8 +183,7 @@ class CompositeStrategy(BaseStrategy):
 
         # Montant pondéré
         weighted_amount = sum(
-            decision.amount * Decimal(str(decision.confidence))
-            for _, decision in decisions
+            decision.amount * Decimal(str(decision.confidence)) for _, decision in decisions
         ) / Decimal(str(total_confidence))
 
         # Target pondéré
@@ -232,8 +217,7 @@ class CompositeStrategy(BaseStrategy):
             return self._average_mode(decisions)
 
         weighted_sum = sum(
-            decision.amount * Decimal(str(decision.confidence))
-            for _, decision in decisions
+            decision.amount * Decimal(str(decision.confidence)) for _, decision in decisions
         )
         return weighted_sum / Decimal(str(total_confidence))
 
@@ -242,9 +226,7 @@ class CompositeStrategy(BaseStrategy):
     ) -> BetDecision:
         """Requiert qu'une majorité de stratégies soient d'accord (version complète)."""
         if not decisions:
-            return BetDecision(
-                amount=Decimal("0"), skip=True, reason="No valid decisions"
-            )
+            return BetDecision(amount=Decimal("0"), skip=True, reason="No valid decisions")
 
         # Analyser les types de pari
         bet_types = [d.bet_type for _, d in decisions]
@@ -261,9 +243,7 @@ class CompositeStrategy(BaseStrategy):
             )
 
         # Filtrer les décisions du type consensuel
-        consensus_decisions = [
-            (s, d) for s, d in decisions if d.bet_type == type_consensus[0]
-        ]
+        consensus_decisions = [(s, d) for s, d in decisions if d.bet_type == type_consensus[0]]
 
         # Analyser les montants (logique existante)
         groups = {}
@@ -287,9 +267,7 @@ class CompositeStrategy(BaseStrategy):
             # Calculer la moyenne du groupe consensuel
             avg_amount = sum(d.amount for _, d in largest_group) / len(largest_group)
             avg_target = sum(d.target for _, d in largest_group) / len(largest_group)
-            avg_confidence = sum(d.confidence for _, d in largest_group) / len(
-                largest_group
-            )
+            avg_confidence = sum(d.confidence for _, d in largest_group) / len(largest_group)
 
             return BetDecision(
                 amount=avg_amount,
@@ -348,9 +326,7 @@ class CompositeStrategy(BaseStrategy):
         _, max_decision = max(decisions, key=lambda x: x[1].amount)
         return max_decision
 
-    def _aggressive_mode(
-        self, decisions: list[tuple[BaseStrategy, BetDecision]]
-    ) -> Decimal:
+    def _aggressive_mode(self, decisions: list[tuple[BaseStrategy, BetDecision]]) -> Decimal:
         """Prend la mise la plus élevée (legacy)."""
         return max(decision.amount for _, decision in decisions)
 
@@ -362,9 +338,7 @@ class CompositeStrategy(BaseStrategy):
         _, min_decision = min(decisions, key=lambda x: x[1].amount)
         return min_decision
 
-    def _conservative_mode(
-        self, decisions: list[tuple[BaseStrategy, BetDecision]]
-    ) -> Decimal:
+    def _conservative_mode(self, decisions: list[tuple[BaseStrategy, BetDecision]]) -> Decimal:
         """Prend la mise la plus faible (legacy)."""
         return min(decision.amount for _, decision in decisions)
 

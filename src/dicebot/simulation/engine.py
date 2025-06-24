@@ -101,8 +101,7 @@ class SimulationEngine:
                 # Check duration limit
                 if (
                     max_duration
-                    and session_state.game_state.session_duration
-                    > max_duration.total_seconds()
+                    and session_state.game_state.session_duration > max_duration.total_seconds()
                 ):
                     session_state.end_session("max_duration")
                     break
@@ -136,15 +135,11 @@ class SimulationEngine:
                                 strategy.get_name(),
                                 session_id,
                                 {
-                                    "old_nonce": game_state.metadata.get(
-                                        "current_nonce", 0
-                                    ),
+                                    "old_nonce": game_state.metadata.get("current_nonce", 0),
                                     "new_server_seed_hash": (
                                         self.dice_game.provably_fair.current_seeds.server_seed_hash
                                     ),
-                                    "seed_rotations_count": (
-                                        game_state.seed_rotations_count
-                                    ),
+                                    "seed_rotations_count": (game_state.seed_rotations_count),
                                 },
                             )
 
@@ -185,9 +180,7 @@ class SimulationEngine:
                                     "reason": "forced_parking_bet",
                                     "amount": str(decision.amount),
                                     "target": strategy.select_target(game_state),
-                                    "bet_type": strategy.select_bet_type(
-                                        game_state
-                                    ).value,
+                                    "bet_type": strategy.select_bet_type(game_state).value,
                                 },
                             )
                         pass
@@ -218,9 +211,7 @@ class SimulationEngine:
 
                 # Log bet result if logger is available
                 if self.logger:
-                    self.logger.log_bet_result(
-                        result, game_state, strategy.get_name(), session_id
-                    )
+                    self.logger.log_bet_result(result, game_state, strategy.get_name(), session_id)
 
         except Exception as e:
             session_state.end_session(f"error: {str(e)}")
@@ -230,9 +221,7 @@ class SimulationEngine:
             session_state.end_session("completed")
 
         # Update vault with results
-        self.vault.return_session_profit(
-            initial_balance, session_state.game_state.balance
-        )
+        self.vault.return_session_profit(initial_balance, session_state.game_state.balance)
 
         # Log session end if logger is available
         if self.logger:
@@ -364,9 +353,7 @@ class SimulationEngine:
         total_profit = sum(s.game_state.total_profit for s in self.session_history)
         total_wagered = sum(s.game_state.total_wagered for s in self.session_history)
 
-        profitable_sessions = sum(
-            1 for s in self.session_history if s.game_state.total_profit > 0
-        )
+        profitable_sessions = sum(1 for s in self.session_history if s.game_state.total_profit > 0)
         avg_session_duration = (
             sum(s.total_session_time for s in self.session_history) / total_sessions
         )
@@ -378,9 +365,7 @@ class SimulationEngine:
             stop_reasons[reason] = stop_reasons.get(reason, 0) + 1
 
         # Calculate win rates and ROI
-        win_rate = (
-            sum(s.game_state.win_rate for s in self.session_history) / total_sessions
-        )
+        win_rate = sum(s.game_state.win_rate for s in self.session_history) / total_sessions
         overall_roi = float(total_profit / total_wagered) if total_wagered > 0 else 0.0
 
         # Drawdown analysis
@@ -458,9 +443,7 @@ class SimulationEngine:
                 "lowest_balance": float(session.lowest_balance),
                 "bets_per_minute": session.game_state.bets_per_minute,
                 "stop_loss": float(session.stop_loss) if session.stop_loss else None,
-                "take_profit": float(session.take_profit)
-                if session.take_profit
-                else None,
+                "take_profit": float(session.take_profit) if session.take_profit else None,
                 "max_bets": session.max_bets,
             }
             data.append(session_data)

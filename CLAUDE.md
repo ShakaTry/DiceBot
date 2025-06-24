@@ -297,6 +297,18 @@ pre-commit run --all-files
 pre-commit run --all-files
 ```
 
+### 🔧 Correction Automatique des Erreurs de Linting
+```bash
+# Script de correction automatique développé pour éviter les erreurs récurrentes
+python scripts/fix_lint.py
+
+# Configuration ruff mise à jour :
+# - Longueur de ligne augmentée à 100 caractères
+# - Exclusions E501 pour les modules d'intégration et CLI
+# - Corrections automatiques avec --unsafe-fixes
+# - Pre-commit hooks optimisés
+```
+
 ### Building & Running
 ```bash
 # Commandes CLI disponibles

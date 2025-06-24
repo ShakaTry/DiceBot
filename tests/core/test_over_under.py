@@ -212,9 +212,7 @@ class TestStrategyOverUnder:
         strategy2 = StrategyFactory.create("flat", config2)
 
         # Stratégie composite en mode majorité
-        composite_config = CompositeConfig(
-            base_bet=Decimal("1"), mode=CombinationMode.AVERAGE
-        )
+        composite_config = CompositeConfig(base_bet=Decimal("1"), mode=CombinationMode.AVERAGE)
         composite = CompositeStrategy(composite_config, [strategy1, strategy2])
 
         game_state = GameState(balance=Decimal("100"))

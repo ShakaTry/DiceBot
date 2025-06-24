@@ -31,9 +31,7 @@ class VaultConfig:
 
     @property
     def vault_amount(self) -> Decimal:
-        return (self.total_capital * Decimal(str(self.vault_ratio))).quantize(
-            Decimal("0.00")
-        )
+        return (self.total_capital * Decimal(str(self.vault_ratio))).quantize(Decimal("0.00"))
 
     @property
     def bankroll_amount(self) -> Decimal:
@@ -155,9 +153,7 @@ class GameState:
             self.balance += result.payout - result.amount
             self.total_profit += result.payout - result.amount
             # Mettre à jour le max de gains consécutifs
-            self.max_consecutive_wins = max(
-                self.max_consecutive_wins, self.consecutive_wins
-            )
+            self.max_consecutive_wins = max(self.max_consecutive_wins, self.consecutive_wins)
         else:
             self.losses_count += 1
             self.consecutive_losses += 1
@@ -165,9 +161,7 @@ class GameState:
             self.balance -= result.amount
             self.total_profit -= result.amount
             # Mettre à jour le max de pertes consécutives
-            self.max_consecutive_losses = max(
-                self.max_consecutive_losses, self.consecutive_losses
-            )
+            self.max_consecutive_losses = max(self.max_consecutive_losses, self.consecutive_losses)
 
         # Mettre à jour les balances min/max
         self.max_balance = max(self.max_balance, self.balance)
@@ -296,9 +290,7 @@ class SessionState:
     def should_stop(self) -> tuple[bool, str | None]:
         """Vérifie si la session doit s'arrêter."""
         # Stop loss
-        if self.stop_loss and self.game_state.session_roi <= -abs(
-            float(self.stop_loss)
-        ):
+        if self.stop_loss and self.game_state.session_roi <= -abs(float(self.stop_loss)):
             return True, "stop_loss"
 
         # Take profit

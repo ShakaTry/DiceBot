@@ -27,8 +27,7 @@ class TestSimulationEngine:
         assert self.engine.dice_game is not None
         # En mode provably fair, rng est None mais provably_fair est utilisé
         assert (
-            self.engine.dice_game.provably_fair is not None
-            or self.engine.dice_game.rng is not None
+            self.engine.dice_game.provably_fair is not None or self.engine.dice_game.rng is not None
         )
 
     def test_run_session_basic(self):
@@ -37,9 +36,7 @@ class TestSimulationEngine:
 
         result = self.engine.run_session(self.strategy, session_config=session_config)
 
-        assert result.game_state.balance <= Decimal(
-            "10"
-        )  # Balance finale <= balance initial
+        assert result.game_state.balance <= Decimal("10")  # Balance finale <= balance initial
         assert result.game_state.bets_count <= 5
         assert result.game_state.bets_count > 0
         assert isinstance(result.game_state.balance, Decimal)
@@ -108,9 +105,7 @@ class TestSimulationEngine:
 
         assert len(results) == 3
         for result in results:
-            assert abs(result.game_state.balance - Decimal("10")) <= Decimal(
-                "10"
-            )  # Started at 10
+            assert abs(result.game_state.balance - Decimal("10")) <= Decimal("10")  # Started at 10
             assert result.game_state.bets_count <= 5
 
     def test_run_multiple_sessions_parallel(self):
@@ -125,9 +120,7 @@ class TestSimulationEngine:
 
         assert len(results) == 4
         for result in results:
-            assert abs(result.game_state.balance - Decimal("10")) <= Decimal(
-                "10"
-            )  # Started at 10
+            assert abs(result.game_state.balance - Decimal("10")) <= Decimal("10")  # Started at 10
             assert result.game_state.bets_count <= 5
 
     def test_run_multiple_sessions_strategy_reset(self):
@@ -135,9 +128,7 @@ class TestSimulationEngine:
         # Utiliser Martingale pour voir l'effet de reset
         from dicebot.strategies import MartingaleStrategy
 
-        martingale = MartingaleStrategy(
-            StrategyConfig(base_bet=Decimal("0.001"), max_losses=5)
-        )
+        martingale = MartingaleStrategy(StrategyConfig(base_bet=Decimal("0.001"), max_losses=5))
 
         results = self.engine.run_multiple_sessions(
             martingale,
@@ -153,9 +144,7 @@ class TestSimulationEngine:
         """Test sans réinitialisation de stratégie entre sessions."""
         from dicebot.strategies import MartingaleStrategy
 
-        martingale = MartingaleStrategy(
-            StrategyConfig(base_bet=Decimal("0.001"), max_losses=5)
-        )
+        martingale = MartingaleStrategy(StrategyConfig(base_bet=Decimal("0.001"), max_losses=5))
 
         results = self.engine.run_multiple_sessions(
             martingale,

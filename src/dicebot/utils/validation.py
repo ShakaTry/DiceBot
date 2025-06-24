@@ -111,9 +111,7 @@ class ParameterValidator:
         if capital_ratio > 0.1:  # More than 10% of capital
             warnings.append(f"base_bet is {capital_ratio:.1%} of capital - very risky")
             safer_bet = capital * Decimal("0.01")  # 1% of capital
-            suggestions.append(
-                f"Consider reducing base_bet to {safer_bet:.6f} LTC (1% of capital)"
-            )
+            suggestions.append(f"Consider reducing base_bet to {safer_bet:.6f} LTC (1% of capital)")
 
         # Validate max_losses
         max_losses = strategy_config.get("max_losses", 10)
@@ -133,19 +131,13 @@ class ParameterValidator:
                     f"Martingale strategy would require {max_possible_bet:.6f} LTC "
                     f"but capital is only {capital:.6f} LTC"
                 )
-                suggested_max_losses = (
-                    ParameterValidator._suggest_martingale_max_losses(
-                        base_bet, capital, strategy_config.get("multiplier", 2.0)
-                    )
+                suggested_max_losses = ParameterValidator._suggest_martingale_max_losses(
+                    base_bet, capital, strategy_config.get("multiplier", 2.0)
                 )
-                suggestions.append(
-                    f"Reduce max_losses to {suggested_max_losses} or less"
-                )
+                suggestions.append(f"Reduce max_losses to {suggested_max_losses} or less")
 
         elif strategy_name == "fibonacci":
-            max_fib_bet = ParameterValidator._calculate_fibonacci_max_bet(
-                base_bet, max_losses
-            )
+            max_fib_bet = ParameterValidator._calculate_fibonacci_max_bet(base_bet, max_losses)
             if max_fib_bet > capital * Decimal("0.5"):  # More than 50% of capital
                 warnings.append(
                     f"Fibonacci sequence could reach {max_fib_bet:.6f} LTC "
@@ -189,9 +181,7 @@ class ParameterValidator:
             stop_loss = session_config["stop_loss"]
             if isinstance(stop_loss, int | float):
                 if stop_loss >= 0:
-                    warnings.append(
-                        "stop_loss should be negative (e.g., -0.1 for -10%)"
-                    )
+                    warnings.append("stop_loss should be negative (e.g., -0.1 for -10%)")
                 if stop_loss < -0.5:
                     warnings.append("stop_loss is very strict (< -50%)")
 
@@ -200,9 +190,7 @@ class ParameterValidator:
             take_profit = session_config["take_profit"]
             if isinstance(take_profit, int | float):
                 if take_profit <= 0:
-                    warnings.append(
-                        "take_profit should be positive (e.g., 0.2 for 20%)"
-                    )
+                    warnings.append("take_profit should be positive (e.g., 0.2 for 20%)")
                 if take_profit > 2.0:
                     warnings.append("take_profit is very optimistic (> 200%)")
 
@@ -363,9 +351,7 @@ def validate_and_suggest(
     """
     try:
         # Validate strategy config
-        strategy_results = ParameterValidator.validate_strategy_config(
-            strategy_config, capital
-        )
+        strategy_results = ParameterValidator.validate_strategy_config(strategy_config, capital)
 
         # Validate session config
         session_results = {"warnings": [], "suggestions": []}
@@ -380,9 +366,7 @@ def validate_and_suggest(
                 progress_manager.print_warning(warning)
 
             # Show suggestions
-            all_suggestions = (
-                strategy_results["suggestions"] + session_results["suggestions"]
-            )
+            all_suggestions = strategy_results["suggestions"] + session_results["suggestions"]
             for suggestion in all_suggestions:
                 progress_manager.print_info(f"💡 {suggestion}")
 

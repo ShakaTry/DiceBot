@@ -239,9 +239,7 @@ class SimulationRunner:
                 strategy_summaries[strategy_name] = results["simulation_summary"]
 
             except Exception as e:
-                print(
-                    f"Error running strategy {config.get('strategy', 'unknown')}: {e}"
-                )
+                print(f"Error running strategy {config.get('strategy', 'unknown')}: {e}")
                 continue
 
         # Generate comparison analysis
@@ -328,9 +326,7 @@ class SimulationRunner:
                 sweep_results.append(sweep_result)
 
                 # Progress indicator
-                print(
-                    f"Completed parameter combination {i + 1}/{len(param_combinations)}"
-                )
+                print(f"Completed parameter combination {i + 1}/{len(param_combinations)}")
 
             except Exception as e:
                 print(f"Error with parameter combination {params}: {e}")
@@ -338,16 +334,12 @@ class SimulationRunner:
 
         # Analyze results
         best_result = (
-            max(sweep_results, key=lambda x: x["strategy_fitness"])
-            if sweep_results
-            else None
+            max(sweep_results, key=lambda x: x["strategy_fitness"]) if sweep_results else None
         )
 
         final_results = {
             "sweep_results": sweep_results,
-            "best_parameters": best_result["parameter_combination"]
-            if best_result
-            else None,
+            "best_parameters": best_result["parameter_combination"] if best_result else None,
             "best_performance": best_result if best_result else None,
             "parameter_ranges": parameter_ranges,
             "metadata": {
@@ -364,18 +356,14 @@ class SimulationRunner:
 
         return final_results
 
-    def _analyze_strategy_comparison(
-        self, summaries: dict[str, dict]
-    ) -> dict[str, Any]:
+    def _analyze_strategy_comparison(self, summaries: dict[str, dict]) -> dict[str, Any]:
         """Analyze comparison results between strategies."""
         if not summaries:
             return {}
 
         # Ranking by different metrics
         rankings = {
-            "by_roi": sorted(
-                summaries.items(), key=lambda x: x[1]["overall_roi"], reverse=True
-            ),
+            "by_roi": sorted(summaries.items(), key=lambda x: x[1]["overall_roi"], reverse=True),
             "by_profitability_rate": sorted(
                 summaries.items(),
                 key=lambda x: x[1]["profitability_rate"],
@@ -415,9 +403,7 @@ class SimulationRunner:
         # Best overall performer
         if rankings["by_roi"]:
             best_roi = rankings["by_roi"][0]
-            recommendations.append(
-                f"Best ROI: {best_roi[0]} ({best_roi[1]['overall_roi']:.2%})"
-            )
+            recommendations.append(f"Best ROI: {best_roi[0]} ({best_roi[1]['overall_roi']:.2%})")
 
         # Most consistent
         if rankings["by_profitability_rate"]:
@@ -431,15 +417,12 @@ class SimulationRunner:
         if rankings["by_drawdown"]:
             lowest_dd = rankings["by_drawdown"][0]
             recommendations.append(
-                f"Lowest risk: {lowest_dd[0]} "
-                f"({lowest_dd[1]['worst_drawdown']:.1%} max drawdown)"
+                f"Lowest risk: {lowest_dd[0]} ({lowest_dd[1]['worst_drawdown']:.1%} max drawdown)"
             )
 
         return recommendations
 
-    def _generate_parameter_combinations(
-        self, parameter_ranges: dict[str, list]
-    ) -> list[dict]:
+    def _generate_parameter_combinations(self, parameter_ranges: dict[str, list]) -> list[dict]:
         """Generate all combinations of parameters."""
         import itertools
 

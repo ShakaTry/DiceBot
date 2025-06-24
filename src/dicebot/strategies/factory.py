@@ -43,9 +43,7 @@ class StrategyFactory:
         """
         if name not in cls._strategies:
             available = ", ".join(cls._strategies.keys())
-            raise ValueError(
-                f"Unknown strategy: '{name}'. Available strategies: {available}"
-            )
+            raise ValueError(f"Unknown strategy: '{name}'. Available strategies: {available}")
 
         # Valider la configuration
         cls._validate_config(config, name)
@@ -63,9 +61,7 @@ class StrategyFactory:
         if name == "composite" and "strategies" in kwargs:
             strategies = kwargs["strategies"]
             if not isinstance(strategies, list) or not strategies:
-                raise ValueError(
-                    "composite strategy requires a non-empty list of strategies"
-                )
+                raise ValueError("composite strategy requires a non-empty list of strategies")
             return strategy_class(config, strategies)
 
         # AdaptiveStrategy a déjà sa configuration spécialisée
@@ -270,9 +266,7 @@ class StrategyFactory:
         # Créer les sous-stratégies
         sub_strategies = []
         for strategy_name, strategy_config in strategies:
-            sub_strategy = cls.create_from_dict(
-                {"strategy": strategy_name, **strategy_config}
-            )
+            sub_strategy = cls.create_from_dict({"strategy": strategy_name, **strategy_config})
             sub_strategies.append(sub_strategy)
 
         # Configurer la stratégie composite
@@ -287,9 +281,7 @@ class StrategyFactory:
             mode_enum = CombinationMode[mode.upper()]
         except KeyError:
             available_modes = ", ".join([m.name.lower() for m in CombinationMode])
-            raise ValueError(
-                f"Invalid mode '{mode}'. Available modes: {available_modes}"
-            )
+            raise ValueError(f"Invalid mode '{mode}'. Available modes: {available_modes}")
 
         composite_config["mode"] = mode_enum
 

@@ -77,9 +77,7 @@ class SlackServer:
                 # Handle command
                 self._handle_command(command, text, channel_id, user_id)
 
-                return jsonify(
-                    {"response_type": "in_channel", "text": "Command received!"}
-                )
+                return jsonify({"response_type": "in_channel", "text": "Command received!"})
 
             except Exception as e:
                 self.logger.error(f"Commands endpoint error: {e}")

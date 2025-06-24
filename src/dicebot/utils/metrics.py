@@ -97,9 +97,7 @@ class PerformanceMetrics:
         return annualized_return / max_drawdown
 
     @staticmethod
-    def calculate_value_at_risk(
-        returns: list[float], confidence_level: float = 0.05
-    ) -> float:
+    def calculate_value_at_risk(returns: list[float], confidence_level: float = 0.05) -> float:
         """Calculate Value at Risk (VaR).
 
         Args:
@@ -115,9 +113,7 @@ class PerformanceMetrics:
         return np.percentile(returns, confidence_level * 100)
 
     @staticmethod
-    def calculate_expected_shortfall(
-        returns: list[float], confidence_level: float = 0.05
-    ) -> float:
+    def calculate_expected_shortfall(returns: list[float], confidence_level: float = 0.05) -> float:
         """Calculate Expected Shortfall (Conditional VaR).
 
         Args:
@@ -325,12 +321,8 @@ class SessionAnalyzer:
             len(returns),
         )
         var_95 = PerformanceMetrics.calculate_value_at_risk(returns, 0.05)
-        expected_shortfall = PerformanceMetrics.calculate_expected_shortfall(
-            returns, 0.05
-        )
-        profit_factor = PerformanceMetrics.calculate_profit_factor(
-            self.game_state.bet_history
-        )
+        expected_shortfall = PerformanceMetrics.calculate_expected_shortfall(returns, 0.05)
+        profit_factor = PerformanceMetrics.calculate_profit_factor(self.game_state.bet_history)
 
         # Drawdown duration
         max_dd_results = PerformanceMetrics.calculate_maximum_drawdown_duration(
@@ -357,33 +349,15 @@ class SessionAnalyzer:
                     if self.game_state.bets_count > 0
                     else 0
                 ),
-                "largest_bet": float(
-                    max(bet.amount for bet in self.game_state.bet_history)
-                ),
-                "smallest_bet": float(
-                    min(bet.amount for bet in self.game_state.bet_history)
-                ),
+                "largest_bet": float(max(bet.amount for bet in self.game_state.bet_history)),
+                "smallest_bet": float(min(bet.amount for bet in self.game_state.bet_history)),
                 "average_win_payout": (
-                    float(
-                        np.mean(
-                            [
-                                bet.payout
-                                for bet in self.game_state.bet_history
-                                if bet.won
-                            ]
-                        )
-                    )
+                    float(np.mean([bet.payout for bet in self.game_state.bet_history if bet.won]))
                     if any(bet.won for bet in self.game_state.bet_history)
                     else 0
                 ),
                 "largest_single_loss": (
-                    float(
-                        max(
-                            bet.amount
-                            for bet in self.game_state.bet_history
-                            if not bet.won
-                        )
-                    )
+                    float(max(bet.amount for bet in self.game_state.bet_history if not bet.won))
                     if any(not bet.won for bet in self.game_state.bet_history)
                     else 0
                 ),
@@ -445,15 +419,11 @@ class SessionAnalyzer:
             if i >= window_size - 1:
                 window_start = max(0, i - window_size + 1)
                 window_wins = sum(
-                    1
-                    for b in self.game_state.bet_history[window_start : i + 1]
-                    if b.won
+                    1 for b in self.game_state.bet_history[window_start : i + 1] if b.won
                 )
                 rolling_win_rate.append(window_wins / window_size)
             else:
-                window_wins = sum(
-                    1 for b in self.game_state.bet_history[: i + 1] if b.won
-                )
+                window_wins = sum(1 for b in self.game_state.bet_history[: i + 1] if b.won)
                 rolling_win_rate.append(window_wins / (i + 1))
 
         return {
@@ -462,16 +432,12 @@ class SessionAnalyzer:
                 "cumulative_bets": cumulative_bets,
                 "balance_history": balance_history,
                 "rolling_win_rate": rolling_win_rate,
-                "timestamps": [
-                    bet.timestamp.isoformat() for bet in self.game_state.bet_history
-                ],
+                "timestamps": [bet.timestamp.isoformat() for bet in self.game_state.bet_history],
             },
             "trend_analysis": {
                 "profit_trend_slope": self._calculate_trend_slope(cumulative_profit),
                 "balance_volatility": np.std(balance_history) if balance_history else 0,
-                "win_rate_stability": np.std(rolling_win_rate)
-                if rolling_win_rate
-                else 0,
+                "win_rate_stability": np.std(rolling_win_rate) if rolling_win_rate else 0,
             },
         }
 
@@ -518,9 +484,7 @@ class MultiSessionAnalyzer:
         total_wagered = sum(s.game_state.total_wagered for s in self.sessions)
         total_duration = sum(s.total_session_time for s in self.sessions)
 
-        profitable_sessions = sum(
-            1 for s in self.sessions if s.game_state.total_profit > 0
-        )
+        profitable_sessions = sum(1 for s in self.sessions if s.game_state.total_profit > 0)
 
         # Session-level metrics
         session_profits = [float(s.game_state.total_profit) for s in self.sessions]
@@ -536,9 +500,7 @@ class MultiSessionAnalyzer:
                 "overall_win_rate": total_wins / total_bets if total_bets > 0 else 0,
                 "total_profit": float(total_profit),
                 "total_wagered": float(total_wagered),
-                "overall_roi": float(total_profit / total_wagered)
-                if total_wagered > 0
-                else 0,
+                "overall_roi": float(total_profit / total_wagered) if total_wagered > 0 else 0,
                 "total_duration_hours": total_duration / 3600,
                 "average_bets_per_session": total_bets / len(self.sessions),
                 "profitable_sessions": profitable_sessions,
@@ -574,9 +536,7 @@ class MultiSessionAnalyzer:
             },
         }
 
-    def compare_strategies(
-        self, strategy_groups: dict[str, list[SessionState]]
-    ) -> dict[str, Any]:
+    def compare_strategies(self, strategy_groups: dict[str, list[SessionState]]) -> dict[str, Any]:
         """Compare performance between different strategies.
 
         Args:
@@ -604,14 +564,10 @@ class MultiSessionAnalyzer:
         return {
             "strategy_metrics": strategy_metrics,
             "rankings": rankings,
-            "comparison_summary": self._generate_comparison_summary(
-                strategy_metrics, rankings
-            ),
+            "comparison_summary": self._generate_comparison_summary(strategy_metrics, rankings),
         }
 
-    def _create_strategy_rankings(
-        self, strategy_metrics: dict[str, dict]
-    ) -> dict[str, list]:
+    def _create_strategy_rankings(self, strategy_metrics: dict[str, dict]) -> dict[str, list]:
         """Create rankings for different metrics.
 
         Args:
@@ -625,37 +581,27 @@ class MultiSessionAnalyzer:
         rankings = {
             "by_total_profit": sorted(
                 strategies,
-                key=lambda s: strategy_metrics[s]["aggregate_performance"][
-                    "total_profit"
-                ],
+                key=lambda s: strategy_metrics[s]["aggregate_performance"]["total_profit"],
                 reverse=True,
             ),
             "by_roi": sorted(
                 strategies,
-                key=lambda s: strategy_metrics[s]["aggregate_performance"][
-                    "overall_roi"
-                ],
+                key=lambda s: strategy_metrics[s]["aggregate_performance"]["overall_roi"],
                 reverse=True,
             ),
             "by_profitability_rate": sorted(
                 strategies,
-                key=lambda s: strategy_metrics[s]["aggregate_performance"][
-                    "profitability_rate"
-                ],
+                key=lambda s: strategy_metrics[s]["aggregate_performance"]["profitability_rate"],
                 reverse=True,
             ),
             "by_win_rate": sorted(
                 strategies,
-                key=lambda s: strategy_metrics[s]["aggregate_performance"][
-                    "overall_win_rate"
-                ],
+                key=lambda s: strategy_metrics[s]["aggregate_performance"]["overall_win_rate"],
                 reverse=True,
             ),
             "by_risk_adjusted": sorted(
                 strategies,
-                key=lambda s: strategy_metrics[s]["aggregate_performance"][
-                    "overall_roi"
-                ]
+                key=lambda s: strategy_metrics[s]["aggregate_performance"]["overall_roi"]
                 / max(0.01, strategy_metrics[s]["risk_analysis"]["roi_volatility"]),
                 reverse=True,
             ),
@@ -677,9 +623,7 @@ class MultiSessionAnalyzer:
         """
         best_overall = rankings["by_roi"][0] if rankings["by_roi"] else None
         most_consistent = (
-            rankings["by_profitability_rate"][0]
-            if rankings["by_profitability_rate"]
-            else None
+            rankings["by_profitability_rate"][0] if rankings["by_profitability_rate"] else None
         )
         lowest_risk = (
             min(
@@ -695,14 +639,10 @@ class MultiSessionAnalyzer:
             "most_consistent_performer": most_consistent,
             "lowest_risk_performer": lowest_risk,
             "recommendations": [
-                f"Best ROI: {best_overall}"
-                if best_overall
-                else "No strategies analyzed",
+                f"Best ROI: {best_overall}" if best_overall else "No strategies analyzed",
                 f"Most consistent: {most_consistent}"
                 if most_consistent
                 else "No strategies analyzed",
-                f"Lowest risk: {lowest_risk}"
-                if lowest_risk
-                else "No strategies analyzed",
+                f"Lowest risk: {lowest_risk}" if lowest_risk else "No strategies analyzed",
             ],
         }

@@ -30,9 +30,7 @@ class TestCompositeStrategy:
 
     def test_initialization(self):
         """Test l'initialisation de la stratégie composite."""
-        config = CompositeConfig(
-            base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE
-        )
+        config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE)
         strategies = [self.martingale, self.fibonacci]
 
         composite = CompositeStrategy(config, strategies)
@@ -51,9 +49,7 @@ class TestCompositeStrategy:
 
     def test_average_mode(self):
         """Test le mode AVERAGE."""
-        config = CompositeConfig(
-            base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE
-        )
+        config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE)
         strategies = [self.martingale, self.fibonacci]
         composite = CompositeStrategy(config, strategies)
 
@@ -66,9 +62,7 @@ class TestCompositeStrategy:
 
     def test_weighted_mode(self):
         """Test le mode WEIGHTED (pondéré par confiance)."""
-        config = CompositeConfig(
-            base_bet=Decimal("0.001"), mode=CombinationMode.WEIGHTED
-        )
+        config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.WEIGHTED)
         strategies = [self.martingale, self.fibonacci]
         composite = CompositeStrategy(config, strategies)
 
@@ -80,9 +74,7 @@ class TestCompositeStrategy:
 
     def test_aggressive_mode(self):
         """Test le mode AGGRESSIVE (mise la plus élevée)."""
-        config = CompositeConfig(
-            base_bet=Decimal("0.001"), mode=CombinationMode.AGGRESSIVE
-        )
+        config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AGGRESSIVE)
         strategies = [self.martingale, self.fibonacci]
         composite = CompositeStrategy(config, strategies)
 
@@ -103,9 +95,7 @@ class TestCompositeStrategy:
 
     def test_conservative_mode(self):
         """Test le mode CONSERVATIVE (mise la plus faible)."""
-        config = CompositeConfig(
-            base_bet=Decimal("0.001"), mode=CombinationMode.CONSERVATIVE
-        )
+        config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.CONSERVATIVE)
         strategies = [self.martingale, self.fibonacci]
         composite = CompositeStrategy(config, strategies)
 
@@ -155,9 +145,7 @@ class TestCompositeStrategy:
 
     def test_update_after_result(self):
         """Test la mise à jour après résultat."""
-        config = CompositeConfig(
-            base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE
-        )
+        config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE)
         strategies = [self.martingale, self.fibonacci]
         composite = CompositeStrategy(config, strategies)
 

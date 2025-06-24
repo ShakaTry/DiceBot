@@ -54,9 +54,7 @@ class SlackNotifier:
             self.logger.error(f"Failed to send Slack notification: {e}")
             return False
 
-    def notify_simulation_start(
-        self, strategy: str, capital: Decimal, sessions: int
-    ) -> bool:
+    def notify_simulation_start(self, strategy: str, capital: Decimal, sessions: int) -> bool:
         """Notify simulation start."""
         message = (
             f"🎲 **DiceBot Simulation Started**\n"
@@ -257,9 +255,7 @@ class SlackBot:
             self.logger.error(f"Slack API error: {e}")
             return False
 
-    def schedule_simulation(
-        self, channel: str, strategy: str, capital: str, sessions: str
-    ) -> None:
+    def schedule_simulation(self, channel: str, strategy: str, capital: str, sessions: str) -> None:
         """Schedule a simulation to run (placeholder for actual implementation)."""
         # This would integrate with the actual simulation runner
         # For now, just send a placeholder message

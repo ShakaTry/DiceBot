@@ -167,12 +167,8 @@ class TestProvablyFairConstraints:
                 action="toggle_bet_type",
                 bet_type=BetType.OVER,
             ),
-            BetDecision(
-                amount=Decimal("0"), multiplier=2.0, skip=True, action="change_seed"
-            ),
-            BetDecision(
-                amount=Decimal("0.001"), multiplier=2.0, skip=False, action=None
-            ),
+            BetDecision(amount=Decimal("0"), multiplier=2.0, skip=True, action="change_seed"),
+            BetDecision(amount=Decimal("0.001"), multiplier=2.0, skip=False, action=None),
         ]
 
         mock_strategy.decide_bet = Mock(side_effect=actions)

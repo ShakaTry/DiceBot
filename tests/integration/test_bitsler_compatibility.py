@@ -165,9 +165,7 @@ class TestBitslerCompatibility:
 
     def test_house_edge_consistency(self):
         """Test que le house edge de 1% est correctement appliqué."""
-        game = DiceGame(
-            use_provably_fair=False, seed=12345
-        )  # Seed fixe pour reproductibilité
+        game = DiceGame(use_provably_fair=False, seed=12345)  # Seed fixe pour reproductibilité
 
         # Test sur plusieurs configurations
         test_configs = [
@@ -226,9 +224,7 @@ class TestBitslerCompatibility:
 
             assert result.won == expected_win
 
-            print(
-                f"{description}: Target={target}, Roll={result.roll:.2f}, Won={result.won}"
-            )
+            print(f"{description}: Target={target}, Roll={result.roll:.2f}, Won={result.won}")
 
         # Vérifier que les multiplicateurs extrêmes sont gérés
         extreme_under = game.multiplier_from_target(0.01, BetType.UNDER)
@@ -282,9 +278,7 @@ class TestBitslerCompatibility:
             game_state.update(result)
 
             # Affichage
-            profit_loss = (
-                result.payout - result.amount if result.won else -result.amount
-            )
+            profit_loss = result.payout - result.amount if result.won else -result.amount
             print(f"\n🎲 Pari #{round_num}:")
             print(f"   📈 Type: {result.bet_type.value.upper()} {result.target}")
             print(f"   💵 Mise: {result.amount} LTC")

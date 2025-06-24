@@ -227,15 +227,11 @@ class DiceBotConfig:
         risk_levels = self.strategies["risk_levels"]
         if risk_level not in risk_levels:
             available = ", ".join(risk_levels.keys())
-            raise KeyError(
-                f"Risk level '{risk_level}' not found. Available: {available}"
-            )
+            raise KeyError(f"Risk level '{risk_level}' not found. Available: {available}")
 
         return risk_levels[risk_level].copy()
 
-    def assess_strategy_risk(
-        self, strategy_config: dict[str, Any], capital: Decimal
-    ) -> str:
+    def assess_strategy_risk(self, strategy_config: dict[str, Any], capital: Decimal) -> str:
         """Assess the risk level of a strategy configuration.
 
         Args:
@@ -264,9 +260,7 @@ class DiceBotConfig:
 
         return "extreme"
 
-    def suggest_improvements(
-        self, strategy_config: dict[str, Any], capital: Decimal
-    ) -> list[str]:
+    def suggest_improvements(self, strategy_config: dict[str, Any], capital: Decimal) -> list[str]:
         """Suggest improvements for a strategy configuration.
 
         Args:
@@ -286,9 +280,7 @@ class DiceBotConfig:
 
             # Suggest reducing max_losses
             if max_losses > 10:
-                suggestions.append(
-                    f"Consider reducing max_losses from {max_losses} to 8-10"
-                )
+                suggestions.append(f"Consider reducing max_losses from {max_losses} to 8-10")
 
             # Suggest reducing base_bet
             capital_ratio = float(base_bet / capital)

@@ -56,9 +56,7 @@ class DiceGame:
     def calculate_win_chance_from_multiplier(self, multiplier: float) -> float:
         """Méthode legacy pour compatibilité - calcule via multiplier."""
         if multiplier < MIN_MULTIPLIER or multiplier > MAX_MULTIPLIER:
-            raise ValueError(
-                f"Multiplier must be between {MIN_MULTIPLIER} and {MAX_MULTIPLIER}"
-            )
+            raise ValueError(f"Multiplier must be between {MIN_MULTIPLIER} and {MAX_MULTIPLIER}")
 
         # Win chance without house edge
         raw_chance = 100.0 / multiplier
@@ -68,9 +66,7 @@ class DiceGame:
 
         return actual_chance
 
-    def target_from_multiplier(
-        self, multiplier: float, bet_type: BetType = BetType.UNDER
-    ) -> float:
+    def target_from_multiplier(self, multiplier: float, bet_type: BetType = BetType.UNDER) -> float:
         """Convertit un multiplicateur en target selon le type de pari."""
         # Win chance raw (sans house edge)
         win_chance_raw = 100.0 / multiplier
@@ -153,8 +149,7 @@ class DiceGame:
                 target=target,
                 server_seed_hash=seed_info["server_seed_hash"],
                 client_seed=seed_info["client_seed"],
-                nonce=seed_info["nonce"]
-                - 1,  # Le nonce a été incrémenté dans generate_dice_result
+                nonce=seed_info["nonce"] - 1,  # Le nonce a été incrémenté dans generate_dice_result
             )
         else:
             # Mode legacy pour tests
@@ -187,9 +182,7 @@ class DiceGame:
         target = self.target_from_multiplier(multiplier, BetType.UNDER)
         return self.roll(bet_amount, target, BetType.UNDER)
 
-    def expected_value(
-        self, bet_amount: Decimal, target: float, bet_type: BetType
-    ) -> Decimal:
+    def expected_value(self, bet_amount: Decimal, target: float, bet_type: BetType) -> Decimal:
         """Calcule la valeur attendue d'un pari OVER/UNDER."""
         win_chance = self.calculate_win_chance(target, bet_type) / 100
         multiplier = self.multiplier_from_target(target, bet_type)
@@ -202,9 +195,7 @@ class DiceGame:
         expected_win = bet_amount * Decimal(str(multiplier)) * Decimal(str(win_chance))
         return expected_win - bet_amount
 
-    def kelly_criterion(
-        self, bankroll: Decimal, target: float, bet_type: BetType
-    ) -> Decimal:
+    def kelly_criterion(self, bankroll: Decimal, target: float, bet_type: BetType) -> Decimal:
         """Calcule le critère de Kelly pour un pari OVER/UNDER."""
         win_prob = self.calculate_win_chance(target, bet_type) / 100
         lose_prob = 1 - win_prob

@@ -23,9 +23,7 @@ class ParameterValidator:
     """Validator for DiceBot parameters and configurations."""
 
     @staticmethod
-    def validate_strategy_config(
-        config: dict[str, Any], capital: Decimal
-    ) -> dict[str, str]:
+    def validate_strategy_config(config: dict[str, Any], capital: Decimal) -> dict[str, str]:
         """
         Valide une configuration de stratégie.
 
@@ -56,19 +54,13 @@ class ParameterValidator:
                     f"base_bet is {capital_ratio:.1%} of capital - very risky. Consider reducing base_bet to {safer_bet:.6f} LTC (1% of capital)"
                 )
             elif capital_ratio > 0.05:  # Plus de 5% du capital
-                warnings["base_bet"] = (
-                    f"base_bet is {capital_ratio:.1%} of capital - risky"
-                )
+                warnings["base_bet"] = f"base_bet is {capital_ratio:.1%} of capital - risky"
 
             # Validation max_losses
             if max_losses > 20:
-                warnings["max_losses"] = (
-                    f"max_losses ({max_losses}) is very high - extreme risk"
-                )
+                warnings["max_losses"] = f"max_losses ({max_losses}) is very high - extreme risk"
             elif max_losses > 15:
-                warnings["max_losses"] = (
-                    f"max_losses ({max_losses}) is high - use with caution"
-                )
+                warnings["max_losses"] = f"max_losses ({max_losses}) is high - use with caution"
 
             # Validation spécifique Martingale
             if strategy_name == "martingale" and max_losses > 0:
@@ -142,9 +134,7 @@ class ParameterValidator:
             return RiskLevel.EXTREME
 
     @staticmethod
-    def calculate_martingale_max_safe_losses(
-        capital: Decimal, base_bet: Decimal
-    ) -> int:
+    def calculate_martingale_max_safe_losses(capital: Decimal, base_bet: Decimal) -> int:
         """
         Calcule le nombre maximum de pertes consécutives sûres pour Martingale.
 

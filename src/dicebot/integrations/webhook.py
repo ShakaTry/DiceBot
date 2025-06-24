@@ -55,9 +55,7 @@ class WebhookNotifier:
                 ).hexdigest()
                 headers["X-DiceBot-Signature"] = f"sha256={signature}"
 
-            response = requests.post(
-                self.webhook_url, json=payload, headers=headers, timeout=10
-            )
+            response = requests.post(self.webhook_url, json=payload, headers=headers, timeout=10)
             response.raise_for_status()
 
             self.logger.info(f"Webhook sent successfully: {event_type}")
@@ -67,9 +65,7 @@ class WebhookNotifier:
             self.logger.error(f"Failed to send webhook: {e}")
             return False
 
-    def notify_simulation_start(
-        self, strategy: str, capital: float, sessions: int
-    ) -> bool:
+    def notify_simulation_start(self, strategy: str, capital: float, sessions: int) -> bool:
         """Notify simulation start."""
         data = {
             "strategy": strategy,
@@ -87,9 +83,7 @@ class WebhookNotifier:
         """Notify individual bet result."""
         return self.send_webhook("bet_result", bet_data)
 
-    def notify_alert(
-        self, alert_type: str, message: str, severity: str = "info"
-    ) -> bool:
+    def notify_alert(self, alert_type: str, message: str, severity: str = "info") -> bool:
         """Send alert notification."""
         data = {"alert_type": alert_type, "message": message, "severity": severity}
         return self.send_webhook("alert", data)

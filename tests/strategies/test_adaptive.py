@@ -28,9 +28,7 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
-            base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules
-        )
+        config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules)
 
         adaptive = AdaptiveStrategy(config)
 
@@ -353,9 +351,7 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
-            base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules
-        )
+        config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules)
 
         adaptive = AdaptiveStrategy(config)
 

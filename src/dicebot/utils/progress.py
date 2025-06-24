@@ -149,9 +149,7 @@ class ProgressManager:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.console = Console()
-            cls._instance.simulation_progress = SimulationProgress(
-                cls._instance.console
-            )
+            cls._instance.simulation_progress = SimulationProgress(cls._instance.console)
         return cls._instance
 
     @property

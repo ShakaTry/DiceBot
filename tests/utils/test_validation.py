@@ -67,9 +67,7 @@ class TestParameterValidator:
         capital = Decimal("100")
         base_bet = Decimal("0.001")
 
-        max_safe = ParameterValidator.calculate_martingale_max_safe_losses(
-            capital, base_bet
-        )
+        max_safe = ParameterValidator.calculate_martingale_max_safe_losses(capital, base_bet)
 
         # Devrait être un nombre raisonnable
         assert 1 <= max_safe <= 20
@@ -83,9 +81,7 @@ class TestParameterValidator:
         capital = Decimal("100")
         base_bet = Decimal("10")  # 10% du capital
 
-        max_safe = ParameterValidator.calculate_martingale_max_safe_losses(
-            capital, base_bet
-        )
+        max_safe = ParameterValidator.calculate_martingale_max_safe_losses(capital, base_bet)
 
         # Avec une mise élevée, max_safe devrait être très bas
         assert max_safe <= 5
@@ -95,9 +91,7 @@ class TestParameterValidator:
         base_bet = Decimal("0.001")
         max_losses = 10
 
-        requirement = ParameterValidator.estimate_fibonacci_requirement(
-            base_bet, max_losses
-        )
+        requirement = ParameterValidator.estimate_fibonacci_requirement(base_bet, max_losses)
 
         # Devrait être plus élevé que base_bet mais raisonnable
         assert requirement > base_bet
@@ -230,9 +224,7 @@ class TestParameterValidator:
         martingale_warnings = ParameterValidator.validate_strategy_config(
             martingale_config, capital
         )
-        flat_warnings = ParameterValidator.validate_strategy_config(
-            flat_config, capital
-        )
+        flat_warnings = ParameterValidator.validate_strategy_config(flat_config, capital)
 
         # Martingale devrait générer plus ou des avertissements plus sévères
         assert len(martingale_warnings) >= len(flat_warnings)

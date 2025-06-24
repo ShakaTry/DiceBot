@@ -80,9 +80,7 @@ class AdaptiveStrategy(BaseStrategy):
         self.current_strategy = StrategyFactory.create_from_dict(
             {
                 "strategy": config.initial_strategy,
-                "base_bet": str(
-                    config.base_bet
-                ),  # Convert Decimal to string for factory
+                "base_bet": str(config.base_bet),  # Convert Decimal to string for factory
                 **config.initial_config,
             }
         )
@@ -164,17 +162,13 @@ class AdaptiveStrategy(BaseStrategy):
         elif rule.condition == SwitchCondition.DRAWDOWN_THRESHOLD:
             if self.peak_balance is None:
                 return False
-            current_drawdown = float(
-                (self.peak_balance - game_state.balance) / self.peak_balance
-            )
+            current_drawdown = float((self.peak_balance - game_state.balance) / self.peak_balance)
             return current_drawdown >= rule.threshold
 
         elif rule.condition == SwitchCondition.PROFIT_TARGET:
             if self.initial_balance is None:
                 return False
-            roi = float(
-                (game_state.balance - self.initial_balance) / self.initial_balance
-            )
+            roi = float((game_state.balance - self.initial_balance) / self.initial_balance)
             return roi >= rule.threshold
 
         elif rule.condition == SwitchCondition.LOW_CONFIDENCE:
@@ -198,9 +192,7 @@ class AdaptiveStrategy(BaseStrategy):
         new_config = {
             "strategy": rule.target_strategy,
             **rule.target_config,
-            "base_bet": str(
-                self.config.base_bet
-            ),  # Convert Decimal to string for factory
+            "base_bet": str(self.config.base_bet),  # Convert Decimal to string for factory
         }
 
         try:

@@ -65,9 +65,7 @@ class Event:
 class BetPlacedEvent(Event):
     """Événement quand un pari est placé."""
 
-    def __init__(
-        self, decision: BetDecision, game_state: GameState, strategy_name: str
-    ):
+    def __init__(self, decision: BetDecision, game_state: GameState, strategy_name: str):
         super().__init__(
             type=EventType.BET_PLACED,
             timestamp=datetime.now(),
@@ -102,11 +100,7 @@ class StreakEvent(Event):
     """Événement de série (gains/pertes)."""
 
     def __init__(self, streak_type: str, length: int, game_state: GameState):
-        event_type = (
-            EventType.WINNING_STREAK
-            if streak_type == "win"
-            else EventType.LOSING_STREAK
-        )
+        event_type = EventType.WINNING_STREAK if streak_type == "win" else EventType.LOSING_STREAK
         super().__init__(
             type=event_type,
             timestamp=datetime.now(),
@@ -136,9 +130,7 @@ class EventBus:
 
     def __init__(self):
         self._listeners: dict[EventType, list[EventListener]] = defaultdict(list)
-        self._callbacks: dict[EventType, list[Callable[[Event], None]]] = defaultdict(
-            list
-        )
+        self._callbacks: dict[EventType, list[Callable[[Event], None]]] = defaultdict(list)
         self._history: list[Event] = []
         self._history_limit = 10000
 
@@ -147,9 +139,7 @@ class EventBus:
         if listener not in self._listeners[event_type]:
             self._listeners[event_type].append(listener)
 
-    def subscribe_callback(
-        self, event_type: EventType, callback: Callable[[Event], None]
-    ) -> None:
+    def subscribe_callback(self, event_type: EventType, callback: Callable[[Event], None]) -> None:
         """Abonne une fonction callback à un type d'événement."""
         if callback not in self._callbacks[event_type]:
             self._callbacks[event_type].append(callback)
@@ -175,9 +165,7 @@ class EventBus:
         for callback in self._callbacks.get(event.type, []):
             callback(event)
 
-    def get_history(
-        self, event_type: EventType | None = None, limit: int = 100
-    ) -> list[Event]:
+    def get_history(self, event_type: EventType | None = None, limit: int = 100) -> list[Event]:
         """Récupère l'historique des événements."""
         history = (
             self._history

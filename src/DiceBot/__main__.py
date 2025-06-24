@@ -48,9 +48,7 @@ def main(args: Sequence[str] | None = None) -> None:
         type=str,
         help="Use strategy preset (conservative, moderate, aggressive, experimental)",
     )
-    sim_parser.add_argument(
-        "--base-bet", type=str, help="Base bet amount (overrides preset)"
-    )
+    sim_parser.add_argument("--base-bet", type=str, help="Base bet amount (overrides preset)")
     sim_parser.add_argument(
         "--max-losses", type=int, help="Maximum consecutive losses (overrides preset)"
     )
@@ -76,15 +74,9 @@ def main(args: Sequence[str] | None = None) -> None:
         default="results",
         help="Output directory (default: results)",
     )
-    sim_parser.add_argument(
-        "--quiet", "-q", action="store_true", help="Reduce output verbosity"
-    )
-    sim_parser.add_argument(
-        "--no-progress", action="store_true", help="Disable progress bar"
-    )
-    sim_parser.add_argument(
-        "--parallel", action="store_true", help="Force parallel execution"
-    )
+    sim_parser.add_argument("--quiet", "-q", action="store_true", help="Reduce output verbosity")
+    sim_parser.add_argument("--no-progress", action="store_true", help="Disable progress bar")
+    sim_parser.add_argument("--parallel", action="store_true", help="Force parallel execution")
     sim_parser.add_argument(
         "--detailed-logs",
         action="store_true",
@@ -121,18 +113,10 @@ def main(args: Sequence[str] | None = None) -> None:
         "--sessions", type=int, default=100, help="Number of sessions per strategy"
     )
     comp_parser.add_argument("--base-bet", type=str, help="Base bet amount")
-    comp_parser.add_argument(
-        "--output-dir", type=str, default="results", help="Output directory"
-    )
-    comp_parser.add_argument(
-        "--quiet", "-q", action="store_true", help="Reduce output verbosity"
-    )
-    comp_parser.add_argument(
-        "--no-progress", action="store_true", help="Disable progress bar"
-    )
-    comp_parser.add_argument(
-        "--parallel", action="store_true", help="Force parallel execution"
-    )
+    comp_parser.add_argument("--output-dir", type=str, default="results", help="Output directory")
+    comp_parser.add_argument("--quiet", "-q", action="store_true", help="Reduce output verbosity")
+    comp_parser.add_argument("--no-progress", action="store_true", help="Disable progress bar")
+    comp_parser.add_argument("--parallel", action="store_true", help="Force parallel execution")
 
     # Analyze command
     analyze_parser = subparsers.add_parser("analyze", help="Analyze simulation results")
@@ -142,9 +126,7 @@ def main(args: Sequence[str] | None = None) -> None:
     )
 
     # Recovery commands
-    recovery_parser = subparsers.add_parser(
-        "recovery", help="Checkpoint and recovery management"
-    )
+    recovery_parser = subparsers.add_parser("recovery", help="Checkpoint and recovery management")
     recovery_subparsers = recovery_parser.add_subparsers(
         dest="recovery_command", help="Recovery commands"
     )
@@ -156,12 +138,8 @@ def main(args: Sequence[str] | None = None) -> None:
     resume_parser = recovery_subparsers.add_parser(
         "resume", help="Resume simulation from checkpoint"
     )
-    resume_parser.add_argument(
-        "simulation_id", type=str, help="Simulation ID to resume"
-    )
-    resume_parser.add_argument(
-        "--no-progress", action="store_true", help="Disable progress bar"
-    )
+    resume_parser.add_argument("simulation_id", type=str, help="Simulation ID to resume")
+    resume_parser.add_argument("--no-progress", action="store_true", help="Disable progress bar")
 
     # Clean checkpoints
     clean_parser = recovery_subparsers.add_parser("clean", help="Clean old checkpoints")
@@ -170,9 +148,7 @@ def main(args: Sequence[str] | None = None) -> None:
     )
 
     # Monitor command
-    monitor_parser = subparsers.add_parser(
-        "monitor", help="Real-time monitoring and control"
-    )
+    monitor_parser = subparsers.add_parser("monitor", help="Real-time monitoring and control")
     monitor_parser.add_argument(
         "--slack-webhook",
         type=str,
@@ -368,10 +344,7 @@ def run_compare_command(args) -> None:
     runner = SimulationRunner(capital, args.output_dir)
 
     if not args.quiet:
-        print(
-            f"Comparing {len(args.strategies)} strategies with "
-            f"{args.sessions} sessions each..."
-        )
+        print(f"Comparing {len(args.strategies)} strategies with {args.sessions} sessions each...")
         print(f"Strategies: {', '.join(args.strategies)}")
         print(f"Capital: {capital} LTC")
 
@@ -515,9 +488,7 @@ def run_monitor_command(args) -> None:
         progress_manager.print(f"{emoji} [{severity.upper()}] {message}")
 
     # Create monitor
-    monitor = PerformanceMonitor(
-        alert_callback=alert_callback, check_interval=args.check_interval
-    )
+    monitor = PerformanceMonitor(alert_callback=alert_callback, check_interval=args.check_interval)
 
     # Set custom thresholds if provided
     if args.cpu_warning:
@@ -578,20 +549,11 @@ def run_recovery_command(args) -> None:
             remaining = cp.get("remaining_sessions", 0)
             age_hours = cp["file_age_hours"]
 
-            status = (
-                "✅ Completed"
-                if remaining == 0
-                else f"⏸️  {remaining} sessions remaining"
-            )
-            age_str = (
-                f"{age_hours:.1f}h ago"
-                if age_hours < 24
-                else f"{age_hours / 24:.1f}d ago"
-            )
+            status = "✅ Completed" if remaining == 0 else f"⏸️  {remaining} sessions remaining"
+            age_str = f"{age_hours:.1f}h ago" if age_hours < 24 else f"{age_hours / 24:.1f}d ago"
 
             progress_manager.print(
-                f"  📁 {cp['simulation_id']}: {strategy} strategy | "
-                f"{status} | {age_str}"
+                f"  📁 {cp['simulation_id']}: {strategy} strategy | {status} | {age_str}"
             )
 
     elif args.recovery_command == "resume":
@@ -611,9 +573,7 @@ def run_recovery_command(args) -> None:
         )
 
     elif args.recovery_command == "clean":
-        progress_manager.print_info(
-            f"Cleaning checkpoints older than {args.max_age} days..."
-        )
+        progress_manager.print_info(f"Cleaning checkpoints older than {args.max_age} days...")
         # Use public API when available
         # For now, access private method
         checkpoint_manager._cleanup_old_checkpoints(args.max_age)  # noqa: SLF001

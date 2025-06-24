@@ -140,9 +140,7 @@ class TestProvablyFairGenerator:
 
         # Calcul manuel selon l'algorithme Bitsler
         message = f"{client_seed},{nonce}"
-        seed_hash = hmac.new(
-            server_seed.encode(), message.encode(), hashlib.sha512
-        ).hexdigest()
+        seed_hash = hmac.new(server_seed.encode(), message.encode(), hashlib.sha512).hexdigest()
 
         # Extraction du premier nombre valide <= 999999
         offset = 0

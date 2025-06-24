@@ -55,6 +55,19 @@ DiceBot is an **artificial consciousness evolution laboratory** that uses the Di
    - **Événements complets** : session_start/end, bet_decision/result, strategy_*
    - **Architecture flexible** : Logs détaillés optionnels, séparés des résumés
 
+#### Session 7 Organization & Automation:
+12. **🗂️ Organisation Betlog** - ✅ COMPLET
+   - **Structure hiérarchique** : `betlog/` avec sous-dossiers automatiques
+   - **Classification intelligente** : par type de stratégie, simulation, analyse
+   - **Migration automatique** : logs existants organisés correctement
+   - **Documentation complète** : structure et utilisation détaillées
+
+13. **🤖 Système de Commit Automatique** - ✅ COMPLET
+   - **scripts/auto_commit.py** : Surveillance continue des changements (30s)
+   - **scripts/commit_now.sh** : Script one-shot pour commit immédiat
+   - **Hooks Git** : Commits automatiques après merge
+   - **Format standardisé** : Messages avec signature Claude Code
+
 ## 📚 Architecture Overview
 
 The project follows a phased development approach:
@@ -208,6 +221,18 @@ pyright src tests
 
 # Run all pre-commit hooks
 pre-commit run --all-files
+```
+
+### Git Automation (100% Automatique)
+```bash
+# Surveillance continue (commit automatique toutes les 30s)
+python scripts/auto_commit.py
+
+# Commit immédiat de tous les changements
+./scripts/commit_now.sh
+
+# Les hooks Git committent automatiquement après merge
+# Pas d'action requise - le système fonctionne automatiquement
 ```
 
 ### Building & Running

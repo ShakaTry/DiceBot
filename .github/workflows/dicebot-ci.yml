@@ -1,5 +1,10 @@
 name: DiceBot CI/CD
 
+# Annule les anciens runs en cours pour éviter les embouteillages
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main, develop ]
@@ -8,8 +13,6 @@ on:
   schedule:
     # Simulation automatique quotidienne à 9h UTC
     - cron: '0 9 * * *'
-    # Tests et monitoring toutes les heures (optionnel)
-    - cron: '0 * * * *'
 
 env:
   PYTHON_VERSION: '3.11'
@@ -18,6 +21,7 @@ jobs:
   tests:
     name: 🧪 Tests & Quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     steps:
     - name: 📂 Checkout code
@@ -60,6 +64,7 @@ jobs:
   simulation:
     name: 🎲 Daily Simulation
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: tests
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     
@@ -109,10 +114,8 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: simulation-results-${{ github.run_number }}
-        path: |
-          *.json
-          betlog/
-        retention-days: 30
+        path: "*.json"
+        retention-days: 7
         
     - name: 📢 Slack Notification
       if: always()
@@ -135,7 +138,8 @@ jobs:
   deploy:
     name: 🚀 Deploy & Notify
     runs-on: ubuntu-latest
-    needs: [tests, simulation]
+    timeout-minutes: 10
+    needs: tests
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:

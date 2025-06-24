@@ -1,0 +1,120 @@
+name: Deploy Slack Bot
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/dicebot/integrations/**'
+      - 'scripts/start_slack_bot.py'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  deploy-slack-bot:
+    name: 🤖 Deploy Slack Bot
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📂 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        
+    - name: 🧪 Test Slack integration
+      run: |
+        python -c "
+        from dicebot.integrations.slack_bot import SlackNotifier
+        from dicebot.integrations.slack_server import SlackServer
+        print('✅ Slack integration imports successfully')
+        "
+        
+    - name: 🔧 Validate Slack bot configuration
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+      run: |
+        if [ -z "$SLACK_BOT_TOKEN" ] || [ -z "$SLACK_SIGNING_SECRET" ]; then
+          echo "❌ Slack configuration missing"
+          echo "Please set SLACK_BOT_TOKEN and SLACK_SIGNING_SECRET secrets"
+          exit 1
+        else
+          echo "✅ Slack configuration validated"
+        fi
+        
+    - name: 📋 Create deployment package
+      run: |
+        mkdir -p deploy
+        cp -r src deploy/
+        cp -r scripts deploy/
+        cp pyproject.toml deploy/
+        
+        # Create start script
+        cat > deploy/start.sh << 'EOF'
+        #!/bin/bash
+        export PYTHONPATH="/app/src:$PYTHONPATH"
+        cd /app
+        python scripts/start_slack_bot.py
+        EOF
+        chmod +x deploy/start.sh
+        
+    - name: 📦 Upload deployment package
+      uses: actions/upload-artifact@v3
+      with:
+        name: slack-bot-deploy-${{ github.run_number }}
+        path: deploy/
+        retention-days: 30
+        
+    - name: 🐳 Create Dockerfile
+      run: |
+        cat > deploy/Dockerfile << 'EOF'
+        FROM python:3.11-slim
+        
+        WORKDIR /app
+        
+        # Install system dependencies
+        RUN apt-get update && apt-get install -y \
+          gcc \
+          && rm -rf /var/lib/apt/lists/*
+        
+        # Copy application
+        COPY . .
+        
+        # Install Python dependencies
+        RUN pip install --no-cache-dir -e .
+        
+        # Expose port
+        EXPOSE 3000
+        
+        # Health check
+        HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+          CMD curl -f http://localhost:3000/health || exit 1
+        
+        # Start application
+        CMD ["./start.sh"]
+        EOF
+        
+    - name: 🚀 Deploy notification
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        text: |
+          🤖 **Slack Bot Deployment Status: ${{ job.status }}**
+          
+          📦 **Package:** slack-bot-deploy-${{ github.run_number }}
+          🔗 **Repository:** ${{ github.repository }}
+          📝 **Commit:** ${{ github.sha }}
+          
+          ${{ job.status == 'success' && '✅ Ready for deployment!' || '❌ Deployment failed - check logs' }}

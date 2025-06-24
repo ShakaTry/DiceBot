@@ -96,6 +96,16 @@ def main(args: Sequence[str] | None = None) -> None:
         default="betlog",
         help="Directory for detailed logs (default: betlog)",
     )
+    sim_parser.add_argument(
+        "--slack-webhook",
+        type=str,
+        help="Slack webhook URL for notifications",
+    )
+    sim_parser.add_argument(
+        "--enable-monitoring",
+        action="store_true",
+        help="Enable performance monitoring and alerts",
+    )
 
     # Compare command
     comp_parser = subparsers.add_parser("compare", help="Compare multiple strategies")
@@ -159,6 +169,34 @@ def main(args: Sequence[str] | None = None) -> None:
         "--max-age", type=int, default=7, help="Maximum age in days (default: 7)"
     )
 
+    # Monitor command
+    monitor_parser = subparsers.add_parser(
+        "monitor", help="Real-time monitoring and control"
+    )
+    monitor_parser.add_argument(
+        "--slack-webhook",
+        type=str,
+        help="Slack webhook URL for notifications",
+    )
+    monitor_parser.add_argument(
+        "--check-interval",
+        type=int,
+        default=60,
+        help="Check interval in seconds (default: 60)",
+    )
+    monitor_parser.add_argument(
+        "--cpu-warning",
+        type=float,
+        default=80.0,
+        help="CPU warning threshold percent (default: 80)",
+    )
+    monitor_parser.add_argument(
+        "--memory-warning",
+        type=float,
+        default=85.0,
+        help="Memory warning threshold percent (default: 85)",
+    )
+
     # Parse arguments
     parsed_args = parser.parse_args(args)
 
@@ -177,6 +215,8 @@ def main(args: Sequence[str] | None = None) -> None:
             run_analyze_command(parsed_args)
         elif parsed_args.command == "recovery":
             run_recovery_command(parsed_args)
+        elif parsed_args.command == "monitor":
+            run_monitor_command(parsed_args)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
@@ -243,6 +283,29 @@ def run_simulate_command(args) -> None:
     ):
         return  # Validation failed
 
+    # Setup Slack notifications if webhook provided
+    slack_notifier = None
+    if args.slack_webhook:
+        from dicebot.integrations.slack_bot import SlackNotifier
+
+        slack_notifier = SlackNotifier(args.slack_webhook)
+        if not args.quiet:
+            progress_manager.print_info("✅ Slack notifications enabled")
+
+    # Setup monitoring if enabled
+    monitor = None
+    if args.enable_monitoring:
+        from dicebot.integrations.monitoring import PerformanceMonitor
+
+        def alert_callback(alert_type: str, message: str, severity: str):
+            if slack_notifier:
+                slack_notifier.notify_alert(alert_type, message)
+
+        monitor = PerformanceMonitor(alert_callback=alert_callback)
+        monitor.start_monitoring()
+        if not args.quiet:
+            progress_manager.print_info("🔍 Performance monitoring enabled")
+
     # Create runner and run simulation
     game_config = config.create_game_config()
     runner = SimulationRunner(capital, args.output_dir, game_config)
@@ -256,15 +319,29 @@ def run_simulate_command(args) -> None:
         if strategy_config.get("base_bet"):
             progress_manager.print_info(f"Base bet: {strategy_config['base_bet']} LTC")
 
-    results = runner.run_strategy_simulation(
-        strategy_config,
-        sessions,
-        session_config if session_config else None,
-        parallel=args.parallel,
-        show_progress=not args.no_progress,
-        enable_detailed_logs=args.detailed_logs,
-        log_dir=args.log_dir,
-    )
+    # Send start notification
+    if slack_notifier:
+        slack_notifier.notify_simulation_start(args.strategy, capital, sessions)
+
+    try:
+        results = runner.run_strategy_simulation(
+            strategy_config,
+            sessions,
+            session_config if session_config else None,
+            parallel=args.parallel,
+            show_progress=not args.no_progress,
+            enable_detailed_logs=args.detailed_logs,
+            log_dir=args.log_dir,
+        )
+
+        # Send completion notification
+        if slack_notifier:
+            slack_notifier.notify_simulation_complete(results["simulation_summary"])
+
+    finally:
+        # Stop monitoring
+        if monitor:
+            monitor.stop_monitoring()
 
     # Print summary
     if not args.quiet:
@@ -403,6 +480,83 @@ def print_analysis(results: dict, detailed: bool = False) -> None:
         print("DETAILED DATA")
         print("=" * 60)
         print(json.dumps(results, indent=2, default=str))
+
+
+def run_monitor_command(args) -> None:
+    """Run monitoring command."""
+    import time
+
+    from dicebot.integrations.monitoring import PerformanceMonitor
+    from dicebot.integrations.slack_bot import SlackNotifier
+    from dicebot.utils.progress import progress_manager
+
+    progress_manager.print_info("🔍 Starting DiceBot Performance Monitor")
+
+    # Setup Slack notifications if webhook provided
+    slack_notifier = None
+    if args.slack_webhook:
+        slack_notifier = SlackNotifier(args.slack_webhook)
+        progress_manager.print_info("✅ Slack notifications enabled")
+
+        # Test notification
+        slack_notifier.notify_alert(
+            "info",
+            "DiceBot monitoring started",
+        )
+
+    # Setup alert callback
+    def alert_callback(alert_type: str, message: str, severity: str):
+        if slack_notifier:
+            slack_notifier.notify_alert(alert_type, message)
+
+        # Also log to console
+        emoji_map = {"error": "🚨", "warning": "⚠️", "success": "✅", "info": "ℹ️"}
+        emoji = emoji_map.get(alert_type, "🔔")
+        progress_manager.print(f"{emoji} [{severity.upper()}] {message}")
+
+    # Create monitor
+    monitor = PerformanceMonitor(
+        alert_callback=alert_callback, check_interval=args.check_interval
+    )
+
+    # Set custom thresholds if provided
+    if args.cpu_warning:
+        monitor.set_threshold("cpu_warning", args.cpu_warning)
+    if args.memory_warning:
+        monitor.set_threshold("memory_warning", args.memory_warning)
+
+    # Start monitoring
+    monitor.start_monitoring()
+
+    try:
+        progress_manager.print_info(
+            f"🎯 Monitoring active (check interval: {args.check_interval}s)"
+        )
+        progress_manager.print_info("Press Ctrl+C to stop monitoring")
+
+        while True:
+            time.sleep(5)
+
+            # Show periodic status
+            summary = monitor.get_performance_summary()
+            if summary and not summary.get("error"):
+                system = summary["system"]
+                sessions = summary["sessions"]
+
+                progress_manager.print(
+                    f"📊 CPU: {system['cpu_percent']:.1f}% | "
+                    f"Memory: {system['memory_percent']:.1f}% | "
+                    f"Active sessions: {sessions['active_count']}"
+                )
+
+    except KeyboardInterrupt:
+        progress_manager.print_info("\n🛑 Stopping monitor...")
+        monitor.stop_monitoring()
+
+        if slack_notifier:
+            slack_notifier.notify_alert("info", "DiceBot monitoring stopped")
+
+        progress_manager.print_info("✅ Monitor stopped")
 
 
 def run_recovery_command(args) -> None:

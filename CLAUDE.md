@@ -62,11 +62,10 @@ DiceBot is an **artificial consciousness evolution laboratory** that uses the Di
    - **Migration automatique** : logs existants organisés correctement
    - **Documentation complète** : structure et utilisation détaillées
 
-13. **🤖 Système de Commit Automatique** - ✅ COMPLET
-   - **scripts/auto_commit.py** : Surveillance continue des changements (30s)
-   - **scripts/commit_now.sh** : Script one-shot pour commit immédiat
-   - **Hooks Git** : Commits automatiques après merge
-   - **Format standardisé** : Messages avec signature Claude Code
+13. **🤖 Système de Commit Automatique** - ✅ MIGRÉ VERS PYCHARM
+   - **PyCharm VCS Integration** : Commit automatique via IDE
+   - **Pre-commit hooks** : Formatage et vérifications automatiques
+   - **Configuration native** : Plus besoin de scripts externes
 
 ## 📚 Architecture Overview
 
@@ -223,16 +222,17 @@ pyright src tests
 pre-commit run --all-files
 ```
 
-### Git Automation (100% Automatique)
+### Git Automation (PyCharm Integration)
 ```bash
-# Surveillance continue (commit automatique toutes les 30s)
-python scripts/auto_commit.py
+# Configuration PyCharm pour commit automatique :
+# File → Settings → Version Control → Commit
+# ✓ Reformat code
+# ✓ Rearrange code  
+# ✓ Optimize imports
+# ✓ Run advanced checks after commit
 
-# Commit immédiat de tous les changements
-./scripts/commit_now.sh
-
-# Les hooks Git committent automatiquement après merge
-# Pas d'action requise - le système fonctionne automatiquement
+# Pre-commit hooks déjà configurés pour formatage automatique
+pre-commit run --all-files
 ```
 
 ### Building & Running

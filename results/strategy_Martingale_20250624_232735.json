@@ -1,0 +1,100 @@
+{
+  "simulation_summary": {
+    "total_sessions": 1,
+    "total_bets": 3,
+    "total_profit": -0.007,
+    "total_wagered": 0.007,
+    "overall_roi": -1.0,
+    "profitable_sessions": 0,
+    "profitability_rate": 0.0,
+    "average_win_rate": 0.0,
+    "average_session_duration": 0.000874,
+    "stop_reasons": {
+      "max_bets": 1
+    },
+    "average_max_drawdown": 0.01037037037037037,
+    "worst_drawdown": 0.01037037037037037,
+    "vault_status": {
+      "vault_balance": 25.5,
+      "bankroll_balance": 4.493,
+      "total_balance": 29.993,
+      "vault_ratio": 0.8501983796219118,
+      "bankroll_ratio": 0.14980162037808822,
+      "total_deposited": 30.0,
+      "total_withdrawn": 0.0,
+      "net_profit": -0.007
+    }
+  },
+  "strategy_info": {
+    "strategy_config": {
+      "strategy": "martingale",
+      "base_bet": "0.001"
+    },
+    "strategy_genome": {
+      "strategy_type": "Martingale",
+      "base_bet": "0.001",
+      "min_bet": "0.00015",
+      "max_bet": "1000",
+      "multiplier": 2.0,
+      "max_losses": 10,
+      "default_multiplier": 2.0,
+      "default_bet_type": "under",
+      "default_target": 50.0,
+      "allow_bet_type_switching": false,
+      "allow_target_adjustment": false,
+      "confidence": 0.8573749999999999,
+      "fitness": 0.3958518518518519,
+      "generation": 0,
+      "mutations": []
+    },
+    "strategy_fitness": 0.3958518518518519,
+    "strategy_metrics": {
+      "total_bets": 3,
+      "win_rate": 0.0,
+      "roi": -1.0,
+      "max_bet_reached": 0.004,
+      "max_consecutive_losses": 3,
+      "average_confidence": 0.0,
+      "profit_factor": 0.0
+    }
+  },
+  "sessions_data": [
+    {
+      "session_id": "af642261-252a-4910-91da-87deeff3b549",
+      "strategy_name": "Martingale",
+      "bot_id": "manual",
+      "started_at": "2025-06-24T23:27:35.899067",
+      "ended_at": "2025-06-24T23:27:35.899941",
+      "stop_reason": "max_bets",
+      "duration_seconds": 0.000874,
+      "initial_balance": 0.675,
+      "final_balance": 0.668,
+      "total_profit": -0.007,
+      "total_wagered": 0.007,
+      "roi": -0.01037037037037037,
+      "bets_count": 3,
+      "wins_count": 0,
+      "losses_count": 3,
+      "win_rate": 0.0,
+      "max_consecutive_wins": 0,
+      "max_consecutive_losses": 3,
+      "max_drawdown": 0.01037037037037037,
+      "sharpe_ratio": 0.0,
+      "peak_balance": 0.675,
+      "lowest_balance": 0.668,
+      "bets_per_minute": 79086.11599297012,
+      "stop_loss": null,
+      "take_profit": null,
+      "max_bets": 3
+    }
+  ],
+  "simulation_metadata": {
+    "run_timestamp": "2025-06-24T23:27:35.901339",
+    "num_sessions_requested": 1,
+    "num_sessions_completed": 1,
+    "session_config": {
+      "max_bets": 3
+    },
+    "total_capital": 30.0
+  }
+}

@@ -87,7 +87,10 @@ class BaseStrategy(ABC):
 
     @abstractmethod
     def _update_strategy_state(self, result: BetResult) -> None:
-        """Met à jour l'état spécifique à la stratégie (à implémenter dans les sous-classes)"""
+        """Met à jour l'état spécifique à la stratégie.
+
+        À implémenter dans les sous-classes.
+        """
         pass
 
     @abstractmethod
@@ -202,7 +205,10 @@ class BaseStrategy(ABC):
         return max(1.01, min(99.0, multiplier))
 
     def get_genome(self) -> dict[str, Any]:
-        """Retourne la configuration génétique de la stratégie (pour évolution future)."""
+        """Retourne la configuration génétique de la stratégie.
+
+        Pour évolution future.
+        """
         return {
             "strategy_type": self.get_name(),
             "base_bet": str(self.config.base_bet),
@@ -271,19 +277,19 @@ class BaseStrategy(ABC):
     # Hooks pour l'extensibilité
     def on_before_bet(self, game_state: GameState) -> None:
         """Hook appelé avant de calculer le prochain pari."""
-        pass
+        _ = game_state  # Unused parameter
 
     def on_after_decision(self, decision: BetDecision, game_state: GameState) -> None:
         """Hook appelé après avoir pris une décision."""
-        pass
+        _ = decision, game_state  # Unused parameters
 
     def on_winning_streak(self, streak_length: int, game_state: GameState) -> None:
         """Hook appelé lors d'une série de gains."""
-        pass
+        _ = streak_length, game_state  # Unused parameters
 
     def on_losing_streak(self, streak_length: int, game_state: GameState) -> None:
         """Hook appelé lors d'une série de pertes."""
-        pass
+        _ = streak_length, game_state  # Unused parameters
 
     # Méthodes privées
     def _check_streaks(self, game_state: GameState) -> None:

@@ -53,6 +53,13 @@ cov.xml
 # Django stuff:
 *.log
 
+# DiceBot specific - Large log files
+betlog/**/*.jsonl
+logs/
+test_logs/
+hybrid_logs/
+*.jsonl
+
 # Sphinx documentation
 docs/_build/
 docs/_api

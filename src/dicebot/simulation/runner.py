@@ -10,6 +10,7 @@ from typing import Any
 
 from ..core.models import GameConfig, VaultConfig
 from ..strategies.factory import StrategyFactory
+from ..utils.logger import JSONLinesLogger
 from ..utils.progress import progress_manager
 from .engine import SimulationEngine
 
@@ -50,6 +51,8 @@ class SimulationRunner:
         parallel: bool = None,
         max_workers: int | None = None,
         show_progress: bool = True,
+        enable_detailed_logs: bool = False,
+        log_dir: str | Path = "logs",
     ) -> dict[str, Any]:
         """Run simulation for a single strategy.
 
@@ -61,6 +64,8 @@ class SimulationRunner:
             parallel: Whether to use parallel processing (auto-detect if None)
             max_workers: Maximum number of parallel workers
             show_progress: Whether to show progress bar
+            enable_detailed_logs: Whether to enable detailed JSON Lines logging
+            log_dir: Directory for detailed log files
 
         Returns:
             Dictionary with simulation results
@@ -76,8 +81,34 @@ class SimulationRunner:
         # Create vault config
         vault_config = VaultConfig(total_capital=self.total_capital)
 
+        # Create logger if detailed logging is enabled
+        logger = None
+        if enable_detailed_logs:
+            # Create unique log file name with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_filename = f"simulation_{strategy_name}_{timestamp}.jsonl"
+
+            # Import LogType for classification
+            from ..utils.logger import LogType
+
+            # Determine log type based on strategy
+            log_type = None
+            if "composite" in strategy_name.lower():
+                log_type = LogType.STRATEGY_COMPOSITE
+            elif "adaptive" in strategy_name.lower():
+                log_type = LogType.STRATEGY_ADAPTIVE
+            elif any(
+                basic in strategy_name.lower()
+                for basic in ["martingale", "fibonacci", "dalembert", "flat", "paroli"]
+            ):
+                log_type = LogType.STRATEGY_BASIC
+            else:
+                log_type = LogType.SIMULATION_SINGLE
+
+            logger = JSONLinesLogger(log_filename, log_type=log_type, base_dir=log_dir)
+
         # Create and run simulation
-        engine = SimulationEngine(vault_config, self.game_config)
+        engine = SimulationEngine(vault_config, self.game_config, logger=logger)
 
         if show_progress:
             description = f"Running {strategy_name} strategy"
@@ -155,6 +186,10 @@ class SimulationRunner:
         if save_results:
             self._save_strategy_results(strategy_name, results)
 
+        # Close logger if it was created
+        if logger:
+            logger.close()
+
         return results
 
     def run_strategy_comparison(
@@ -163,6 +198,8 @@ class SimulationRunner:
         num_sessions: int = 100,
         session_config: dict[str, Any] | None = None,
         save_results: bool = True,
+        enable_detailed_logs: bool = False,
+        log_dir: str | Path = "betlog",
     ) -> dict[str, Any]:
         """Run and compare multiple strategies.
 
@@ -171,6 +208,8 @@ class SimulationRunner:
             num_sessions: Number of sessions per strategy
             session_config: Session configuration
             save_results: Whether to save results to file
+            enable_detailed_logs: Whether to enable detailed JSON Lines logging
+            log_dir: Directory for detailed log files
 
         Returns:
             Dictionary with comparison results
@@ -186,9 +225,14 @@ class SimulationRunner:
                 )  # Use copy to avoid modifying original
                 strategy_name = strategy.get_name()
 
-                # Run simulation
+                # Run simulation with comparison logging if enabled
                 results = self.run_strategy_simulation(
-                    config, num_sessions, session_config, save_results=False
+                    config,
+                    num_sessions,
+                    session_config,
+                    save_results=False,
+                    enable_detailed_logs=enable_detailed_logs,
+                    log_dir=log_dir,
                 )
 
                 comparison_results[strategy_name] = results
@@ -231,6 +275,8 @@ class SimulationRunner:
         num_sessions: int = 50,
         session_config: dict[str, Any] | None = None,
         save_results: bool = True,
+        enable_detailed_logs: bool = False,
+        log_dir: str | Path = "betlog",
     ) -> dict[str, Any]:
         """Run parameter sweep for strategy optimization.
 
@@ -240,6 +286,8 @@ class SimulationRunner:
             num_sessions: Number of sessions per parameter combination
             session_config: Session configuration
             save_results: Whether to save results
+            enable_detailed_logs: Whether to enable detailed JSON Lines logging
+            log_dir: Directory for detailed log files
 
         Returns:
             Dictionary with sweep results
@@ -255,9 +303,14 @@ class SimulationRunner:
             config.update(params)
 
             try:
-                # Run simulation
+                # Run simulation with parameter sweep logging if enabled
                 results = self.run_strategy_simulation(
-                    config, num_sessions, session_config, save_results=False
+                    config,
+                    num_sessions,
+                    session_config,
+                    save_results=False,
+                    enable_detailed_logs=enable_detailed_logs,
+                    log_dir=log_dir,
                 )
 
                 # Extract key metrics
@@ -370,14 +423,16 @@ class SimulationRunner:
         if rankings["by_profitability_rate"]:
             best_prof = rankings["by_profitability_rate"][0]
             recommendations.append(
-                f"Most consistent: {best_prof[0]} ({best_prof[1]['profitability_rate']:.1%} profitable sessions)"
+                f"Most consistent: {best_prof[0]} "
+                f"({best_prof[1]['profitability_rate']:.1%} profitable sessions)"
             )
 
         # Lowest risk
         if rankings["by_drawdown"]:
             lowest_dd = rankings["by_drawdown"][0]
             recommendations.append(
-                f"Lowest risk: {lowest_dd[0]} ({lowest_dd[1]['worst_drawdown']:.1%} max drawdown)"
+                f"Lowest risk: {lowest_dd[0]} "
+                f"({lowest_dd[1]['worst_drawdown']:.1%} max drawdown)"
             )
 
         return recommendations

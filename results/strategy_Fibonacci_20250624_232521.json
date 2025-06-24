@@ -1,0 +1,126 @@
+{
+  "simulation_summary": {
+    "total_sessions": 2,
+    "total_bets": 255,
+    "total_profit": -2.08125,
+    "total_wagered": 12.97125,
+    "overall_roi": -0.16045099739809193,
+    "profitable_sessions": 0,
+    "profitability_rate": 0.0,
+    "average_win_rate": 0.008695652173913044,
+    "average_session_duration": 0.0245135,
+    "stop_reasons": {
+      "insufficient_balance": 2
+    },
+    "average_max_drawdown": 1.0,
+    "worst_drawdown": 1.0,
+    "vault_status": {
+      "vault_balance": 42.5,
+      "bankroll_balance": 5.41875,
+      "total_balance": 47.91875,
+      "vault_ratio": 0.8869179600886918,
+      "bankroll_ratio": 0.1130820399113082,
+      "total_deposited": 50.0,
+      "total_withdrawn": 0.0,
+      "net_profit": -2.08125
+    }
+  },
+  "strategy_info": {
+    "strategy_config": {
+      "strategy": "fibonacci",
+      "base_bet": "0.001"
+    },
+    "strategy_genome": {
+      "strategy_type": "Fibonacci",
+      "base_bet": "0.001",
+      "min_bet": "0.00015",
+      "max_bet": "1000",
+      "multiplier": 2.0,
+      "max_losses": 10,
+      "default_multiplier": 2.0,
+      "default_bet_type": "under",
+      "default_target": 50.0,
+      "allow_bet_type_switching": false,
+      "allow_target_adjustment": false,
+      "confidence": 0.1,
+      "fitness": 0.3710470554223424,
+      "generation": 0,
+      "mutations": []
+    },
+    "strategy_fitness": 0.3710470554223424,
+    "strategy_metrics": {
+      "total_bets": 255,
+      "win_rate": 0.01568627450980392,
+      "roi": -0.16045099739809193,
+      "max_bet_reached": 0.055,
+      "max_consecutive_losses": 132,
+      "average_confidence": 0.0,
+      "profit_factor": 0.8369920145955639
+    }
+  },
+  "sessions_data": [
+    {
+      "session_id": "ce97386f-53e8-4f25-94b7-1ee2120ca230",
+      "strategy_name": "Fibonacci",
+      "bot_id": "manual",
+      "started_at": "2025-06-24T23:25:21.914799",
+      "ended_at": "2025-06-24T23:25:21.959115",
+      "stop_reason": "insufficient_balance",
+      "duration_seconds": 0.044316,
+      "initial_balance": 1.125,
+      "final_balance": 0.0,
+      "total_profit": -1.125,
+      "total_wagered": 12.015,
+      "roi": -1.0,
+      "bets_count": 230,
+      "wins_count": 4,
+      "losses_count": 226,
+      "win_rate": 0.017391304347826087,
+      "max_consecutive_wins": 1,
+      "max_consecutive_losses": 132,
+      "max_drawdown": 1.0,
+      "sharpe_ratio": 0.0,
+      "peak_balance": 7.197,
+      "lowest_balance": 0.0,
+      "bets_per_minute": 271306.39929224417,
+      "stop_loss": null,
+      "take_profit": null,
+      "max_bets": null
+    },
+    {
+      "session_id": "75c49669-2ffc-4e0c-99b5-aa3b9fb7bc24",
+      "strategy_name": "Fibonacci",
+      "bot_id": "manual",
+      "started_at": "2025-06-24T23:25:21.959294",
+      "ended_at": "2025-06-24T23:25:21.964005",
+      "stop_reason": "insufficient_balance",
+      "duration_seconds": 0.004711,
+      "initial_balance": 0.95625,
+      "final_balance": 0.0,
+      "total_profit": -0.95625,
+      "total_wagered": 0.95625,
+      "roi": -1.0,
+      "bets_count": 25,
+      "wins_count": 0,
+      "losses_count": 25,
+      "win_rate": 0.0,
+      "max_consecutive_wins": 0,
+      "max_consecutive_losses": 25,
+      "max_drawdown": 1.0,
+      "sharpe_ratio": 0.0,
+      "peak_balance": 0.95625,
+      "lowest_balance": 0.0,
+      "bets_per_minute": 234815.278647464,
+      "stop_loss": null,
+      "take_profit": null,
+      "max_bets": null
+    }
+  ],
+  "simulation_metadata": {
+    "run_timestamp": "2025-06-24T23:25:21.965681",
+    "num_sessions_requested": 2,
+    "num_sessions_completed": 2,
+    "session_config": {},
+    "total_capital": 50.0
+  }
+}

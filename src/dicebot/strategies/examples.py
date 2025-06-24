@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 from .adaptive import AdaptiveConfig, AdaptiveStrategy, StrategyRule, SwitchCondition
+from .composite import CompositeStrategy
 from .factory import StrategyFactory
 
 

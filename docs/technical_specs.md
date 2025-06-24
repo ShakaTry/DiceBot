@@ -68,6 +68,45 @@ class GameSession:
     emotional_state: Dict[str, float]  # Si on implémente l'aspect émotionnel
 ```
 
+### 3. Contraintes Techniques - Provably Fair
+
+#### Contrainte de Nonce Séquentiel
+
+Le système Provably Fair de Bitsler impose une contrainte critique :
+
+```python
+# Contrainte : Chaque nonce DOIT être utilisé séquentiellement
+# Impossible de "sauter" un nonce (0, 1, 2, 3... sans interruption)
+
+# Actions alternatives sans consommer de nonce :
+ACTIONS_SANS_NONCE = [
+    "toggle_bet_type",     # Change UNDER/OVER
+    "change_seed",         # Rotation de seed (reset nonce à 0)
+]
+
+# Gestion dans BetDecision
+@dataclass
+class BetDecision:
+    amount: Decimal
+    multiplier: float
+    bet_type: BetType = BetType.UNDER
+    skip: bool = False
+    action: str | None = None  # Actions alternatives
+```
+
+#### Implémentation ParkingStrategy
+
+```python
+# Stratégie spécialisée pour gérer la contrainte
+class ParkingStrategy(BaseStrategy):
+    """
+    - Toggle UNDER/OVER jusqu'à max_toggles
+    - Rotation de seed si nécessaire
+    - Paris parking minimum (99% chance) quand forcé
+    - Wrapper pour toute stratégie existante
+    """
+```
+
 ### 3. Composants Techniques
 
 #### Simulateur (Phase 1)

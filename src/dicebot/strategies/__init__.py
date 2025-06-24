@@ -6,6 +6,7 @@ from .factory import StrategyFactory
 from .fibonacci import FibonacciStrategy
 from .flat import FlatBetting
 from .martingale import MartingaleStrategy
+from .parking import ParkingConfig, ParkingStrategy
 from .paroli import ParoliStrategy
 
 __all__ = [
@@ -24,5 +25,7 @@ __all__ = [
     "AdaptiveConfig",
     "StrategyRule",
     "SwitchCondition",
+    "ParkingConfig",
+    "ParkingStrategy",
     "StrategyFactory",
 ]

@@ -89,6 +89,17 @@ game:
   house_edge: 0.01
   min_bet_ltc: "0.00015"
   max_bet_ltc: "1000"
+
+# Configuration du parking (contrainte Provably Fair)
+parking:
+  enabled: true
+  max_toggles_before_bet: 3      # Toggles UNDER/OVER avant pari forcé
+  parking_bet_amount: 0.00015    # Mise minimum en parking
+  parking_target: 98.0           # 99% de chance de gagner
+  parking_bet_type: "UNDER"
+  auto_seed_rotation_after: 1000 # Rotation après X nonces
+  parking_on_consecutive_losses: 5
+  parking_on_drawdown_percent: 0.1
 ```
 
 ### Presets Disponibles
@@ -133,6 +144,11 @@ game:
 
 6. **composite** - Combine plusieurs stratégies
 7. **adaptive** - Change de stratégie dynamiquement
+8. **parking** - Gère la contrainte de nonce séquentiel
+   - Utilise toggles UNDER/OVER pour éviter de parier
+   - Rotation automatique de seed
+   - Paris minimaux à 99% de chance quand forcé
+   - Peut wrapper n'importe quelle stratégie existante
 
 ## 🎲 Système Provably Fair
 
@@ -171,6 +187,7 @@ print(f"Valide: {verification['is_valid']}")
 - ✅ **Vérification croisée** : Compatible avec le vérificateur officiel Bitsler  
 - ✅ **Transparence totale** : Tous les résultats sont vérifiables
 - ✅ **Sécurité cryptographique** : Impossible de prédire ou manipuler
+- ✅ **Contrainte de nonce** : Respect de la séquence obligatoire (0, 1, 2...)
 
 📚 **Documentation complète** : Voir [PROVABLY_FAIR.md](PROVABLY_FAIR.md)
 
@@ -219,6 +236,11 @@ python -m DiceBot recovery clean --max-age 7
 - **Win Rate** : % de paris gagnés
 - **Max Drawdown** : Plus grosse perte depuis un pic
 - **Sharpe Ratio** : Ratio rendement/risque
+- **Parking Metrics** : Paris forcés et pertes de parking
+  - `parking_bets_count` : Nombre de paris parking
+  - `parking_losses` : Pertes totales en parking
+  - `seed_rotations_count` : Rotations de seed
+  - `bet_type_toggles` : Toggles UNDER/OVER
 
 ### Exemple de Sortie
 

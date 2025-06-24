@@ -49,9 +49,9 @@ python -m DiceBot analyze results/strategy_comparison_*.json --detailed
 
 ```
 dicebot/
-├── core/           # 🎯 Moteur de jeu avec house edge 1%
+├── core/           # 🎯 Moteur de jeu avec house edge 1% + Provably Fair
 ├── money/          # 💰 Gestion vault (85%) / bankroll (15%)
-├── strategies/     # 🧠 7 stratégies + Composite + Adaptive
+├── strategies/     # 🧠 8 stratégies + Composite + Adaptive + Parking
 ├── simulation/     # ⚡ Engine multiprocessing (+73% performance)
 ├── utils/          # 🛠️ Progress bars, config YAML, validation
 └── CLI/            # 💻 4 commandes + presets + recovery
@@ -68,6 +68,7 @@ dicebot/
 | `paroli` | 🟢 Faible | Double après gain | Opportuniste |
 | `composite` | 🔵 Variable | Combine stratégies | Avancé |
 | `adaptive` | 🔵 Variable | Change dynamiquement | Expert |
+| `parking` | 🎯 Auto | Gère contrainte nonce | Système |
 
 ## 🎛️ Presets Intégrés
 
@@ -127,10 +128,11 @@ python -m DiceBot simulate --capital 10 --strategy martingale --base-bet 5
 
 ## 🧪 Tests & Qualité
 
-- **73 tests automatisés** (>90% coverage)
+- **82 tests automatisés** (>90% coverage)
 - **Validation continue** avec pre-commit hooks
 - **Type checking** avec pyright
 - **Linting automatique** avec ruff
+- **Contrainte Provably Fair** respectée (nonces séquentiels)
 
 ```bash
 # Lancer tous les tests
@@ -173,6 +175,7 @@ python -m DiceBot recovery resume simulation_id_123
 - **Mise minimum** : 0.00015 LTC
 - **House edge** : 1% (intégré dans tous les calculs)
 - **Délai entre paris** : 1.5-3 secondes
+- **Contrainte Provably Fair** : Nonces séquentiels obligatoires (0, 1, 2...)
 
 ## 🔄 Phases de Développement
 
@@ -211,10 +214,11 @@ Sous licence Apache 2.0. Voir [LICENSE](LICENSE) pour plus de détails.
 
 **✅ PHASE 1 COMPLÈTE - PRODUCTION READY**
 
-- 73 tests passés
+- 82 tests passés (incluant tests Provably Fair)
 - Performance +73% 
 - CLI professionnelle
 - Documentation complète
+- Contrainte nonce séquentiel implémentée
 - Prêt pour la Phase 2
 
 ---

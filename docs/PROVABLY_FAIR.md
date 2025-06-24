@@ -105,6 +105,80 @@ else:
     print("❌ Résultat invalide!")
 ```
 
+## 🔒 Contrainte de Nonce Séquentiel
+
+### Exigence Critique de Bitsler
+
+Sur Bitsler, **chaque nonce doit être utilisé séquentiellement** (0, 1, 2, 3...). Vous ne pouvez pas "sauter" un nonce - c'est une contrainte fondamentale du système Provably Fair.
+
+### Conséquences pour les Stratégies
+
+1. **Impossible de "pausser"** : Toute stratégie qui veut attendre doit faire un pari
+2. **Paris forcés** : Si votre stratégie ne veut pas parier, vous devez quand même consommer le nonce
+3. **Actions alternatives** : Pour éviter de parier sans stratégie
+
+### Actions Sans Consommer de Nonce
+
+| Action | Effet | Utilisation |
+|--------|-------|-------------|
+| **Toggle UNDER/OVER** | Change le type de pari | Peut être répété plusieurs fois |
+| **Rotation de seed** | Reset le nonce à 0 | Révèle l'ancien server seed |
+
+### ParkingStrategy - Solution Intelligente
+
+La `ParkingStrategy` gère automatiquement cette contrainte :
+
+```python
+from dicebot.strategies.parking import ParkingConfig, ParkingStrategy
+
+# Configuration du parking
+parking_config = ParkingConfig(
+    base_bet=Decimal("0.001"),
+    parking_bet_amount=Decimal("0.00015"),  # Mise minimum
+    parking_target=98.0,  # 99% de chance de gagner
+    max_toggles_before_bet=3,  # Toggles avant pari forcé
+    parking_on_consecutive_losses=5,  # Active parking après 5 pertes
+)
+
+# Wrapper une stratégie existante
+base_strategy = StrategyFactory.create("martingale", strategy_config)
+parking = ParkingStrategy(parking_config)
+parking.set_base_strategy(base_strategy)
+```
+
+### Séquence de Parking Typique
+
+1. **Détection** : La stratégie veut attendre (5+ pertes consécutives)
+2. **Toggle 1** : Change UNDER → OVER (pas de nonce consommé)
+3. **Toggle 2** : Change OVER → UNDER (pas de nonce consommé) 
+4. **Toggle 3** : Change UNDER → OVER (pas de nonce consommé)
+5. **Pari forcé** : Mise minimum à 98% de chance (consomme le nonce)
+
+### Métriques de Parking
+
+Le système trace le coût du parking :
+
+```python
+game_state.parking_bets_count    # Nombre de paris parking
+game_state.parking_losses        # Pertes totales en parking
+game_state.seed_rotations_count  # Rotations de seed effectuées
+game_state.bet_type_toggles      # Toggles UNDER/OVER
+```
+
+### Configuration YAML
+
+```yaml
+parking:
+  enabled: true
+  max_toggles_before_bet: 3
+  parking_bet_amount: 0.00015
+  parking_target: 98.0
+  parking_bet_type: "UNDER"
+  auto_seed_rotation_after: 1000
+  parking_on_consecutive_losses: 5
+  parking_on_drawdown_percent: 0.1
+```
+
 ## 🔍 Vérification Manuelle
 
 ### Utilisation du Vérificateur
@@ -264,7 +338,9 @@ Avant d'utiliser le système en production :
 - [ ] Tester avec des seeds connus
 - [ ] Vérifier la compatibilité avec le vérificateur Bitsler
 - [ ] Confirmer que les hashs de server seed correspondent
-- [ ] Valider la séquence de nonce
+- [ ] Valider la séquence de nonce (pas de saut)
 - [ ] Effectuer une rotation de seeds et vérifier l'historique
+- [ ] Tester ParkingStrategy avec vos stratégies
+- [ ] Vérifier les métriques de parking
 
-**🎲 Le système Provably Fair de DiceBot garantit une transparence totale et une compatibilité parfaite avec Bitsler !**
+**🎲 Le système Provably Fair de DiceBot garantit une transparence totale et une compatibilité parfaite avec Bitsler, incluant le respect de la contrainte de nonce séquentiel !**

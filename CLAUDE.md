@@ -8,6 +8,8 @@ DiceBot is an **artificial consciousness evolution laboratory** that uses the Di
 
 **🎲 NOUVEAU**: Système **Provably Fair** compatible Bitsler intégré pour garantir la transparence et la vérifiabilité de tous les résultats.
 
+**⚠️ CONTRAINTE CRITIQUE**: Implémentation de la contrainte de nonce séquentiel - chaque nonce doit être utilisé dans l'ordre (0, 1, 2...). Système de parking intelligent pour minimiser les pertes lors des paris forcés.
+
 ## 🚀 Latest Updates (Session 3 - JOUR 5-7 COMPLET)
 
 ### ✅ Phase 1 TERMINÉE - Production Ready!
@@ -37,6 +39,22 @@ DiceBot is an **artificial consciousness evolution laboratory** that uses the Di
    - 21 tests de compatibilité (20/21 passent)
    - Documentation complète avec exemples
 
+#### Session 5 Nonce Constraint Implementation:
+10. **🔒 Contrainte de Nonce Séquentiel** - ✅ COMPLET
+   - **ParkingStrategy** (`strategies/parking.py`) - Gestion intelligente des paris forcés
+   - Actions alternatives : toggle UNDER/OVER, rotation de seed
+   - Métriques de parking dans GameState
+   - SimulationEngine modifié pour gérer les actions non-paris
+   - 9 tests supplémentaires (82 tests total)
+
+#### Session 6 Logging Enhancement:
+11. **📊 Système de Logging Détaillé** - ✅ COMPLET
+   - **JSONLinesLogger** enrichi avec données Provably Fair complètes
+   - **Nouveaux paramètres CLI** : `--detailed-logs` et `--log-dir`
+   - **Intégration SimulationEngine** : Logging automatique de chaque pari
+   - **Événements complets** : session_start/end, bet_decision/result, strategy_*
+   - **Architecture flexible** : Logs détaillés optionnels, séparés des résumés
+
 ## 📚 Architecture Overview
 
 The project follows a phased development approach:
@@ -62,6 +80,7 @@ src/dicebot/
 │   ├── martingale.py   # Classic strategies...
 │   ├── composite.py    # NEW: Combine multiple strategies
 │   ├── adaptive.py     # NEW: Dynamic strategy switching
+│   ├── parking.py      # NEW: Parking strategy for nonce constraint
 │   └── factory.py      # Enhanced with validation
 ├── simulation/     # ✅ Simulation engine and runner (COMPLET)
 │   ├── engine.py        # Moteur multiprocessing + optimisations
@@ -107,7 +126,7 @@ src/dicebot/
    - Preparation for Phase 2 events
 
 5. **Testing**
-   - 73 tests total (24 core/money + 49 strategies)
+   - 82 tests total (24 core/money + 49 strategies + 9 provably fair)
    - Coverage: Core 91%, Strategies 95%
    - All tests passing ✅
 
@@ -213,6 +232,11 @@ python -m DiceBot analyze results/strategy_Martingale_20250624_180453.json
 python -m DiceBot recovery list
 python -m DiceBot recovery resume simulation_id_123
 
+# Simulation avec logging détaillé (nouveau - organisation automatique)
+python -m DiceBot simulate --capital 100 --strategy fibonacci --detailed-logs
+python -m DiceBot simulate --capital 250 --strategy composite --detailed-logs
+python -m DiceBot simulate --capital 150 --strategy adaptive --detailed-logs --log-dir custom_betlog
+
 # Build distribution
 python -m build
 
@@ -287,6 +311,12 @@ strategy = StrategyFactory.create_from_dict(config_dict)
   - Low confidence
   - Balance thresholds
 
+- **ParkingStrategy** - Gère la contrainte de nonce séquentiel
+  - Toggle UNDER/OVER sans consommer de nonce
+  - Rotation automatique de seed
+  - Paris parking minimaux (99% chance de gagner)
+  - Wrapper pour toute stratégie existante
+
 ## 📍 Development Workflow
 
 ### Starting a new feature:
@@ -301,16 +331,17 @@ strategy = StrategyFactory.create_from_dict(config_dict)
 - **Add CLI**: Create runner with commands (Day 7)
 - **Add Utils**: Logger and metrics (Day 5-6)
 
-### ✅ Phase 1 Terminée (Day 5-7):
+### ✅ Phase 1 Terminée (Day 5-8):
 1. ✅ `SimulationEngine` avec multiprocessing et optimisations
 2. ✅ `SimulationRunner` avec comparaisons et parameter sweep
 3. ✅ CLI 4 commandes + presets + validation
-4. ✅ JSON Lines logger avec rotation
+4. ✅ JSON Lines logger avec rotation + **données Provably Fair**
 5. ✅ Calculateur métriques avancées
 6. ✅ Barres progression Rich avec stats temps réel
 7. ✅ Configuration YAML + presets intégrés
 8. ✅ Système validation + suggestions sécurité
 9. ✅ Recovery/checkpoint complet
+10. ✅ **Logging détaillé intégré** avec paramètres CLI `--detailed-logs`
 
 ### 🎯 Focus Actuel (Phase 2):
 **Prêt pour l'implémentation du système évolutionnaire et Bot Architect**
@@ -331,16 +362,72 @@ strategy = StrategyFactory.create_from_dict(config_dict)
 - Mock external dependencies (Bitsler API when implemented)
 - Use `Decimal` in all test assertions for money values
 - Test strategy limits and edge cases
+- Test provably fair constraints (nonce séquentiel)
 
-## 📊 Logging (✅ IMPLÉMENTÉ)
+## 📊 Logging (✅ IMPLÉMENTÉ COMPLET + STRUCTURE ORGANISÉE)
 
-- ✅ JSON Lines format pour logs structurés
-- ✅ Log détaillé de chaque décision et résultat
-- ✅ Rotation automatique par taille/date
-- ✅ Métriques de session incluses
-- ✅ Aucune information sensible loggée
-- ✅ Export sessions en format JSON/CSV
-- ✅ Intégration avec système de progress bars
+### Architecture du Logging
+- ✅ **Logs détaillés** : JSON Lines format avec rotation automatique
+- ✅ **Logs résumés** : Format JSON pour résultats globaux  
+- ✅ **Structure hiérarchique** : `betlog/` avec classification automatique
+- ✅ **Organisation intelligente** : Classification par type et stratégie
+
+### Structure BetLog Organisée
+```
+betlog/
+├── simulations/          # Simulations standard
+│   ├── single/           # Simulations individuelles
+│   ├── comparison/       # Comparaisons multi-stratégies  
+│   └── parameter_sweep/  # Sweeps de paramètres
+├── strategies/           # Classification par stratégie
+│   ├── basic/           # Martingale, Fibonacci, D'Alembert, Flat, Paroli
+│   ├── composite/       # Stratégies composites/hybrides
+│   └── adaptive/        # Stratégies adaptatives
+├── sessions/            # Sessions de test
+│   ├── manual/          # Tests manuels et validation
+│   └── automated/       # Sessions automatisées
+└── analysis/            # Analyses et debug
+    ├── performance/     # Tests de performance
+    └── validation/      # Validation et debug
+```
+
+### Classification Automatique
+- ✅ **Détection de stratégie** : Composite, Adaptive, Basic auto-détectées
+- ✅ **Type de simulation** : Single, Comparison, Parameter Sweep
+- ✅ **Contexte d'usage** : Manual, Automated, Performance, Validation
+
+### Données Provably Fair dans les Logs
+- ✅ **Informations complètes** : `server_seed_hash`, `client_seed`, `nonce`
+- ✅ **Données de vérification** : `verification_data` avec tous les paramètres
+- ✅ **Compatibilité Bitsler** : Format exact pour audit externe
+
+### Événements Loggés
+- ✅ **`session_start/end`** : Configuration et résumé de session
+- ✅ **`bet_decision/result`** : Chaque décision et résultat de pari
+- ✅ **`strategy_*`** : Actions non-pari (seed_change, bet_type_toggle, parking_bet)
+
+### Utilisation CLI avec Organisation Automatique
+```bash
+# Logging détaillé avec classification automatique
+python -m DiceBot simulate --capital 100 --strategy fibonacci --detailed-logs
+# → betlog/strategies/basic/simulation_Fibonacci_YYYYMMDD_HHMMSS.jsonl
+
+python -m DiceBot simulate --capital 250 --strategy composite --detailed-logs
+# → betlog/strategies/composite/simulation_Composite_YYYYMMDD_HHMMSS.jsonl
+
+python -m DiceBot simulate --capital 150 --strategy adaptive --detailed-logs
+# → betlog/strategies/adaptive/simulation_Adaptive_YYYYMMDD_HHMMSS.jsonl
+
+# Répertoire personnalisé (garde la classification)
+python -m DiceBot simulate --capital 200 --strategy martingale --detailed-logs --log-dir custom_betlog
+# → custom_betlog/strategies/basic/simulation_Martingale_YYYYMMDD_HHMMSS.jsonl
+```
+
+### Intégration
+- ✅ **SimulationEngine** : Logging automatique dans la boucle de jeu
+- ✅ **Performance** : Logging optionnel (aucun impact si désactivé)
+- ✅ **Robustesse** : Gestion d'erreurs et fermeture propre
+- ✅ **Classification intelligente** : Organisation automatique selon type et stratégie
 
 ## 🔧 Code Patterns
 
@@ -414,10 +501,26 @@ config = AdaptiveConfig(
     ]
 )
 adaptive = AdaptiveStrategy(config)
+
+# Parking Strategy (pour la contrainte de nonce)
+from dicebot.strategies.parking import ParkingConfig, ParkingStrategy
+
+parking_config = ParkingConfig(
+    base_bet=Decimal("0.001"),
+    parking_bet_amount=Decimal("0.00015"),  # Mise minimum
+    parking_target=98.0,  # 99% de chance de gagner
+    max_toggles_before_bet=3
+)
+parking = ParkingStrategy(parking_config)
+
+# Wrapper une stratégie existante avec parking
+base_strategy = StrategyFactory.create("martingale", config)
+parking.set_base_strategy(base_strategy)
 ```
 
 ---
 
-*Last updated: After Session 3 - Phase 1 COMPLET*  
-*Status: PRODUCTION READY - 73 tests passés, performance +73%*  
+*Last updated: After Session 6 - Système de Logging Détaillé implémenté*  
+*Status: PRODUCTION READY - 82 tests passés, performance +73%*  
+*Features: Système Provably Fair + Logging détaillé avec données complètes*  
 *Next steps: Phase 2 (Système évolutionnaire, Bot Architect)*

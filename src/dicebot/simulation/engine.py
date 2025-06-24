@@ -25,6 +25,7 @@ class SimulationEngine:
         vault_config: VaultConfig,
         game_config: GameConfig | None = None,
         event_bus: EventBus | None = None,
+        logger=None,
     ):
         """Initialize the simulation engine.
 
@@ -32,12 +33,14 @@ class SimulationEngine:
             vault_config: Configuration for vault and bankroll
             game_config: Configuration for dice game (uses defaults if None)
             event_bus: Event bus for communication (uses global if None)
+            logger: JSONLinesLogger for detailed logging (optional)
         """
         self.vault_config = vault_config
         self.game_config = game_config or GameConfig()
         from ..core.events import event_bus as global_event_bus
 
         self.event_bus = event_bus or global_event_bus
+        self.logger = logger
 
         # Initialize components
         self.vault = Vault(vault_config)
@@ -82,6 +85,10 @@ class SimulationEngine:
         self.current_session = session_state
         max_duration = config.get("max_duration")
 
+        # Log session start if logger is available
+        if self.logger:
+            self.logger.log_session_start(session_state)
+
         # Run simulation loop
         try:
             while True:
@@ -100,11 +107,93 @@ class SimulationEngine:
                     session_state.end_session("max_duration")
                     break
 
+                # Add current nonce to game state metadata
+                if self.dice_game.is_provably_fair_enabled:
+                    game_state.metadata["current_nonce"] = (
+                        self.dice_game.provably_fair.current_seeds.nonce
+                    )
+
                 # Get bet decision from strategy
                 decision = strategy.decide_bet(game_state)
 
-                # Skip if strategy says to skip
-                if decision.skip:
+                # Log bet decision if logger is available
+                if self.logger:
+                    self.logger.log_bet_decision(
+                        decision, game_state, strategy.get_name(), session_id
+                    )
+
+                # Handle non-betting actions (Provably Fair constraint)
+                if decision.skip and decision.action:
+                    if decision.action == "change_seed":
+                        # Rotate seeds (resets nonce to 0)
+                        self.dice_game.rotate_seeds()
+                        game_state.seed_rotations_count += 1
+
+                        # Log seed change action
+                        if self.logger:
+                            self.logger.log_strategy_event(
+                                "seed_change",
+                                strategy.get_name(),
+                                session_id,
+                                {
+                                    "old_nonce": game_state.metadata.get(
+                                        "current_nonce", 0
+                                    ),
+                                    "new_server_seed_hash": (
+                                        self.dice_game.provably_fair.current_seeds.server_seed_hash
+                                    ),
+                                    "seed_rotations_count": (
+                                        game_state.seed_rotations_count
+                                    ),
+                                },
+                            )
+
+                        # Notify strategy of seed change
+                        if hasattr(strategy, "on_seed_change"):
+                            strategy.on_seed_change()
+                        continue
+
+                    elif decision.action == "toggle_bet_type":
+                        # Toggle UNDER/OVER without betting (doesn't consume nonce)
+                        game_state.current_bet_type = decision.bet_type
+                        game_state.bet_type_toggles += 1
+
+                        # Log bet type toggle action
+                        if self.logger:
+                            self.logger.log_strategy_event(
+                                "bet_type_toggle",
+                                strategy.get_name(),
+                                session_id,
+                                {
+                                    "new_bet_type": decision.bet_type.value
+                                    if decision.bet_type
+                                    else None,
+                                    "bet_type_toggles": game_state.bet_type_toggles,
+                                },
+                            )
+                        continue
+
+                    elif decision.action == "forced_parking_bet":
+                        # This is a forced bet, continue to normal betting
+                        # Log parking bet action
+                        if self.logger:
+                            self.logger.log_strategy_event(
+                                "parking_bet",
+                                strategy.get_name(),
+                                session_id,
+                                {
+                                    "reason": "forced_parking_bet",
+                                    "amount": str(decision.amount),
+                                    "target": strategy.select_target(game_state),
+                                    "bet_type": strategy.select_bet_type(
+                                        game_state
+                                    ).value,
+                                },
+                            )
+                        pass
+
+                # Skip if strategy says to skip (old behavior)
+                elif decision.skip:
                     # If strategy can't bet, end session
                     if decision.reason in [
                         "Insufficient balance",
@@ -114,12 +203,24 @@ class SimulationEngine:
                         break
                     continue
 
-                # Execute bet
+                # Execute bet (consumes nonce)
                 result = self.dice_game.roll(decision.amount, decision.multiplier)
+
+                # Track parking bets
+                if decision.action == "forced_parking_bet":
+                    game_state.parking_bets_count += 1
+                    if not result.won:
+                        game_state.parking_losses += result.amount
 
                 # Update states
                 session_state.update(result)
                 strategy.update_after_result(result)
+
+                # Log bet result if logger is available
+                if self.logger:
+                    self.logger.log_bet_result(
+                        result, game_state, strategy.get_name(), session_id
+                    )
 
         except Exception as e:
             session_state.end_session(f"error: {str(e)}")
@@ -132,6 +233,10 @@ class SimulationEngine:
         self.vault.return_session_profit(
             initial_balance, session_state.game_state.balance
         )
+
+        # Log session end if logger is available
+        if self.logger:
+            self.logger.log_session_end(session_state)
 
         # Store session
         self.session_history.append(session_state)
@@ -154,7 +259,8 @@ class SimulationEngine:
             strategy: The betting strategy to use
             num_sessions: Number of sessions to run
             session_config: Configuration for each session
-            reset_strategy_between_sessions: Whether to reset strategy state between sessions
+            reset_strategy_between_sessions: Whether to reset strategy state
+                between sessions
             parallel: Whether to run sessions in parallel (faster but uses more memory)
             max_workers: Maximum number of parallel workers (defaults to CPU count)
 

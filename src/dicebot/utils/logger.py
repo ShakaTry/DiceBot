@@ -12,6 +12,100 @@ from typing import Any
 from ..core.models import BetDecision, BetResult, GameState, SessionState
 
 
+class LogType:
+    """Constants for log type classification."""
+
+    # Simulation types
+    SIMULATION_SINGLE = "simulation_single"
+    SIMULATION_COMPARISON = "simulation_comparison"
+    SIMULATION_PARAMETER_SWEEP = "simulation_parameter_sweep"
+
+    # Strategy types
+    STRATEGY_BASIC = "strategy_basic"
+    STRATEGY_COMPOSITE = "strategy_composite"
+    STRATEGY_ADAPTIVE = "strategy_adaptive"
+
+    # Session types
+    SESSION_MANUAL = "session_manual"
+    SESSION_AUTOMATED = "session_automated"
+
+    # Analysis types
+    ANALYSIS_PERFORMANCE = "analysis_performance"
+    ANALYSIS_VALIDATION = "analysis_validation"
+
+
+def get_log_path(
+    base_dir: str | Path, filename: str, log_type: str | None = None
+) -> Path:
+    """
+    Determine the appropriate log path based on filename and log type.
+
+    Args:
+        base_dir: Base directory (usually 'betlog')
+        filename: Log filename
+        log_type: Optional explicit log type
+
+    Returns:
+        Complete path for the log file
+    """
+    base_path = Path(base_dir)
+
+    # If log_type is explicitly provided, use it
+    if log_type:
+        type_mapping = {
+            LogType.SIMULATION_SINGLE: "simulations/single",
+            LogType.SIMULATION_COMPARISON: "simulations/comparison",
+            LogType.SIMULATION_PARAMETER_SWEEP: "simulations/parameter_sweep",
+            LogType.STRATEGY_BASIC: "strategies/basic",
+            LogType.STRATEGY_COMPOSITE: "strategies/composite",
+            LogType.STRATEGY_ADAPTIVE: "strategies/adaptive",
+            LogType.SESSION_MANUAL: "sessions/manual",
+            LogType.SESSION_AUTOMATED: "sessions/automated",
+            LogType.ANALYSIS_PERFORMANCE: "analysis/performance",
+            LogType.ANALYSIS_VALIDATION: "analysis/validation",
+        }
+
+        if log_type in type_mapping:
+            return base_path / type_mapping[log_type] / filename
+
+    # Auto-detect based on filename patterns
+    filename_lower = filename.lower()
+
+    # Strategy classification (high priority)
+    if "composite" in filename_lower:
+        return base_path / "strategies" / "composite" / filename
+    elif "adaptive" in filename_lower:
+        return base_path / "strategies" / "adaptive" / filename
+    elif any(
+        strategy in filename_lower
+        for strategy in ["martingale", "fibonacci", "dalembert", "flat", "paroli"]
+    ):
+        return base_path / "strategies" / "basic" / filename
+
+    # Analysis classification (before session to catch performance/benchmark/validation)
+    elif "performance" in filename_lower or "benchmark" in filename_lower:
+        return base_path / "analysis" / "performance" / filename
+    elif "validation" in filename_lower or "debug" in filename_lower:
+        return base_path / "analysis" / "validation" / filename
+
+    # Simulation classification
+    elif "comparison" in filename_lower:
+        return base_path / "simulations" / "comparison" / filename
+    elif "parameter_sweep" in filename_lower or "sweep" in filename_lower:
+        return base_path / "simulations" / "parameter_sweep" / filename
+    elif "simulation" in filename_lower:
+        return base_path / "simulations" / "single" / filename
+
+    # Session classification (lower priority)
+    elif "manual" in filename_lower or "test" in filename_lower:
+        return base_path / "sessions" / "manual" / filename
+    elif "automated" in filename_lower:
+        return base_path / "sessions" / "automated" / filename
+
+    # Default fallback to sessions/manual for unclassified logs
+    return base_path / "sessions" / "manual" / filename
+
+
 class JSONLinesLogger:
     """Logger that writes structured data in JSON Lines format."""
 
@@ -21,16 +115,26 @@ class JSONLinesLogger:
         level: int = logging.INFO,
         max_file_size: int = 10 * 1024 * 1024,  # 10MB
         backup_count: int = 5,
+        log_type: str | None = None,
+        base_dir: str | Path = "betlog",
     ):
         """Initialize the JSON Lines logger.
 
         Args:
-            log_file: Path to the log file
+            log_file: Path to the log file (can be just filename for
+                auto-classification)
             level: Logging level
             max_file_size: Maximum file size before rotation (bytes)
             backup_count: Number of backup files to keep
+            log_type: Optional explicit log type for classification
+            base_dir: Base directory for organized logs (default: betlog)
         """
-        self.log_file = Path(log_file)
+        # If log_file is just a filename, use organized path
+        if "/" not in str(log_file) and "\\" not in str(log_file):
+            self.log_file = get_log_path(base_dir, str(log_file), log_type)
+        else:
+            self.log_file = Path(log_file)
+
         self.level = level
         self.max_file_size = max_file_size
         self.backup_count = backup_count
@@ -138,6 +242,17 @@ class JSONLinesLogger:
                 "profit": str(
                     result.payout - result.amount if result.won else -result.amount
                 ),
+                "bet_type": result.bet_type.value if result.bet_type else None,
+                "target": result.target,
+                "multiplier": result.multiplier,
+            },
+            "provably_fair": {
+                "server_seed_hash": result.server_seed_hash,
+                "client_seed": result.client_seed,
+                "nonce": result.nonce,
+                "verification_data": result.to_verification_dict()
+                if hasattr(result, "to_verification_dict")
+                else None,
             },
             "game_state_after": {
                 "balance": str(game_state.balance),
@@ -210,7 +325,9 @@ class JSONLinesLogger:
                 "losses_count": session_state.game_state.losses_count,
                 "win_rate": session_state.game_state.win_rate,
                 "max_consecutive_wins": session_state.game_state.max_consecutive_wins,
-                "max_consecutive_losses": session_state.game_state.max_consecutive_losses,
+                "max_consecutive_losses": (
+                    session_state.game_state.max_consecutive_losses
+                ),
                 "max_drawdown": str(session_state.game_state.max_drawdown),
                 "sharpe_ratio": session_state.game_state.sharpe_ratio,
                 "peak_balance": str(session_state.peak_balance),

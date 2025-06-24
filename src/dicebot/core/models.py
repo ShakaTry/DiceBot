@@ -120,6 +120,15 @@ class GameState:
     current_bet_type: BetType = BetType.UNDER
     current_target: float = 50.0
 
+    # Métriques Parking & Provably Fair
+    parking_bets_count: int = 0
+    parking_losses: Decimal = Decimal("0")
+    seed_rotations_count: int = 0
+    bet_type_toggles: int = 0
+
+    # Metadata flexible pour stocker des informations supplémentaires
+    metadata: dict[str, Any] = field(default_factory=dict)
+
     def __post_init__(self):
         if self.max_balance is None:
             self.max_balance = self.balance
@@ -247,6 +256,7 @@ class BetDecision:
     reason: str | None = None
     confidence: float = 1.0  # Niveau de confiance dans la décision (0-1)
     metadata: dict[str, Any] = field(default_factory=dict)  # Données additionnelles
+    action: str | None = None  # "change_seed", "toggle_bet_type", "forced_parking_bet"
 
 
 @dataclass

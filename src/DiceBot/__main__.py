@@ -85,6 +85,17 @@ def main(args: Sequence[str] | None = None) -> None:
     sim_parser.add_argument(
         "--parallel", action="store_true", help="Force parallel execution"
     )
+    sim_parser.add_argument(
+        "--detailed-logs",
+        action="store_true",
+        help="Enable detailed JSON Lines logging for each bet",
+    )
+    sim_parser.add_argument(
+        "--log-dir",
+        type=str,
+        default="betlog",
+        help="Directory for detailed logs (default: betlog)",
+    )
 
     # Compare command
     comp_parser = subparsers.add_parser("compare", help="Compare multiple strategies")
@@ -251,6 +262,8 @@ def run_simulate_command(args) -> None:
         session_config if session_config else None,
         parallel=args.parallel,
         show_progress=not args.no_progress,
+        enable_detailed_logs=args.detailed_logs,
+        log_dir=args.log_dir,
     )
 
     # Print summary

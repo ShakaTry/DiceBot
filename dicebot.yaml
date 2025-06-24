@@ -65,3 +65,14 @@ cli:
   default_output_dir: "results"
   color_output: true
   show_warnings: true
+
+# Configuration for parking strategy (Provably Fair constraint)
+parking:
+  enabled: true
+  max_toggles_before_bet: 3  # Max UNDER/OVER toggles before forced bet
+  parking_bet_amount: 0.00015  # Minimum bet
+  parking_target: 98.0  # 99% chance of winning
+  parking_bet_type: "UNDER"
+  auto_seed_rotation_after: 1000  # Rotate seed after X nonces
+  parking_on_consecutive_losses: 5  # Enter parking after X losses
+  parking_on_drawdown_percent: 0.1  # Enter parking at 10% drawdown

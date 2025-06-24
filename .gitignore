@@ -54,11 +54,14 @@ cov.xml
 *.log
 
 # DiceBot specific - Large log files
+betlog/
 betlog/**/*.jsonl
+betlog/**/*.jsonl.*
 logs/
 test_logs/
 hybrid_logs/
 *.jsonl
+*.jsonl.*
 
 # Sphinx documentation
 docs/_build/

@@ -12,6 +12,10 @@
       "dest": "/api/health.py"
     },
     {
+      "src": "/test",
+      "dest": "/api/test.py"
+    },
+    {
       "src": "/slack/events",
       "dest": "/api/slack_events.py"
     },

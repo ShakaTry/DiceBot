@@ -1,4 +1,1 @@
-# Core dependencies for Vercel deployment
-requests>=2.31.0
-slack-sdk>=3.23.0
-psutil>=5.9.0
+# Empty for minimal Vercel testing

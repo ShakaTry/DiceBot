@@ -9,10 +9,11 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
         response = {
-            "message": "Hello from DiceBot Vercel!",
-            "status": "working",
-            "service": "dicebot-integration",
-            "endpoints": {"slack": "/api/slack", "hello": "/api/hello"},
+            "message": "DiceBot Vercel Integration",
+            "status": "online",
+            "service": "dicebot-slack-github",
+            "version": "1.0.0",
+            "endpoints": {"health": "/api/", "slack_integration": "/api/slack"},
         }
 
         self.wfile.write(json.dumps(response).encode())

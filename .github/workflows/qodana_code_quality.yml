@@ -1,0 +1,67 @@
+name: 🔍 Qodana Code Quality Analysis
+on:
+  workflow_dispatch:
+    inputs:
+      full_analysis:
+        description: 'Run full analysis including all inspections'
+        required: false
+        default: true
+        type: boolean
+  schedule:
+    # Weekly deep analysis on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  # Only on release branches for comprehensive analysis
+  push:
+    branches:
+      - 'releases/*'
+
+jobs:
+  qodana:
+    name: 🔍 Deep Code Quality Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+      actions: read
+    
+    steps:
+      - name: 📂 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for comprehensive analysis
+          
+      - name: 🐍 Setup Python Environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          
+      - name: 🔍 Qodana Deep Analysis
+        uses: JetBrains/qodana-action@v2025.1
+        with:
+          pr-mode: false
+          args: --print-problems
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_1428929760 }}
+          QODANA_ENDPOINT: 'https://qodana.cloud'
+          
+      - name: 📊 Upload Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qodana-report
+          path: ${{ runner.temp }}/qodana/results/
+          retention-days: 7
+          
+      - name: 📢 Notify Results
+        if: always()
+        run: |
+          echo "🔍 Qodana analysis completed"
+          echo "📊 View detailed results at: https://qodana.cloud"
+          echo "🗂️ Analysis artifacts uploaded for 7 days"

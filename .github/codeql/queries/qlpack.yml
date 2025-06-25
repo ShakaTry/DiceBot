@@ -1,0 +1,12 @@
+name: dicebot-security-queries
+version: 1.0.0
+description: Custom security queries for DiceBot financial application
+author: DiceBot Team
+
+dependencies:
+  codeql/python-all: "*"
+
+queries:
+  - name: financial-security
+    description: Financial and gambling security checks
+    query: financial-security.ql

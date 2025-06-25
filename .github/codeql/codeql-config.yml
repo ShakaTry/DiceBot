@@ -1,0 +1,62 @@
+name: "DiceBot CodeQL Configuration"
+
+# Advanced CodeQL configuration for Python security analysis
+# Optimized for financial/gambling applications
+
+queries:
+  # Core security queries
+  - uses: security-and-quality
+  - uses: security-extended
+  
+  # Custom query packs for financial apps
+  - name: python-security-audit
+    uses: ./.github/codeql/queries/
+
+# Paths to analyze
+paths:
+  - src/dicebot/
+  - src/DiceBot/
+
+# Paths to ignore
+paths-ignore:
+  - tests/
+  - docs/
+  - scripts/
+  - betlog/
+  - "**/*.md"
+  - "**/*.txt"
+  - "**/*.json"
+  - "**/*.yml"
+  - "**/*.yaml"
+
+# Disable specific queries if they generate false positives
+disable-default-queries: false
+
+# Query filters - customize based on findings
+query-filters:
+  # Exclude test files from certain checks
+  - exclude:
+      id: py/unused-import
+      paths:
+        - tests/
+
+# Build configuration
+build:
+  # Commands to run before analysis
+  before-build:
+    - python -m pip install --upgrade pip
+    - pip install -e ".[dev]"
+  
+  # Custom build commands if needed
+  commands: []
+
+# Analysis configuration  
+analysis:
+  # Fail the analysis if critical security issues found
+  fail-on-error: true
+  
+  # Upload results even if analysis fails
+  upload-on-error: true
+  
+  # Additional configuration
+  timeout: 30m

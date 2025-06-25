@@ -1,0 +1,52 @@
+# GitHub CLI configuration for DiceBot
+# Place in ~/.config/gh/config.yml after authentication
+
+git_protocol: https
+editor: nano
+prompt: enabled
+pager: less
+
+aliases:
+  # Repository shortcuts
+  repo-status: repo view ShakaTry/DiceBot
+  repo-issues: issue list --repo ShakaTry/DiceBot
+  repo-prs: pr list --repo ShakaTry/DiceBot
+  
+  # Issue management
+  bug: issue create --label bug --assignee @me --title
+  feature: issue create --label enhancement --assignee @me --title
+  issue-mine: issue list --assignee @me
+  
+  # Pull request workflow
+  prc: pr create --assignee @me
+  prv: pr view
+  prm: pr merge
+  pr-mine: pr list --author @me
+  
+  # Workflow management
+  workflows: workflow list
+  runs: run list --limit 10
+  run-watch: run watch
+  
+  # Release management
+  releases: release list
+  release-create: release create
+  release-view: release view
+  
+  # DiceBot specific commands
+  dice-simulate: '!gh workflow run dicebot-production.yml'
+  dice-release: '!gh workflow run release.yml'
+  dice-status: '!echo "🎲 DiceBot Status:" && gh repo view ShakaTry/DiceBot && echo "" && gh run list --limit 3'
+
+# Default flags for commands
+issue:
+  create:
+    assignee: "@me"
+  
+pr:
+  create:
+    assignee: "@me"
+    
+workflow:
+  run:
+    confirm: false

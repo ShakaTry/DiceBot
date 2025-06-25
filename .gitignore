@@ -64,6 +64,12 @@ simulation_logs/
 *.jsonl.*
 *.log.*
 
+# Environment files (sensitive)
+.env
+.env.*
+.env.local
+.env.vercel
+
 # Temporary simulation files  
 checkpoints/temp_*
 results/*_large_*.json

@@ -1,35 +1,15 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/*.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/health",
-      "dest": "/api/health.py"
-    },
-    {
-      "src": "/test",
-      "dest": "/api/test.py"
-    },
-    {
-      "src": "/slack/events",
-      "dest": "/api/slack_events.py"
-    },
-    {
-      "src": "/slack/commands",
-      "dest": "/api/slack_simple.py"
-    },
-    {
-      "src": "/slack/interactive",
-      "dest": "/api/slack_interactive.py"
-    }
-  ],
   "functions": {
-    "api/*.py": {
+    "api/test.py": {
+      "runtime": "python3.9"
+    },
+    "api/health.py": {
+      "runtime": "python3.9"
+    },
+    "api/slack_simple.py": {
+      "runtime": "python3.9"
+    },
+    "api/slack_events.py": {
       "runtime": "python3.9"
     }
   }

@@ -24,7 +24,15 @@ def health():
 @app.route("/slack/webhook", methods=["POST"])
 def slack_webhook():
     try:
-        data = request.get_json() or request.form.to_dict()
+        # Handle both JSON and form data from Slack
+        if request.content_type == "application/json":
+            data = request.get_json() or {}
+        else:
+            data = request.form.to_dict()
+
+        # Log the request for debugging
+        print(f"Slack request: {data}")
+        print(f"Headers: {dict(request.headers)}")
 
         # Slack slash command handling
         if "command" in data:

@@ -76,6 +76,18 @@ data_file = "/tmp/DiceBot.coverage"
 # Tests are run from installed location, map back to the src directory
 source = ["src", "**/site-packages/"]
 
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
 # tox must currently be configured via an embedded ini string
 # See: https://github.com/tox-dev/tox/issues/999
 [tool.tox]

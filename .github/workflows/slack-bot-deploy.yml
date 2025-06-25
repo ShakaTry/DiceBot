@@ -1,12 +1,14 @@
 name: Deploy Slack Bot
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'src/dicebot/integrations/**'
-      - 'scripts/start_slack_bot.py'
+  # Only manual trigger for now
   workflow_dispatch:
+  # DISABLED - Covered by dicebot-ci.yml
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'src/dicebot/integrations/**'
+  #     - 'scripts/start_slack_bot.py'
 
 env:
   PYTHON_VERSION: '3.11'

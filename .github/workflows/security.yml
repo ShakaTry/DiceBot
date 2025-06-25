@@ -1,12 +1,12 @@
 name: Security Scan
 
 on:
-  push:
-    branches: [ main ]
+  # Only on PR and weekly schedule to avoid queue
   pull_request:
     branches: [ main ]
   schedule:
     - cron: '0 6 * * 1'  # Weekly Monday 6am
+  workflow_dispatch:
 
 jobs:
   security:

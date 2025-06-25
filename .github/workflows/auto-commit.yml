@@ -2,9 +2,9 @@ name: Auto Commit & Push
 
 on:
   workflow_dispatch:
-  schedule:
-    # Check for changes every 15 minutes
-    - cron: '*/15 * * * *'
+  # DISABLED - Too frequent, causing queue
+  # schedule:
+  #   - cron: '*/15 * * * *'
 
 jobs:
   auto-commit:

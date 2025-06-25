@@ -1,9 +1,6 @@
-from flask import Flask, jsonify
-
-app = Flask(__name__)
-
-
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def handler(path):
-    return jsonify({"message": "Hello from Vercel!", "status": "working"})
+def handler(request):
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": '{"message": "Hello from Vercel!", "status": "working"}',
+    }

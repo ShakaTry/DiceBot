@@ -209,10 +209,25 @@ GET  /test                # Environment variables check
 ```
 
 ### 🎯 **Infrastructure Production Ready**
-- **Railway Backend** : Auto-deploy from main branch
-- **Slack App** : Installée et configurée
+- **Railway Backend** : Auto-deploy from main branch (`https://dicebot-production-bba9.up.railway.app`)
+- **Slack App** : Installée et configurée ✅ testée
 - **GitHub API** : Issues management opérationnel
 - **Monitoring** : Railway logs + Slack status commands
+
+### 🔒 **Security & Quality Assurance** - ✅ RENFORCÉ
+- **GitHub Actions** : Tests automatiques + Security scans
+- **Coverage minimum** : 85% obligatoire
+- **Security scanning** : `bandit`, `safety`, `trufflehog`
+- **Dependency checks** : Vulnerabilities + outdated packages
+- **Secret detection** : Automatic sur PR/push + weekly scans
+
+### 📊 **GitHub Workflows Actifs**
+```
+🧪 dicebot-ci.yml    # Tests, linting, simulations, déploiement
+🔒 security.yml      # Security scans hebdomadaires + PR triggers  
+🤖 auto-commit.yml   # Commit automation (si besoin)
+📦 slack-bot-deploy.yml # Slack bot deployment
+```
 
 ## 🛠️ Development Commands
 
@@ -233,8 +248,8 @@ pre-commit install
 
 ### Testing
 ```bash
-# Run all tests with coverage
-pytest --cov=dicebot --cov-report term --cov-report xml:cov.xml
+# Run all tests with coverage (minimum 85%)
+pytest --cov=dicebot --cov-report term --cov-report xml:cov.xml --cov-fail-under=85
 
 # Run specific module tests
 pytest tests/core/
@@ -266,17 +281,19 @@ pyright src tests
 pre-commit run --all-files
 ```
 
-### Git Automation (PyCharm Integration)
+### Security & Quality Checks
 ```bash
-# Configuration PyCharm pour commit automatique :
-# File → Settings → Version Control → Commit
-# ✓ Reformat code
-# ✓ Rearrange code  
-# ✓ Optimize imports
-# ✓ Run advanced checks after commit
+# Security analysis
+bandit -r src/ -f json -o bandit-report.json
+safety check --json --output safety-report.json
 
-# Pre-commit hooks déjà configurés pour formatage automatique
+# Secret detection
+trufflehog --git . --only-verified
+
+# All quality checks (same as CI)
 pre-commit run --all-files
+pytest --cov=dicebot --cov-fail-under=85
+pyright src tests
 ```
 
 ### 🔧 Correction Automatique des Erreurs de Linting
@@ -347,8 +364,9 @@ pip install -e .
 1. **Money Handling**: Always use `Decimal` for monetary values, never `float`
 2. **Vault Ratio**: Maintain 85% vault / 15% bankroll split
 3. **House Edge**: 1% must be integrated in all probability calculations
-4. **Personalities**: 8 archetypes (sage, rebel, mystic, etc.) - some MUST be destructive
-5. **Bot Architect**: Meta-bot that orchestrates without playing (Phase 2)
+4. **Security**: No secrets in code, coverage ≥85%, security scans required
+5. **Production**: Railway deployment, Slack monitoring, GitHub Actions CI/CD
+6. **Bot Architect**: Meta-bot that orchestrates without playing (Phase 2)
 
 ## 🎮 Bitsler Parameters
 

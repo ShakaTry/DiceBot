@@ -1,12 +1,13 @@
-name: CI
+# DISABLED - Use dicebot-ci.yml instead
+# name: CI
 
-on:
-  push:
-    branches:
-      - main
-    tags:
-      - '*'
-  pull_request:
+# on:
+#   push:
+#     branches:
+#       - main
+#     tags:
+#       - '*'
+#   pull_request:
 
 jobs:
 

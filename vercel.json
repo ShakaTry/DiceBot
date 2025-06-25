@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "public": true,
   "builds": [
     {
       "src": "api/*.py",
@@ -25,11 +24,9 @@
       "dest": "/api/slack_interactive.py"
     }
   ],
-  "env": {
-    "GITHUB_TOKEN": "@github_token",
-    "SLACK_BOT_TOKEN": "@slack_bot_token", 
-    "SLACK_SIGNING_SECRET": "@slack_signing_secret",
-    "GITHUB_OWNER": "ShakaTry",
-    "GITHUB_REPO": "DiceBot"
+  "functions": {
+    "api/*.py": {
+      "runtime": "python3.9"
+    }
   }
 }

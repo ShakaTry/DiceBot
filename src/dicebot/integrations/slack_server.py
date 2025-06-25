@@ -1,204 +1,298 @@
 """
-Flask server for Slack bot integration.
+Flask server for handling Slack events and slash commands.
 """
 
+import json
 import logging
-import os
 from typing import Any
 
 from flask import Flask, jsonify, request
-from slack_sdk.signature import SignatureVerifier
 
 from .slack_bot import SlackBot
 
 
 class SlackServer:
-    """Flask server for handling Slack bot requests."""
+    """Flask server for Slack integration."""
 
-    def __init__(self, bot_token: str, signing_secret: str, port: int = 3000):
+    def __init__(self, slack_bot: SlackBot, debug: bool = False):
         """Initialize Slack server.
 
         Args:
-            bot_token: Slack bot token
-            signing_secret: Slack signing secret
-            port: Server port
+            slack_bot: Configured SlackBot instance
+            debug: Enable Flask debug mode
         """
+        self.slack_bot = slack_bot
         self.app = Flask(__name__)
-        self.bot = SlackBot(bot_token, signing_secret)
-        self.signature_verifier = SignatureVerifier(signing_secret)
-        self.port = port
+        self.app.debug = debug
         self.logger = logging.getLogger(__name__)
 
-        # Setup routes
-        self._setup_routes()
+        # Register routes
+        self._register_routes()
 
-    def _setup_routes(self) -> None:
-        """Setup Flask routes."""
-
-        @self.app.route("/slack/events", methods=["POST"])
-        def slack_events():
-            """Handle Slack events."""
-            try:
-                # Verify request signature
-                if not self._verify_request():
-                    return jsonify({"error": "Invalid signature"}), 401
-
-                data = request.get_json()
-
-                # Handle URL verification
-                if data.get("type") == "url_verification":
-                    return jsonify({"challenge": data["challenge"]})
-
-                # Handle events
-                if data.get("type") == "event_callback":
-                    event = data.get("event", {})
-                    self._handle_event(event)
-
-                return jsonify({"status": "ok"})
-
-            except Exception as e:
-                self.logger.error(f"Events endpoint error: {e}")
-                return jsonify({"error": "Internal server error"}), 500
-
-        @self.app.route("/slack/commands", methods=["POST"])
-        def slack_commands():
-            """Handle Slack slash commands."""
-            try:
-                # Verify request signature
-                if not self._verify_request():
-                    return jsonify({"error": "Invalid signature"}), 401
-
-                # Parse command
-                command = request.form.get("command")
-                text = request.form.get("text", "")
-                channel_id = request.form.get("channel_id")
-                user_id = request.form.get("user_id")
-
-                # Handle command
-                self._handle_command(command, text, channel_id, user_id)
-
-                return jsonify({"response_type": "in_channel", "text": "Command received!"})
-
-            except Exception as e:
-                self.logger.error(f"Commands endpoint error: {e}")
-                return jsonify({"error": "Internal server error"}), 500
-
-        @self.app.route("/slack/interactive", methods=["POST"])
-        def slack_interactive():
-            """Handle Slack interactive components."""
-            try:
-                # Verify request signature
-                if not self._verify_request():
-                    return jsonify({"error": "Invalid signature"}), 401
-
-                # Handle interactive components (buttons, modals, etc.)
-                payload = request.form.get("payload")
-                if payload:
-                    import json
-
-                    data = json.loads(payload)
-                    self._handle_interactive(data)
-
-                return jsonify({"status": "ok"})
-
-            except Exception as e:
-                self.logger.error(f"Interactive endpoint error: {e}")
-                return jsonify({"error": "Internal server error"}), 500
+    def _register_routes(self):
+        """Register Flask routes."""
 
         @self.app.route("/health", methods=["GET"])
         def health_check():
             """Health check endpoint."""
-            return jsonify(
-                {
-                    "status": "healthy",
-                    "service": "dicebot-slack-server",
-                    "version": "1.0.0",
-                }
-            )
+            return jsonify({"status": "healthy", "service": "dicebot-slack"})
 
-    def _verify_request(self) -> bool:
+        @self.app.route("/slack/events", methods=["POST"])
+        def handle_slack_events():
+            """Handle Slack events (messages, mentions, etc.)."""
+            try:
+                # Verify request
+                if not self._verify_slack_request():
+                    return jsonify({"error": "Invalid request"}), 401
+
+                # Parse event data
+                event_data = request.get_json()
+
+                # Handle URL verification challenge
+                if event_data.get("type") == "url_verification":
+                    return jsonify({"challenge": event_data.get("challenge")})
+
+                # Handle actual events
+                if event_data.get("type") == "event_callback":
+                    self._handle_event_callback(event_data)
+
+                return jsonify({"status": "ok"})
+
+            except Exception as e:
+                self.logger.error(f"Event handling failed: {e}")
+                return jsonify({"error": "Internal server error"}), 500
+
+        @self.app.route("/slack/commands", methods=["POST"])
+        def handle_slack_commands():
+            """Handle Slack slash commands."""
+            try:
+                # Verify request
+                if not self._verify_slack_request():
+                    return jsonify({"error": "Invalid request"}), 401
+
+                # Parse command data
+                command_data = request.form.to_dict()
+
+                # Extract command info
+                command = command_data.get("command", "")
+                text = command_data.get("text", "")
+                channel_id = command_data.get("channel_id", "")
+                user_name = command_data.get("user_name", "")
+
+                # Handle command
+                response = self._handle_slash_command(command, text, channel_id, user_name)
+
+                return jsonify(response)
+
+            except Exception as e:
+                self.logger.error(f"Command handling failed: {e}")
+                return jsonify({"response_type": "ephemeral", "text": f"❌ Command failed: {e}"})
+
+        @self.app.route("/slack/interactive", methods=["POST"])
+        def handle_slack_interactive():
+            """Handle Slack interactive components (buttons, modals, etc.)."""
+            try:
+                # Verify request
+                if not self._verify_slack_request():
+                    return jsonify({"error": "Invalid request"}), 401
+
+                # Parse payload
+                payload = json.loads(request.form.get("payload", "{}"))
+
+                # Handle interactive component
+                response = self._handle_interactive_component(payload)
+
+                return jsonify(response)
+
+            except Exception as e:
+                self.logger.error(f"Interactive handling failed: {e}")
+                return jsonify({"text": f"❌ Interaction failed: {e}"})
+
+    def _verify_slack_request(self) -> bool:
         """Verify Slack request signature."""
         try:
-            timestamp = request.headers.get("X-Slack-Request-Timestamp")
-            signature = request.headers.get("X-Slack-Signature")
+            headers = dict(request.headers)
             body = request.get_data(as_text=True)
 
-            return self.signature_verifier.is_valid(body, timestamp, signature)
+            return self.slack_bot.verify_request(headers, body)
 
         except Exception as e:
-            self.logger.error(f"Signature verification failed: {e}")
+            self.logger.error(f"Request verification failed: {e}")
             return False
 
-    def _handle_event(self, event: dict[str, Any]) -> None:
-        """Handle Slack event."""
+    def _handle_event_callback(self, event_data: dict[str, Any]) -> None:
+        """Handle Slack event callback."""
+        event = event_data.get("event", {})
         event_type = event.get("type")
 
-        if event_type == "message":
-            # Handle direct messages or mentions
-            channel = event.get("channel")
-            user = event.get("user")
-            text = event.get("text", "")
+        if event_type == "app_mention":
+            # Bot was mentioned
+            self._handle_mention(event)
+        elif event_type == "message":
+            # Message in channel (if bot is in channel)
+            self._handle_message(event)
 
-            # Simple command parsing from message
-            if "status" in text.lower():
-                self.bot.handle_status(channel, user)
-            elif "results" in text.lower():
-                self.bot.handle_results(channel, user)
+    def _handle_mention(self, event: dict[str, Any]) -> None:
+        """Handle bot mention."""
+        channel = event.get("channel")
+        user = event.get("user")
+        text = event.get("text", "")
 
-    def _handle_command(self, command: str, text: str, channel: str, user: str) -> None:
-        """Handle slash command."""
-        if command in self.bot.commands:
-            handler = self.bot.commands[command]
-            if command == "/dicebot-simulate":
-                handler(channel, user, text)
-            else:
-                handler(channel, user)
+        # Remove bot mention from text
+        text = self._clean_mention_text(text)
+
+        # Send status if just mentioned without command
+        if not text.strip():
+            self.slack_bot.handle_status(channel, user)
         else:
-            self.bot.send_message(channel, f"Unknown command: {command}")
+            # Try to parse as a command
+            if text.startswith("status"):
+                self.slack_bot.handle_status(channel, user)
+            elif text.startswith("simulate"):
+                self.slack_bot.handle_simulate(channel, user, text[8:].strip())
+            elif text.startswith("results"):
+                self.slack_bot.handle_results(channel, user)
+            elif text.startswith("issue"):
+                self.slack_bot.handle_github_issue(channel, user, text[5:].strip())
+            else:
+                self.slack_bot.send_message(
+                    channel,
+                    "🤖 Hi! I'm DiceBot. Try:\n• `@dicebot status`\n• `@dicebot simulate --strategy fibonacci`\n• `@dicebot issue list`",
+                )
 
-    def _handle_interactive(self, data: dict[str, Any]) -> None:
-        """Handle interactive component."""
-        # Handle button clicks, modal submissions, etc.
-        action_type = data.get("type")
+    def _handle_message(self, event: dict[str, Any]) -> None:
+        """Handle regular message (if needed)."""
+        # For now, only respond to mentions
+        # Could be extended for channel monitoring
+        pass
 
-        if action_type == "block_actions":
+    def _clean_mention_text(self, text: str) -> str:
+        """Remove bot mention from text."""
+        # Remove <@BOTID> format mentions
+        import re
+
+        cleaned = re.sub(r"<@[UW][A-Z0-9]+>", "", text).strip()
+        return cleaned
+
+    def _handle_slash_command(
+        self, command: str, text: str, channel: str, user: str
+    ) -> dict[str, Any]:
+        """Handle slash command and return response."""
+
+        # Map slash commands to bot methods
+        command_handlers = {
+            "/dicebot-status": lambda: self._execute_and_respond(
+                self.slack_bot.handle_status, channel, user
+            ),
+            "/dicebot-simulate": lambda: self._execute_and_respond(
+                self.slack_bot.handle_simulate, channel, user, text
+            ),
+            "/dicebot-stop": lambda: self._execute_and_respond(
+                self.slack_bot.handle_stop, channel, user
+            ),
+            "/dicebot-results": lambda: self._execute_and_respond(
+                self.slack_bot.handle_results, channel, user
+            ),
+            "/issue": lambda: self._execute_and_respond(
+                self.slack_bot.handle_github_issue, channel, user, text
+            ),
+        }
+
+        handler = command_handlers.get(command)
+
+        if handler:
+            return handler()
+        else:
+            return {"response_type": "ephemeral", "text": f"❌ Unknown command: {command}"}
+
+    def _execute_and_respond(self, handler_func, *args) -> dict[str, Any]:
+        """Execute handler and return appropriate response."""
+        try:
+            # Execute the handler (it sends message directly to Slack)
+            handler_func(*args)
+
+            # Return immediate response for slash command
+            return {
+                "response_type": "ephemeral",
+                "text": "🎲 Command executed! Check the channel for results.",
+            }
+
+        except Exception as e:
+            self.logger.error(f"Handler execution failed: {e}")
+            return {"response_type": "ephemeral", "text": f"❌ Command failed: {e}"}
+
+    def _handle_interactive_component(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Handle interactive components (buttons, etc.)."""
+        component_type = payload.get("type")
+
+        if component_type == "block_actions":
             # Handle button clicks
-            actions = data.get("actions", [])
-            channel = data.get("channel", {}).get("id")
-            user = data.get("user", {}).get("id")
-
+            actions = payload.get("actions", [])
             for action in actions:
                 action_id = action.get("action_id")
 
-                if action_id == "start_simulation":
-                    self.bot.handle_simulate(channel, user, "")
-                elif action_id == "stop_simulation":
-                    self.bot.handle_stop(channel, user)
+                if action_id == "simulate_quick":
+                    # Quick simulate button
+                    channel = payload.get("channel", {}).get("id")
+                    user = payload.get("user", {}).get("name")
 
-    def run(self, debug: bool = False, host: str = "0.0.0.0") -> None:
+                    self.slack_bot.handle_simulate(
+                        channel, user, "--strategy fibonacci --preset conservative"
+                    )
+
+                    return {"text": "🎲 Quick simulation started!"}
+
+        return {"text": "👍 Action received"}
+
+    def run(self, host: str = "0.0.0.0", port: int = 3000) -> None:
         """Run the Flask server.
 
         Args:
-            debug: Enable debug mode
-            host: Host address
+            host: Host to bind to
+            port: Port to listen on
         """
-        self.logger.info(f"Starting Slack server on {host}:{self.port}")
-        self.app.run(host=host, port=self.port, debug=debug)
+        self.logger.info(f"Starting Slack server on {host}:{port}")
+        self.app.run(host=host, port=port, debug=self.app.debug)
+
+    @classmethod
+    def create_from_env(cls, debug: bool = False) -> "SlackServer":
+        """Create SlackServer from environment variables.
+
+        Args:
+            debug: Enable Flask debug mode
+
+        Returns:
+            Configured SlackServer instance
+        """
+        slack_bot = SlackBot.create_from_env()
+        return cls(slack_bot, debug)
 
 
-def create_slack_server() -> SlackServer:
-    """Create Slack server from environment variables."""
-    bot_token = os.getenv("SLACK_BOT_TOKEN")
-    signing_secret = os.getenv("SLACK_SIGNING_SECRET")
-    port = int(os.getenv("SLACK_SERVER_PORT", "3000"))
-
-    if not bot_token or not signing_secret:
-        raise ValueError("SLACK_BOT_TOKEN and SLACK_SIGNING_SECRET must be set")
-
-    return SlackServer(bot_token, signing_secret, port)
+def create_app() -> Flask:
+    """Factory function to create Flask app for deployment."""
+    server = SlackServer.create_from_env()
+    return server.app
 
 
 if __name__ == "__main__":
-    # Development server
-    server = create_slack_server()
-    server.run(debug=True)
+    # Run server directly
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run DiceBot Slack server")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
+    parser.add_argument("--port", type=int, default=3000, help="Port to listen on")
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+
+    args = parser.parse_args()
+
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    try:
+        server = SlackServer.create_from_env(debug=args.debug)
+        server.run(host=args.host, port=args.port)
+    except Exception as e:
+        print(f"Failed to start server: {e}")
+        exit(1)

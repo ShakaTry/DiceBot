@@ -4,6 +4,7 @@ Slack integration for DiceBot notifications and remote control.
 
 import json
 import logging
+import os
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
@@ -11,6 +12,8 @@ from typing import Any
 import requests
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+
+from .github_integration import GitHubClient, SlackGitHubBridge
 
 
 class SlackNotifier:
@@ -108,16 +111,22 @@ class SlackNotifier:
 class SlackBot:
     """Advanced Slack bot for DiceBot control and monitoring."""
 
-    def __init__(self, bot_token: str, signing_secret: str):
+    def __init__(
+        self, bot_token: str, signing_secret: str, github_client: GitHubClient | None = None
+    ):
         """Initialize Slack bot.
 
         Args:
             bot_token: Slack bot token
             signing_secret: Slack signing secret for verification
+            github_client: Optional GitHub client for issue management
         """
         self.client = WebClient(token=bot_token)
         self.signing_secret = signing_secret
         self.logger = logging.getLogger(__name__)
+
+        # GitHub integration
+        self.github_bridge = SlackGitHubBridge(github_client) if github_client else None
 
         # Command handlers
         self.commands = {
@@ -125,6 +134,7 @@ class SlackBot:
             "/dicebot-simulate": self.handle_simulate,
             "/dicebot-stop": self.handle_stop,
             "/dicebot-results": self.handle_results,
+            "/issue": self.handle_github_issue,
         }
 
     def handle_status(self, channel: str, user: str) -> None:
@@ -294,3 +304,57 @@ class SlackBot:
         except Exception as e:
             self.logger.error(f"Request verification failed: {e}")
             return False
+
+    def handle_github_issue(self, channel: str, user: str, text: str = "") -> None:
+        """Handle GitHub issue commands."""
+        if not self.github_bridge:
+            self.send_message(
+                channel,
+                "❌ GitHub integration not configured. Please set GITHUB_TOKEN and repository info.",
+            )
+            return
+
+        try:
+            # Parse the command
+            command = self.github_bridge.parse_issue_command(text)
+
+            # Execute the command
+            response = self.github_bridge.execute_command(command, user)
+
+            # Send response to Slack
+            self.send_message(channel, response)
+
+        except Exception as e:
+            self.logger.error(f"GitHub issue command failed: {e}")
+            self.send_message(channel, f"❌ GitHub command failed: {e}")
+
+    @classmethod
+    def create_from_env(cls) -> "SlackBot":
+        """Create SlackBot from environment variables.
+
+        Required environment variables:
+        - SLACK_BOT_TOKEN: Slack bot token
+        - SLACK_SIGNING_SECRET: Slack signing secret
+        - GITHUB_TOKEN: GitHub personal access token (optional)
+        - GITHUB_OWNER: Repository owner (optional)
+        - GITHUB_REPO: Repository name (optional)
+
+        Returns:
+            Configured SlackBot instance
+        """
+        bot_token = os.getenv("SLACK_BOT_TOKEN")
+        signing_secret = os.getenv("SLACK_SIGNING_SECRET")
+
+        if not bot_token or not signing_secret:
+            raise ValueError("SLACK_BOT_TOKEN and SLACK_SIGNING_SECRET must be set")
+
+        # Optional GitHub integration
+        github_client = None
+        github_token = os.getenv("GITHUB_TOKEN")
+        github_owner = os.getenv("GITHUB_OWNER", "ShakaTry")  # Default to your username
+        github_repo = os.getenv("GITHUB_REPO", "DiceBot")
+
+        if github_token:
+            github_client = GitHubClient(github_token, github_owner, github_repo)
+
+        return cls(bot_token, signing_secret, github_client)

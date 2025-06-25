@@ -1,7 +1,13 @@
 {
   "functions": {
+    "api/slack.py": {
+      "runtime": "@vercel/python"
+    },
     "api/hello.py": {
       "runtime": "@vercel/python"
     }
+  },
+  "env": {
+    "PYTHONPATH": "./src:./src/dicebot"
   }
 }

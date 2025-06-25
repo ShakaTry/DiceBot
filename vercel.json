@@ -21,7 +21,7 @@
     },
     {
       "src": "/slack/commands",
-      "dest": "/api/slack_commands.py"
+      "dest": "/api/slack_simple.py"
     },
     {
       "src": "/slack/interactive",

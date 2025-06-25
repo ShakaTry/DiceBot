@@ -12,7 +12,18 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 description = "Dice Bot Drived By AI"
-dependencies = [] # Add project dependencies here, e.g. ["click", "numpy"]
+dependencies = [
+    "numpy>=1.24.0", 
+    "scipy>=1.10.0", 
+    "rich>=13.0.0", 
+    "pyyaml>=6.0.0",
+    "requests>=2.31.0",
+    "slack-sdk>=3.23.0",
+    "psutil>=5.9.0",
+    "schedule>=1.2.0",
+    "flask>=2.3.0",
+    "gunicorn>=23.0.0"
+]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.md"
@@ -66,6 +77,18 @@ data_file = "/tmp/DiceBot.coverage"
 # Tests are run from installed location, map back to the src directory
 source = ["src", "**/site-packages/"]
 
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
 # tox must currently be configured via an embedded ini string
 # See: https://github.com/tox-dev/tox/issues/999
 [tool.tox]
@@ -89,7 +112,7 @@ commands =
 
 [tool.ruff]
 src = ["src", "tests"]
-line-length = 88
+line-length = 100
 lint.select = [
     "B",   # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
     "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
@@ -105,4 +128,8 @@ lint.select = [
 # By default, private member access is allowed in tests
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
 # Remove this line to forbid private member access in tests
-"tests/**/*" = ["SLF001"]
+"tests/**/*" = ["SLF001", "E501"]  # Allow long lines in tests
+# Allow long lines in integration modules for alert messages and API calls
+"src/dicebot/integrations/*" = ["E501"]
+# Allow long lines in CLI module for help strings and messages
+"src/DiceBot/__main__.py" = ["E501"]

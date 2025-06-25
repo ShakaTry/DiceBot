@@ -1,0 +1,122 @@
+{
+  "simulation_summary": {
+    "total_sessions": 2,
+    "total_bets": 0,
+    "total_profit": 0.0,
+    "total_wagered": 0.0,
+    "overall_roi": 0.0,
+    "profitable_sessions": 0,
+    "profitability_rate": 0.0,
+    "average_win_rate": 0.0,
+    "average_session_duration": 1.1e-05,
+    "stop_reasons": {
+      "error: 'DiceGame' object has no attribute 'play_round'": 2
+    },
+    "average_max_drawdown": 0.0,
+    "worst_drawdown": 0.0,
+    "vault_status": {
+      "vault_balance": 42.5,
+      "bankroll_balance": 7.5,
+      "total_balance": 50.0,
+      "vault_ratio": 0.85,
+      "bankroll_ratio": 0.15,
+      "total_deposited": 50.0,
+      "total_withdrawn": 0.0,
+      "net_profit": 0.0
+    }
+  },
+  "strategy_info": {
+    "strategy_config": {
+      "strategy": "fibonacci",
+      "base_bet": "0.001"
+    },
+    "strategy_genome": {
+      "strategy_type": "Fibonacci",
+      "base_bet": "0.001",
+      "min_bet": "0.00015",
+      "max_bet": "1000",
+      "multiplier": 2.0,
+      "max_losses": 10,
+      "default_multiplier": 2.0,
+      "confidence": 1.0,
+      "fitness": 0.0,
+      "generation": 0,
+      "mutations": []
+    },
+    "strategy_fitness": 0.0,
+    "strategy_metrics": {
+      "total_bets": 0,
+      "win_rate": 0.0,
+      "roi": 0.0,
+      "max_bet_reached": 0.0,
+      "max_consecutive_losses": 0,
+      "average_confidence": 0.0,
+      "profit_factor": 0.0
+    }
+  },
+  "sessions_data": [
+    {
+      "session_id": "ccefa94f-b631-4d43-b4b1-76ec07eb1707",
+      "strategy_name": "Fibonacci",
+      "bot_id": "manual",
+      "started_at": "2025-06-24T17:39:59.122928",
+      "ended_at": "2025-06-24T17:39:59.122941",
+      "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+      "duration_seconds": 1.3e-05,
+      "initial_balance": 1.125,
+      "final_balance": 1.125,
+      "total_profit": 0.0,
+      "total_wagered": 0.0,
+      "roi": 0.0,
+      "bets_count": 0,
+      "wins_count": 0,
+      "losses_count": 0,
+      "win_rate": 0.0,
+      "max_consecutive_wins": 0,
+      "max_consecutive_losses": 0,
+      "max_drawdown": 0.0,
+      "sharpe_ratio": 0.0,
+      "peak_balance": 1.125,
+      "lowest_balance": 1.125,
+      "bets_per_minute": 0.0,
+      "stop_loss": null,
+      "take_profit": null,
+      "max_bets": null
+    },
+    {
+      "session_id": "984bfba9-5d5d-46e1-8969-aa4802332b27",
+      "strategy_name": "Fibonacci",
+      "bot_id": "manual",
+      "started_at": "2025-06-24T17:39:59.122963",
+      "ended_at": "2025-06-24T17:39:59.122972",
+      "stop_reason": "error: 'DiceGame' object has no attribute 'play_round'",
+      "duration_seconds": 9e-06,
+      "initial_balance": 1.125,
+      "final_balance": 1.125,
+      "total_profit": 0.0,
+      "total_wagered": 0.0,
+      "roi": 0.0,
+      "bets_count": 0,
+      "wins_count": 0,
+      "losses_count": 0,
+      "win_rate": 0.0,
+      "max_consecutive_wins": 0,
+      "max_consecutive_losses": 0,
+      "max_drawdown": 0.0,
+      "sharpe_ratio": 0.0,
+      "peak_balance": 1.125,
+      "lowest_balance": 1.125,
+      "bets_per_minute": 0.0,
+      "stop_loss": null,
+      "take_profit": null,
+      "max_bets": null
+    }
+  ],
+  "simulation_metadata": {
+    "run_timestamp": "2025-06-24T17:39:59.123029",
+    "num_sessions_requested": 2,
+    "num_sessions_completed": 2,
+    "session_config": {},
+    "total_capital": 50.0
+  }
+}

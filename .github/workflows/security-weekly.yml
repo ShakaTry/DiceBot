@@ -1,0 +1,84 @@
+name: 🔒 Weekly Security Assessment
+
+on:
+  schedule:
+    # Every Monday at 6am UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+    
+jobs:
+  comprehensive-security:
+    name: 🛡️ Comprehensive Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+    - name: 📂 Checkout
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 📦 Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit[toml] safety semgrep
+        pip install -e .
+        
+    - name: 🔍 Advanced security linting
+      run: |
+        bandit -r src/ -f json -o bandit-detailed.json -v
+        echo "✅ Bandit scan completed"
+        
+    - name: 🛡️ Dependency vulnerability assessment
+      run: |
+        safety check --json --output safety-detailed.json --full-report
+        echo "✅ Safety scan completed"
+        
+    - name: 🔒 Secrets detection with trufflehog
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+        
+    - name: 📊 Semgrep security analysis
+      run: |
+        semgrep --config=auto --json --output=semgrep-report.json src/ || true
+        echo "✅ Semgrep scan completed"
+        
+    - name: 📋 Upload comprehensive security reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: weekly-security-assessment-${{ github.run_number }}
+        path: "*-report.json"
+        retention-days: 90
+        
+    - name: 📢 Security report notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        text: |
+          🔒 **Weekly Security Assessment Complete**
+          
+          📊 **Scans performed:**
+          - 🛡️ Bandit (code security)
+          - 🔍 Safety (dependencies)
+          - 🔒 TruffleHog (secrets)
+          - 📈 Semgrep (advanced patterns)
+          
+          📋 **Reports:** Available in GitHub Actions artifacts
+          🔗 **Repository:** ${{ github.repository }}
+          
+          🎯 Security status: ${{ job.status }}

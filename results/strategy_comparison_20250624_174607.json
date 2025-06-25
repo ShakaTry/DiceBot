@@ -1,0 +1,512 @@
+{
+  "comparison_analysis": {
+    "rankings": {
+      "by_roi": [
+        [
+          "Fibonacci",
+          {
+            "total_sessions": 2,
+            "total_bets": 70408,
+            "total_profit": -4.1625,
+            "total_wagered": 221.2545,
+            "overall_roi": -0.018813176681152247,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.49035810836066984,
+            "average_session_duration": 0.3179045,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ],
+        [
+          "Martingale",
+          {
+            "total_sessions": 2,
+            "total_bets": 6429,
+            "total_profit": -4.1625,
+            "total_wagered": 34.6585,
+            "overall_roi": -0.12010040826925573,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.4919977664126245,
+            "average_session_duration": 0.0277595,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ]
+      ],
+      "by_profitability_rate": [
+        [
+          "Martingale",
+          {
+            "total_sessions": 2,
+            "total_bets": 6429,
+            "total_profit": -4.1625,
+            "total_wagered": 34.6585,
+            "overall_roi": -0.12010040826925573,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.4919977664126245,
+            "average_session_duration": 0.0277595,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ],
+        [
+          "Fibonacci",
+          {
+            "total_sessions": 2,
+            "total_bets": 70408,
+            "total_profit": -4.1625,
+            "total_wagered": 221.2545,
+            "overall_roi": -0.018813176681152247,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.49035810836066984,
+            "average_session_duration": 0.3179045,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ]
+      ],
+      "by_win_rate": [
+        [
+          "Martingale",
+          {
+            "total_sessions": 2,
+            "total_bets": 6429,
+            "total_profit": -4.1625,
+            "total_wagered": 34.6585,
+            "overall_roi": -0.12010040826925573,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.4919977664126245,
+            "average_session_duration": 0.0277595,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ],
+        [
+          "Fibonacci",
+          {
+            "total_sessions": 2,
+            "total_bets": 70408,
+            "total_profit": -4.1625,
+            "total_wagered": 221.2545,
+            "overall_roi": -0.018813176681152247,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.49035810836066984,
+            "average_session_duration": 0.3179045,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ]
+      ],
+      "by_drawdown": [
+        [
+          "Martingale",
+          {
+            "total_sessions": 2,
+            "total_bets": 6429,
+            "total_profit": -4.1625,
+            "total_wagered": 34.6585,
+            "overall_roi": -0.12010040826925573,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.4919977664126245,
+            "average_session_duration": 0.0277595,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ],
+        [
+          "Fibonacci",
+          {
+            "total_sessions": 2,
+            "total_bets": 70408,
+            "total_profit": -4.1625,
+            "total_wagered": 221.2545,
+            "overall_roi": -0.018813176681152247,
+            "profitable_sessions": 0,
+            "profitability_rate": 0.0,
+            "average_win_rate": 0.49035810836066984,
+            "average_session_duration": 0.3179045,
+            "stop_reasons": {
+              "insufficient_balance": 2
+            },
+            "average_max_drawdown": 1.0,
+            "worst_drawdown": 1.0,
+            "vault_status": {
+              "vault_balance": 85.0,
+              "bankroll_balance": 10.8375,
+              "total_balance": 95.8375,
+              "vault_ratio": 0.8869179600886918,
+              "bankroll_ratio": 0.1130820399113082,
+              "total_deposited": 100.0,
+              "total_withdrawn": 0.0,
+              "net_profit": -4.1625
+            }
+          }
+        ]
+      ]
+    },
+    "statistics": {
+      "average_roi": -0.06945679247520399,
+      "best_roi": -0.018813176681152247,
+      "worst_roi": -0.12010040826925573,
+      "average_profitability_rate": 0.0,
+      "strategies_with_positive_roi": 0,
+      "total_strategies": 2
+    },
+    "recommendations": [
+      "Best ROI: Fibonacci (-1.88%)",
+      "Most consistent: Martingale (0.0% profitable sessions)",
+      "Lowest risk: Martingale (100.0% max drawdown)"
+    ]
+  },
+  "individual_results": {
+    "Martingale": {
+      "simulation_summary": {
+        "total_sessions": 2,
+        "total_bets": 6429,
+        "total_profit": -4.1625,
+        "total_wagered": 34.6585,
+        "overall_roi": -0.12010040826925573,
+        "profitable_sessions": 0,
+        "profitability_rate": 0.0,
+        "average_win_rate": 0.4919977664126245,
+        "average_session_duration": 0.0277595,
+        "stop_reasons": {
+          "insufficient_balance": 2
+        },
+        "average_max_drawdown": 1.0,
+        "worst_drawdown": 1.0,
+        "vault_status": {
+          "vault_balance": 85.0,
+          "bankroll_balance": 10.8375,
+          "total_balance": 95.8375,
+          "vault_ratio": 0.8869179600886918,
+          "bankroll_ratio": 0.1130820399113082,
+          "total_deposited": 100.0,
+          "total_withdrawn": 0.0,
+          "net_profit": -4.1625
+        }
+      },
+      "strategy_info": {
+        "strategy_config": {
+          "strategy": "martingale",
+          "base_bet": "0.001"
+        },
+        "strategy_genome": {
+          "strategy_type": "Martingale",
+          "base_bet": "0.001",
+          "min_bet": "0.00015",
+          "max_bet": "1000",
+          "multiplier": 2.0,
+          "max_losses": 10,
+          "default_multiplier": 2.0,
+          "confidence": 0.1,
+          "fitness": 0.47444002100597155,
+          "generation": 0,
+          "mutations": []
+        },
+        "strategy_fitness": 0.47444002100597155,
+        "strategy_metrics": {
+          "total_bets": 6429,
+          "win_rate": 0.4923005132991134,
+          "roi": -0.12010040826925573,
+          "max_bet_reached": 0.512,
+          "max_consecutive_losses": 15,
+          "average_confidence": 0.0,
+          "profit_factor": 0.7634419348152435
+        }
+      },
+      "sessions_data": [
+        {
+          "session_id": "ba50c352-60c7-4eed-8d1a-8fd56d43c860",
+          "strategy_name": "Martingale",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:46:06.641956",
+          "ended_at": "2025-06-24T17:46:06.684588",
+          "stop_reason": "insufficient_balance",
+          "duration_seconds": 0.042632,
+          "initial_balance": 2.25,
+          "final_balance": 0.0,
+          "total_profit": -2.25,
+          "total_wagered": 24.58,
+          "roi": -1.0,
+          "bets_count": 4913,
+          "wins_count": 2420,
+          "losses_count": 2493,
+          "win_rate": 0.4925707307144311,
+          "max_consecutive_wins": 10,
+          "max_consecutive_losses": 11,
+          "max_drawdown": 1.0,
+          "sharpe_ratio": -0.1525087041380007,
+          "peak_balance": 3.444,
+          "lowest_balance": 0.0,
+          "bets_per_minute": 5292850.217258591,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        },
+        {
+          "session_id": "626ddd59-0e5f-4ca3-b9a8-597fbc27d45c",
+          "strategy_name": "Martingale",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:46:06.684631",
+          "ended_at": "2025-06-24T17:46:06.697518",
+          "stop_reason": "insufficient_balance",
+          "duration_seconds": 0.012887,
+          "initial_balance": 1.9125,
+          "final_balance": 0.0,
+          "total_profit": -1.9125,
+          "total_wagered": 10.0785,
+          "roi": -1.0,
+          "bets_count": 1516,
+          "wins_count": 745,
+          "losses_count": 771,
+          "win_rate": 0.49142480211081796,
+          "max_consecutive_wins": 10,
+          "max_consecutive_losses": 15,
+          "max_drawdown": 1.0,
+          "sharpe_ratio": -0.4008961316765609,
+          "peak_balance": 1.9265,
+          "lowest_balance": 0.0,
+          "bets_per_minute": 6959449.120122418,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        }
+      ],
+      "simulation_metadata": {
+        "run_timestamp": "2025-06-24T17:46:06.697699",
+        "num_sessions_requested": 2,
+        "num_sessions_completed": 2,
+        "session_config": {},
+        "total_capital": 100.0
+      }
+    },
+    "Fibonacci": {
+      "simulation_summary": {
+        "total_sessions": 2,
+        "total_bets": 70408,
+        "total_profit": -4.1625,
+        "total_wagered": 221.2545,
+        "overall_roi": -0.018813176681152247,
+        "profitable_sessions": 0,
+        "profitability_rate": 0.0,
+        "average_win_rate": 0.49035810836066984,
+        "average_session_duration": 0.3179045,
+        "stop_reasons": {
+          "insufficient_balance": 2
+        },
+        "average_max_drawdown": 1.0,
+        "worst_drawdown": 1.0,
+        "vault_status": {
+          "vault_balance": 85.0,
+          "bankroll_balance": 10.8375,
+          "total_balance": 95.8375,
+          "vault_ratio": 0.8869179600886918,
+          "bankroll_ratio": 0.1130820399113082,
+          "total_deposited": 100.0,
+          "total_withdrawn": 0.0,
+          "net_profit": -4.1625
+        }
+      },
+      "strategy_info": {
+        "strategy_config": {
+          "strategy": "fibonacci",
+          "base_bet": "0.001"
+        },
+        "strategy_genome": {
+          "strategy_type": "Fibonacci",
+          "base_bet": "0.001",
+          "min_bet": "0.00015",
+          "max_bet": "1000",
+          "multiplier": 2.0,
+          "max_losses": 10,
+          "default_multiplier": 2.0,
+          "confidence": 0.1,
+          "fitness": 0.4945528969896416,
+          "generation": 0,
+          "mutations": []
+        },
+        "strategy_fitness": 0.4945528969896416,
+        "strategy_metrics": {
+          "total_bets": 70408,
+          "win_rate": 0.4915776616293603,
+          "roi": -0.018813176681152247,
+          "max_bet_reached": 0.055,
+          "max_consecutive_losses": 14,
+          "average_confidence": 0.0,
+          "profit_factor": 0.9629969510359369
+        }
+      },
+      "sessions_data": [
+        {
+          "session_id": "ecf35d2f-c3dc-4a14-bbaf-17dd03471963",
+          "strategy_name": "Fibonacci",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:46:06.697799",
+          "ended_at": "2025-06-24T17:46:07.116764",
+          "stop_reason": "insufficient_balance",
+          "duration_seconds": 0.418965,
+          "initial_balance": 2.25,
+          "final_balance": 0.0,
+          "total_profit": -2.25,
+          "total_wagered": 142.746,
+          "roi": -1.0,
+          "bets_count": 46518,
+          "wins_count": 22987,
+          "losses_count": 23531,
+          "win_rate": 0.4941528010662539,
+          "max_consecutive_wins": 15,
+          "max_consecutive_losses": 13,
+          "max_drawdown": 1.0,
+          "sharpe_ratio": -0.21596173651707773,
+          "peak_balance": 2.489,
+          "lowest_balance": 0.0,
+          "bets_per_minute": 4388449.16557391,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        },
+        {
+          "session_id": "7a23a4d1-36d3-4edf-87e7-7b848498b6ac",
+          "strategy_name": "Fibonacci",
+          "bot_id": "manual",
+          "started_at": "2025-06-24T17:46:07.116816",
+          "ended_at": "2025-06-24T17:46:07.333660",
+          "stop_reason": "insufficient_balance",
+          "duration_seconds": 0.216844,
+          "initial_balance": 1.9125,
+          "final_balance": 0.0,
+          "total_profit": -1.9125,
+          "total_wagered": 78.5085,
+          "roi": -1.0,
+          "bets_count": 23890,
+          "wins_count": 11624,
+          "losses_count": 12266,
+          "win_rate": 0.4865634156550858,
+          "max_consecutive_wins": 15,
+          "max_consecutive_losses": 14,
+          "max_drawdown": 1.0,
+          "sharpe_ratio": 0.030163448583042797,
+          "peak_balance": 2.1005,
+          "lowest_balance": 0.0,
+          "bets_per_minute": 6604190.855310445,
+          "stop_loss": null,
+          "take_profit": null,
+          "max_bets": null
+        }
+      ],
+      "simulation_metadata": {
+        "run_timestamp": "2025-06-24T17:46:07.333859",
+        "num_sessions_requested": 2,
+        "num_sessions_completed": 2,
+        "session_config": {},
+        "total_capital": 100.0
+      }
+    }
+  },
+  "metadata": {
+    "comparison_timestamp": "2025-06-24T17:46:07.333886",
+    "strategies_compared": 2,
+    "num_sessions_per_strategy": 2,
+    "session_config": {},
+    "total_capital": 100.0
+  }
+}

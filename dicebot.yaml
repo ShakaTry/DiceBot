@@ -1,0 +1,78 @@
+# DiceBot Configuration File
+# This file contains default settings for DiceBot simulations
+
+simulation:
+  default_sessions: 100
+  parallel_workers: 4
+  memory_limit_mb: 512
+  auto_parallel_threshold: 50  # Enable parallel processing for sessions >= this number
+  progress_bar: true
+
+strategies:
+  presets:
+    conservative:
+      base_bet: "0.0005"
+      max_losses: 5
+      multiplier: 2.0
+    
+    moderate:
+      base_bet: "0.001" 
+      max_losses: 8
+      multiplier: 2.0
+    
+    aggressive:
+      base_bet: "0.002"
+      max_losses: 12
+      multiplier: 2.0
+    
+    experimental:
+      base_bet: "0.003"
+      max_losses: 15
+      multiplier: 2.5
+
+  risk_levels:
+    low:
+      max_losses: 5
+      max_capital_ratio: 0.05  # 5% of capital max
+    medium:
+      max_losses: 10
+      max_capital_ratio: 0.10  # 10% of capital max
+    high:
+      max_losses: 15
+      max_capital_ratio: 0.20  # 20% of capital max
+    extreme:
+      max_losses: 20
+      max_capital_ratio: 0.35  # 35% of capital max
+
+game:
+  house_edge: 0.01
+  min_bet_ltc: "0.00015"
+  max_bet_ltc: "1000"
+  bet_delay_min: 1.5
+  bet_delay_max: 3.0
+
+vault:
+  vault_ratio: 0.85  # 85% in vault, 15% in session bankroll
+  session_bankroll_ratio: 0.15
+
+output:
+  format: json  # json, csv, parquet
+  compression: null  # gzip, bz2, null
+  auto_cleanup_days: 30
+  include_session_details: true
+
+cli:
+  default_output_dir: "results"
+  color_output: true
+  show_warnings: true
+
+# Configuration for parking strategy (Provably Fair constraint)
+parking:
+  enabled: true
+  max_toggles_before_bet: 3  # Max UNDER/OVER toggles before forced bet
+  parking_bet_amount: 0.00015  # Minimum bet
+  parking_target: 98.0  # 99% chance of winning
+  parking_bet_type: "UNDER"
+  auto_seed_rotation_after: 1000  # Rotate seed after X nonces
+  parking_on_consecutive_losses: 5  # Enter parking after X losses
+  parking_on_drawdown_percent: 0.1  # Enter parking at 10% drawdown

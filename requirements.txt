@@ -1,1 +1,1 @@
-# Empty for minimal Vercel testing
+requests>=2.31.0

@@ -53,7 +53,7 @@ jobs:
       run: pyright src tests
       
     - name: ✅ Run tests
-      run: pytest --cov=dicebot --cov-report=xml --cov-report=term
+      run: pytest --cov=dicebot --cov-report=xml --cov-report=term --cov-fail-under=85
       
     - name: 📊 Upload coverage
       uses: codecov/codecov-action@v3

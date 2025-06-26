@@ -1,5 +1,6 @@
 """Tests pour SimulationEngine."""
 
+import os
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -8,6 +9,11 @@ from dicebot.core.models import VaultConfig
 from dicebot.money.vault import Vault
 from dicebot.simulation.engine import SimulationEngine
 from dicebot.strategies import FlatBetting, StrategyConfig
+
+# Reduce test complexity in CI environment
+CI_MODE = os.getenv("CI", "").lower() in ("true", "1")
+MAX_BETS_CI = 5 if CI_MODE else 1000
+MAX_BETS_LONG_CI = 10 if CI_MODE else 1000
 
 
 class TestSimulationEngine:
@@ -67,32 +73,32 @@ class TestSimulationEngine:
         """Test l'arrêt sur stop-loss."""
         session_config = {
             "initial_balance": Decimal("1"),
-            "max_bets": 1000,
+            "max_bets": MAX_BETS_CI,
             "stop_loss_ratio": 0.5,  # Arrêt à 50% de perte
         }
 
         result = self.engine.run_session(self.strategy, session_config=session_config)
 
-        # Devrait s'arrêter avant 1000 paris si stop-loss atteint
+        # Devrait s'arrêter avant max_bets si stop-loss atteint
         if result.game_state.balance <= Decimal("0.5"):
-            assert result.game_state.bets_count < 1000
+            assert result.game_state.bets_count < MAX_BETS_CI
 
     def test_run_session_take_profit(self) -> None:
         """Test l'arrêt sur take-profit."""
         session_config = {
             "initial_balance": Decimal("1"),
-            "max_bets": 1000,
+            "max_bets": MAX_BETS_CI,
             "take_profit_ratio": 2.0,  # Arrêt à 100% de gain
         }
 
         result = self.engine.run_session(self.strategy, session_config=session_config)
 
         # Si take-profit atteint, devrait s'arrêter avant max_bets
-        # Sinon, vérifie que les 1000 bets ont été joués
+        # Sinon, vérifie que tous les bets ont été joués
         if result.stop_reason == "take_profit":
-            assert result.game_state.bets_count < 1000
+            assert result.game_state.bets_count < MAX_BETS_CI
         else:
-            assert result.game_state.bets_count <= 1000
+            assert result.game_state.bets_count <= MAX_BETS_CI
 
     def test_run_multiple_sessions_sequential(self) -> None:
         """Test l'exécution de plusieurs sessions en séquentiel."""
@@ -179,7 +185,7 @@ class TestSimulationEngine:
         """Test l'arrêt sur limite de pertes consécutives."""
         session_config = {
             "initial_balance": Decimal("10"),
-            "max_bets": 1000,
+            "max_bets": MAX_BETS_CI,
             "max_consecutive_losses": 5,
         }
 

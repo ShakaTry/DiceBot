@@ -2,7 +2,9 @@
 
 from decimal import Decimal
 
-from dicebot.utils.validation_simple import ParameterValidator, RiskLevel
+import pytest
+
+from dicebot.utils.validation import ParameterValidator, RiskLevel, ValidationError
 
 
 class TestParameterValidator:
@@ -27,11 +29,12 @@ class TestParameterValidator:
         }
         capital = Decimal("100")
 
-        warnings = ParameterValidator.validate_strategy_config(config, capital)
+        # Cette configuration devrait lever une ValidationError car trop risquée
+        with pytest.raises(ValidationError) as exc_info:
+            ParameterValidator.validate_strategy_config(config, capital)
 
-        # Devrait générer un avertissement sur base_bet
-        assert len(warnings) > 0
-        assert any("base_bet" in warning for warning in warnings.values())
+        # Vérifier que l'erreur mentionne le capital insuffisant
+        assert "capital" in str(exc_info.value).lower()
 
     def test_validate_strategy_config_extreme_base_bet(self) -> None:
         """Test validation avec mise de base extrême."""

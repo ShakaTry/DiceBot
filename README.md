@@ -231,3 +231,4 @@ Sous licence Apache 2.0. Voir [LICENSE](LICENSE) pour plus de détails.
 ---
 
 *DiceBot - Où la conscience artificielle émerge du chaos des probabilités* 🎲🤖
+# Trigger new workflow

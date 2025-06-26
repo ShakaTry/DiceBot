@@ -1,0 +1,168 @@
+name: 🚀 Fast Developer Feedback
+
+# Ultra-fast feedback loop for developers (<5 minutes)
+# Runs essential checks only to provide immediate feedback
+
+on:
+  push:
+    branches: [main, develop, feature/*, fix/*]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.pre-commit-config.yaml'
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.11'
+  CACHE_VERSION: 'v3-fast'
+
+jobs:
+  fast-feedback:
+    name: ⚡ Fast Feedback
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      quality-passed: ${{ steps.quality-check.outputs.passed }}
+      tests-passed: ${{ steps.tests.outputs.passed }}
+    
+    steps:
+    - name: 📂 Checkout
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        fetch-depth: 0
+        
+    - name: 🔍 Detect Changes
+      id: changes
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+        else
+          CHANGED_FILES=$(git diff --name-only HEAD~1)
+        fi
+        
+        if echo "$CHANGED_FILES" | grep -E '\.(py|yml|yaml|toml)$'; then
+          echo "has-changes=true" >> $GITHUB_OUTPUT
+          echo "📝 Code changes detected"
+        else
+          echo "has-changes=false" >> $GITHUB_OUTPUT  
+          echo "📄 No significant changes - skipping checks"
+        fi
+        
+    - name: 🐍 Setup Python + Fast Cache
+      if: steps.changes.outputs.has-changes == 'true'
+      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: ⚡ Ultra-Fast Dependencies Cache
+      if: steps.changes.outputs.has-changes == 'true'
+      uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.cache/pre-commit
+          .ruff_cache
+        key: fast-${{ env.CACHE_VERSION }}-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          fast-${{ env.CACHE_VERSION }}-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-
+          
+    - name: 📦 Install Dependencies (90s max)
+      if: steps.changes.outputs.has-changes == 'true'
+      timeout-minutes: 2
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        
+    - name: ⚡ Quality Check (90s max)
+      id: quality-check
+      if: steps.changes.outputs.has-changes == 'true'
+      timeout-minutes: 2
+      run: |
+        echo "🔍 Running fast quality checks..."
+        
+        # Fast linting (30s max)
+        echo "📋 Linting..."
+        ruff check src tests --output-format=github
+        
+        # Fast formatting (15s max)
+        echo "🎨 Format check..."
+        ruff format --check src tests
+        
+        # Fast type check (45s max)
+        echo "🔒 Type checking..."
+        pyright src tests --skipunannotated
+        
+        echo "passed=true" >> $GITHUB_OUTPUT
+        echo "✅ Quality checks passed"
+        
+    - name: ⚡ Core Tests Only (120s max)
+      id: tests
+      if: steps.changes.outputs.has-changes == 'true'
+      timeout-minutes: 2
+      run: |
+        echo "🧪 Running core tests only..."
+        
+        # Run only core tests with minimal coverage
+        pytest tests/core/ tests/money/ \
+          --cov=dicebot.core \
+          --cov=dicebot.money \
+          --cov-report=term \
+          --cov-fail-under=85 \
+          -x \
+          --tb=short \
+          --maxfail=3
+          
+        echo "passed=true" >> $GITHUB_OUTPUT
+        echo "✅ Core tests passed"
+        
+    - name: 🎯 Fast Status Summary
+      if: always() && steps.changes.outputs.has-changes == 'true'
+      run: |
+        echo "📊 Fast Feedback Summary:"
+        echo "Quality: ${{ steps.quality-check.outputs.passed == 'true' && '✅' || '❌' }}"
+        echo "Tests: ${{ steps.tests.outputs.passed == 'true' && '✅' || '❌' }}"
+        
+        if [[ "${{ steps.quality-check.outputs.passed }}" == "true" && "${{ steps.tests.outputs.passed }}" == "true" ]]; then
+          echo "🚀 All fast checks passed - ready for full CI"
+        else
+          echo "⚠️ Fast checks failed - fix before full CI"
+          exit 1
+        fi
+        
+    - name: 💬 PR Comment
+      if: always() && github.event_name == 'pull_request' && steps.changes.outputs.has-changes == 'true'
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      with:
+        script: |
+          const quality = '${{ steps.quality-check.outputs.passed }}' === 'true' ? '✅' : '❌';
+          const tests = '${{ steps.tests.outputs.passed }}' === 'true' ? '✅' : '❌';
+          
+          const body = `## ⚡ Fast Feedback Results
+          
+          | Check | Status | Time |
+          |-------|--------|------|
+          | 🔍 Quality | ${quality} | ~90s |
+          | 🧪 Core Tests | ${tests} | ~120s |
+          
+          ${quality === '✅' && tests === '✅' ? 
+            '🚀 **All fast checks passed!** Full CI will run automatically.' : 
+            '⚠️ **Fast checks failed.** Please fix issues before full CI runs.'}
+          
+          *Fast feedback completed in <5 minutes*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });

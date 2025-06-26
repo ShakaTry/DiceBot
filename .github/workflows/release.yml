@@ -39,12 +39,12 @@ jobs:
     
     steps:
     - name: 📂 Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         fetch-depth: 0  # Need full history for setuptools_scm
         
     - name: 🐍 Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
@@ -134,13 +134,13 @@ jobs:
     
     steps:
     - name: 📂 Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         fetch-depth: 0
         ref: ${{ needs.create-release.outputs.tag }}
         
     - name: 🐍 Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
@@ -158,7 +158,7 @@ jobs:
         python -m twine check dist/*
         
     - name: 📤 Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
       with:
         name: dicebot-package-${{ needs.create-release.outputs.version }}
         path: dist/
@@ -176,12 +176,12 @@ jobs:
     
     steps:
     - name: 📂 Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         ref: ${{ needs.create-release.outputs.tag }}
         
     - name: 📥 Download package artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
         name: dicebot-package-${{ needs.create-release.outputs.version }}
         path: dist/
@@ -214,7 +214,7 @@ jobs:
         EOF
         
     - name: 🏷️ Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # v2.0.8
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

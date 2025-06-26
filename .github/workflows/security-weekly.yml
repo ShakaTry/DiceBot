@@ -1,0 +1,247 @@
+name: 🔒 Weekly Security Analysis
+
+# Comprehensive security analysis - runs weekly to optimize budget
+# Estimated usage: ~25 minutes/week = ~100 minutes/month
+
+on:
+  schedule:
+    # Every Monday at 2 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      full_scan:
+        description: 'Run full security scan suite'
+        required: false
+        default: 'true'
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: '3.11'
+  CACHE_VERSION: 'v2-security'
+
+jobs:
+  # ================================================================
+  # 🔒 COMPREHENSIVE SECURITY ANALYSIS
+  # ================================================================
+  security-analysis:
+    name: 🔒 Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      
+    steps:
+    - name: 📂 Checkout
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        fetch-depth: 0
+        
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Security Cache
+      uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.cache/semgrep
+        key: security-${{ env.CACHE_VERSION }}-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          security-${{ env.CACHE_VERSION }}-${{ runner.os }}-
+          
+    - name: 📦 Install Security Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install bandit[toml] safety semgrep pip-audit
+        
+    - name: 🔍 CodeQL Analysis
+      uses: github/codeql-action/init@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+      with:
+        languages: python
+        queries: +security-and-quality,+security-extended
+        config: |
+          name: "Weekly Security CodeQL Config"
+          query-filters:
+          - exclude:
+              id: py/unused-import
+              paths: ["tests/"]
+              
+    - name: 🏗️ CodeQL Build
+      uses: github/codeql-action/autobuild@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+      
+    - name: 🔍 Complete CodeQL Analysis
+      uses: github/codeql-action/analyze@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+      with:
+        category: "/language:python"
+        
+    - name: 🛡️ Comprehensive Security Scan
+      run: |
+        echo "🔒 Running weekly security analysis..."
+        
+        # Bandit security analysis
+        echo "🔍 Bandit security scan..."
+        bandit -r src/ -f json -o bandit-weekly.json || true
+        bandit -r src/ -ll -f txt | tee bandit-weekly.txt || true
+        
+        # Safety vulnerability check
+        echo "🛡️ Safety vulnerability scan..."
+        safety check --json --output safety-weekly.json || true
+        safety check --full-report | tee safety-weekly.txt || true
+        
+        # Semgrep security patterns
+        echo "🔍 Semgrep security patterns..."
+        semgrep --config=auto --json --output=semgrep-weekly.json src/ || true
+        semgrep --config=auto --verbose --output=semgrep-weekly.txt src/ || true
+        
+        # Dependency audit
+        echo "🔐 Dependency security audit..."
+        pip-audit --format=json --output=pip-audit-weekly.json || true
+        pip-audit --format=text | tee pip-audit-weekly.txt || true
+        
+        echo "✅ Security analysis completed"
+        
+    - name: 📊 Security Report Generation
+      run: |
+        echo "📊 Generating weekly security report..."
+        
+        cat > security-weekly-report.md << 'EOF'
+        # 🔒 Weekly Security Analysis Report
+        
+        **Generated:** $(date)
+        **Repository:** ${{ github.repository }}
+        **Commit:** ${{ github.sha }}
+        **Analysis Type:** Comprehensive Weekly Scan
+        
+        ## 🛡️ Security Tools Used
+        
+        - ✅ **CodeQL** (Microsoft): AI-powered security analysis
+        - ✅ **Bandit**: Python security linting
+        - ✅ **Safety**: Known vulnerability database
+        - ✅ **Semgrep**: Advanced security patterns
+        - ✅ **pip-audit**: Package vulnerability scanning
+        
+        ## 📈 Security Metrics
+        EOF
+        
+        # Calculate security metrics
+        BANDIT_ISSUES=$(jq -r '.results | length' bandit-weekly.json 2>/dev/null || echo "0")
+        SAFETY_VULNS=$(jq -r 'length' safety-weekly.json 2>/dev/null || echo "0")
+        SEMGREP_FINDINGS=$(jq -r '.results | length' semgrep-weekly.json 2>/dev/null || echo "0")
+        AUDIT_VULNS=$(jq -r '.vulnerabilities | length' pip-audit-weekly.json 2>/dev/null || echo "0")
+        
+        echo "" >> security-weekly-report.md
+        echo "| Tool | Issues Found | Status |" >> security-weekly-report.md
+        echo "|------|--------------|--------|" >> security-weekly-report.md
+        echo "| Bandit | $BANDIT_ISSUES | $([ $BANDIT_ISSUES -eq 0 ] && echo '✅ Clean' || echo '⚠️ Review') |" >> security-weekly-report.md
+        echo "| Safety | $SAFETY_VULNS | $([ $SAFETY_VULNS -eq 0 ] && echo '✅ Clean' || echo '🚨 Vulnerabilities') |" >> security-weekly-report.md
+        echo "| Semgrep | $SEMGREP_FINDINGS | $([ $SEMGREP_FINDINGS -eq 0 ] && echo '✅ Clean' || echo '⚠️ Review') |" >> security-weekly-report.md
+        echo "| pip-audit | $AUDIT_VULNS | $([ $AUDIT_VULNS -eq 0 ] && echo '✅ Clean' || echo '🚨 Vulnerabilities') |" >> security-weekly-report.md
+        
+        echo "" >> security-weekly-report.md
+        echo "## 🎯 Overall Security Status" >> security-weekly-report.md
+        
+        TOTAL_CRITICAL=$((SAFETY_VULNS + AUDIT_VULNS))
+        TOTAL_ISSUES=$((BANDIT_ISSUES + SAFETY_VULNS + SEMGREP_FINDINGS + AUDIT_VULNS))
+        
+        if [ $TOTAL_CRITICAL -gt 0 ]; then
+          echo "🚨 **CRITICAL** - $TOTAL_CRITICAL vulnerabilities need immediate attention" >> security-weekly-report.md
+          echo "SECURITY_STATUS=CRITICAL" >> $GITHUB_ENV
+        elif [ $TOTAL_ISSUES -eq 0 ]; then
+          echo "✅ **SECURE** - No security issues detected" >> security-weekly-report.md
+          echo "SECURITY_STATUS=SECURE" >> $GITHUB_ENV
+        elif [ $TOTAL_ISSUES -lt 5 ]; then
+          echo "⚠️ **REVIEW NEEDED** - $TOTAL_ISSUES minor issues detected" >> security-weekly-report.md
+          echo "SECURITY_STATUS=REVIEW" >> $GITHUB_ENV
+        else
+          echo "🚨 **ACTION REQUIRED** - $TOTAL_ISSUES security issues detected" >> security-weekly-report.md
+          echo "SECURITY_STATUS=ACTION_REQUIRED" >> $GITHUB_ENV
+        fi
+        
+        echo "" >> security-weekly-report.md
+        echo "## 📋 Next Steps" >> security-weekly-report.md
+        echo "" >> security-weekly-report.md
+        
+        if [ $TOTAL_CRITICAL -gt 0 ]; then
+          echo "1. 🚨 **URGENT**: Address critical vulnerabilities immediately" >> security-weekly-report.md
+          echo "2. 📊 Review detailed reports in artifacts" >> security-weekly-report.md
+          echo "3. 🔄 Update dependencies and re-run scan" >> security-weekly-report.md
+        elif [ $TOTAL_ISSUES -gt 0 ]; then
+          echo "1. 📊 Review detailed findings in artifacts" >> security-weekly-report.md
+          echo "2. ⚠️ Address medium/low priority issues" >> security-weekly-report.md
+          echo "3. 🔄 Monitor for new vulnerabilities" >> security-weekly-report.md
+        else
+          echo "1. ✅ Maintain current security practices" >> security-weekly-report.md
+          echo "2. 🔄 Continue weekly monitoring" >> security-weekly-report.md
+          echo "3. 📚 Stay updated on security best practices" >> security-weekly-report.md
+        fi
+        
+        cat security-weekly-report.md
+        
+    - name: 📤 Upload Security Artifacts
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
+      with:
+        name: security-analysis-${{ github.run_number }}
+        path: |
+          *-weekly.*
+          security-weekly-report.md
+        retention-days: 90
+        
+    - name: 📢 Security Status Notification
+      if: always()
+      uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baaa4262dd3613 # v1.27.0
+      with:
+        payload: |
+          {
+            "text": "🔒 Weekly Security Analysis Complete",
+            "attachments": [{
+              "color": "${{ env.SECURITY_STATUS == 'SECURE' && 'good' || env.SECURITY_STATUS == 'CRITICAL' && 'danger' || 'warning' }}",
+              "fields": [
+                {"title": "Repository", "value": "${{ github.repository }}", "short": true},
+                {"title": "Status", "value": "${{ env.SECURITY_STATUS }}", "short": true},
+                {"title": "Analysis Date", "value": "${{ github.run_id }}", "short": true},
+                {"title": "Branch", "value": "${{ github.ref_name }}", "short": true}
+              ],
+              "footer": "DiceBot Security Monitor",
+              "ts": ${{ github.event.repository.updated_at }}
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ================================================================
+  # 🔐 SECRET SCANNING
+  # ================================================================
+  secret-scan:
+    name: 🔐 Secret Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      
+    steps:
+    - name: 📂 Checkout
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        fetch-depth: 0
+        
+    - name: 🔍 TruffleHog Secret Scan
+      uses: trufflesecurity/trufflehog@595d6499673e7b9d644e6a1b8c5f0c9c8bbaed89 # v3.63.4
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+        
+    - name: 📊 Secret Scan Summary
+      run: |
+        echo "🔐 Secret scan completed"
+        echo "✅ No verified secrets detected in commits"

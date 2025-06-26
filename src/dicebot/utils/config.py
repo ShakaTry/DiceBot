@@ -99,7 +99,7 @@ class DiceBotConfig:
                 try:
                     self.load_from_file(location)
                     break
-                except Exception:
+                except (OSError, yaml.YAMLError, ValueError):
                     continue  # Try next location
 
     def load_from_file(self, config_file: Path):
@@ -120,7 +120,7 @@ class DiceBotConfig:
                 self.config_file = config_file
 
         except yaml.YAMLError as e:
-            raise ValueError(f"Invalid YAML in config file {config_file}: {e}")
+            raise ValueError(f"Invalid YAML in config file {config_file}: {e}") from e
 
     def _merge_config(self, base: dict, override: dict):
         """Recursively merge configuration dictionaries."""

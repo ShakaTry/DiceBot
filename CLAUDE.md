@@ -384,6 +384,7 @@ pip install -e .
 4. **Security**: No secrets in code, coverage ≥85%, security scans required
 5. **Production**: Railway deployment, Slack monitoring, GitHub Actions CI/CD
 6. **Bot Architect**: Meta-bot that orchestrates without playing (Phase 2)
+7. **Git Commits**: Claude uses controlled commit workflow (Option 2 - ask before commit)
 
 ## 🎮 Bitsler Parameters
 
@@ -463,6 +464,26 @@ strategy = StrategyFactory.create_from_dict(config_dict)
 - **Continue Phase 1**: Implement simulation engine (Day 5-6)
 - **Add CLI**: Create runner with commands (Day 7)
 - **Add Utils**: Logger and metrics (Day 5-6)
+
+### 🤖 Claude Commit Workflow (Option 2):
+1. **Claude completes significant task/phase**
+2. **Claude asks**: "Commit maintenant ?"
+3. **User responds**: "Oui" or "Non/Attends"
+4. **If Yes**: Claude commits with proper message format
+5. **If No**: Continue without committing
+
+#### Commit Message Format:
+```bash
+🚀 MAJOR: Brief description of main change
+
+- Bullet point of key changes
+- Performance metrics if applicable (e.g., -27% budget)
+- Impact summary
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
 
 ### ✅ Phase 1 Terminée (Day 5-8):
 1. ✅ `SimulationEngine` avec multiprocessing et optimisations

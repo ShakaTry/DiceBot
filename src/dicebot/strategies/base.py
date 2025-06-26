@@ -39,6 +39,7 @@ class BaseStrategy(ABC):
         self.confidence = 1.0  # Niveau de confiance (0-1)
         self.metrics = StrategyMetrics()
         self._previous_state: GameState | None = None
+        self._last_game_state: GameState | None = None  # Initialize the attribute
         self.reset_state()
 
     @abstractmethod
@@ -268,11 +269,13 @@ class BaseStrategy(ABC):
             self.metrics.max_drawdown = game_state.current_drawdown
 
     # Hooks pour l'extensibilité
-    def on_before_bet(self, game_state: GameState) -> None:
+    @staticmethod
+    def on_before_bet(game_state: GameState) -> None:
         """Hook appelé avant de calculer le prochain pari."""
         _ = game_state  # Unused parameter
 
-    def on_after_decision(self, decision: BetDecision, game_state: GameState) -> None:
+    @staticmethod
+    def on_after_decision(decision: BetDecision, game_state: GameState) -> None:
         """Hook appelé après avoir pris une décision."""
         _ = decision, game_state  # Unused parameters
 

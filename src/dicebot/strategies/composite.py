@@ -338,7 +338,8 @@ class CompositeStrategy(BaseStrategy):
         _, min_decision = min(decisions, key=lambda x: x[1].amount)
         return min_decision
 
-    def _conservative_mode(self, decisions: list[tuple[BaseStrategy, BetDecision]]) -> Decimal:
+    @staticmethod
+    def _conservative_mode(decisions: list[tuple[BaseStrategy, BetDecision]]) -> Decimal:
         """Prend la mise la plus faible (legacy)."""
         return min(decision.amount for _, decision in decisions)
 

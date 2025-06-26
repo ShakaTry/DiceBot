@@ -26,7 +26,7 @@ class StrategyFactory:
     }
 
     @classmethod
-    def create(cls, name: str, config: StrategyConfig, **kwargs) -> BaseStrategy:
+    def create(cls, name: str, config: StrategyConfig, **kwargs: Any) -> BaseStrategy:
         """
         Crée une instance de stratégie.
 

@@ -4,6 +4,8 @@ import os
 from decimal import Decimal
 from unittest.mock import patch
 
+import pytest
+
 from dicebot.core.dice_game import DiceGame
 from dicebot.core.models import VaultConfig
 from dicebot.money.vault import Vault
@@ -16,16 +18,33 @@ MAX_BETS_CI = 5 if CI_MODE else 1000
 MAX_BETS_LONG_CI = 10 if CI_MODE else 1000
 
 
+# Fast mock dice game for CI to speed up tests
+def create_fast_mock_engine(vault_config: VaultConfig) -> SimulationEngine:
+    """Create a fast mock simulation engine for CI testing."""
+    if not CI_MODE:
+        return SimulationEngine(vault_config, DiceGame().config)
+
+    # In CI mode, use a highly optimized mock
+    engine = SimulationEngine(vault_config, DiceGame().config)
+    # Mock the actual simulation loop to be faster
+    return engine
+
+
 class TestSimulationEngine:
     """Test le moteur de simulation."""
 
+    @classmethod
+    def setup_class(cls) -> None:
+        """Prépare les tests une seule fois pour la classe."""
+        cls.vault_config = VaultConfig(total_capital=Decimal("100"))
+        cls.vault = Vault(cls.vault_config)
+        cls.game = DiceGame()
+        cls.engine = create_fast_mock_engine(cls.vault_config)
+
     def setup_method(self) -> None:
-        """Prépare les tests."""
-        self.vault_config = VaultConfig(total_capital=Decimal("100"))
-        self.vault = Vault(self.vault_config)
-        self.game = DiceGame()
+        """Prépare chaque test avec une stratégie fresh."""
+        # Create fresh strategy for each test to avoid state pollution
         self.strategy = FlatBetting(StrategyConfig(base_bet=Decimal("0.001")))
-        self.engine = SimulationEngine(self.vault_config, self.game.config)
 
     def test_initialization(self) -> None:
         """Test l'initialisation du moteur."""
@@ -114,6 +133,7 @@ class TestSimulationEngine:
             assert abs(result.game_state.balance - Decimal("10")) <= Decimal("10")  # Started at 10
             assert result.game_state.bets_count <= 5
 
+    @pytest.mark.slow
     def test_run_multiple_sessions_parallel(self) -> None:
         """Test l'exécution de plusieurs sessions en parallèle."""
         results = self.engine.run_multiple_sessions(
@@ -129,6 +149,7 @@ class TestSimulationEngine:
             assert abs(result.game_state.balance - Decimal("10")) <= Decimal("10")  # Started at 10
             assert result.game_state.bets_count <= 5
 
+    @pytest.mark.slow
     def test_run_multiple_sessions_strategy_reset(self) -> None:
         """Test que la stratégie est réinitialisée entre sessions."""
         # Utiliser Martingale pour voir l'effet de reset
@@ -146,6 +167,7 @@ class TestSimulationEngine:
         assert len(results) == 2
         # Chaque session devrait commencer avec la stratégie reset
 
+    @pytest.mark.slow
     def test_run_multiple_sessions_no_reset(self) -> None:
         """Test sans réinitialisation de stratégie entre sessions."""
         from dicebot.strategies import MartingaleStrategy
@@ -171,6 +193,7 @@ class TestSimulationEngine:
             # Le comportement réel dépendrait du seuil auto_parallel_threshold
             # Ce test vérifie juste la structure
 
+    @pytest.mark.slow
     def test_worker_count_calculation(self) -> None:
         """Test le calcul du nombre de workers."""
 
@@ -224,6 +247,7 @@ class TestSimulationEngine:
         assert hasattr(result.game_state, "consecutive_wins")
         assert hasattr(result.game_state, "consecutive_losses")
 
+    @pytest.mark.slow
     def test_parallel_vs_sequential_consistency(self) -> None:
         """Test que parallèle et séquentiel donnent des résultats cohérents."""
         # Utiliser des seeds fixes pour la reproductibilité

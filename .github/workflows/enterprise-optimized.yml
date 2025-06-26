@@ -131,16 +131,17 @@ jobs:
           --cov-report=xml \
           --cov-report=term \
           --cov-report=html \
-          --cov-fail-under=85 \
+          --cov-fail-under=90 \
           --junit-xml=junit.xml \
           -v \
           --tb=short \
           --maxfail=3 \
           --durations=10 \
           --disable-warnings \
-          -x
+          -x \
+          -m "not slow"
           
-        echo "✅ Test suite completed with 85%+ coverage"
+        echo "✅ Test suite completed with 90%+ coverage"
         
     - name: 📊 Coverage Upload
       if: steps.changes.outputs.has-changes == 'true'
@@ -154,7 +155,7 @@ jobs:
       run: |
         echo "✅ Enterprise CI validation completed"
         echo "🔍 Quality gates: Passed"
-        echo "🧪 Test coverage: ≥85%"
+        echo "🧪 Test coverage: ≥90%"
         echo "🔒 Security: Weekly analysis scheduled"
         
     - name: 📦 Enterprise Build

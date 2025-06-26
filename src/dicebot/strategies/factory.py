@@ -247,7 +247,8 @@ class StrategyFactory:
 
         Args:
             strategies: Liste de tuples (nom_stratégie, config_dict)
-            mode: Mode de combinaison (average, weighted, consensus, aggressive, conservative, rotate)
+            mode: Mode de combinaison (average, weighted, consensus, aggressive,
+                conservative, rotate)
             base_config: Configuration de base pour la stratégie composite
 
         Returns:
@@ -281,7 +282,7 @@ class StrategyFactory:
             mode_enum = CombinationMode[mode.upper()]
         except KeyError:
             available_modes = ", ".join([m.name.lower() for m in CombinationMode])
-            raise ValueError(f"Invalid mode '{mode}'. Available modes: {available_modes}")
+            raise ValueError(f"Invalid mode '{mode}'. Available modes: {available_modes}") from None
 
         composite_config["mode"] = mode_enum
 

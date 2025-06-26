@@ -228,7 +228,9 @@ class JSONLinesLogger:
         """
         data = {
             "event_type": "bet_result",
-            "timestamp": result.timestamp.isoformat(),
+            "timestamp": result.timestamp.isoformat()
+            if result.timestamp
+            else datetime.now().isoformat(),
             "session_id": session_id,
             "strategy_name": strategy_name,
             "result": {
@@ -454,10 +456,10 @@ class JSONLinesFormatter(logging.Formatter):
         """
         if isinstance(record.msg, dict):
             # Record message is already a dict
-            log_data = record.msg.copy()
+            log_data: dict[str, Any] = record.msg.copy()
         else:
             # Convert string message to dict
-            log_data = {
+            log_data: dict[str, Any] = {
                 "event_type": "log_message",
                 "timestamp": datetime.now().isoformat(),
                 "level": record.levelname,
@@ -501,7 +503,7 @@ class LogAnalyzer:
         """
         self.log_file = Path(log_file)
 
-    def read_events(self, event_type: str | None = None) -> list[dict]:
+    def read_events(self, event_type: str | None = None) -> list[dict[str, Any]]:
         """Read events from the log file.
 
         Args:
@@ -510,7 +512,7 @@ class LogAnalyzer:
         Returns:
             List of event dictionaries
         """
-        events = []
+        events: list[dict[str, Any]] = []
 
         try:
             with open(self.log_file, encoding="utf-8") as f:
@@ -530,7 +532,7 @@ class LogAnalyzer:
 
         return events
 
-    def get_session_events(self, session_id: str) -> list[dict]:
+    def get_session_events(self, session_id: str) -> list[dict[str, Any]]:
         """Get all events for a specific session.
 
         Args:
@@ -539,7 +541,7 @@ class LogAnalyzer:
         Returns:
             List of events for the session
         """
-        events = []
+        events: list[dict[str, Any]] = []
 
         try:
             with open(self.log_file, encoding="utf-8") as f:

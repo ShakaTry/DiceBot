@@ -81,7 +81,7 @@ class BaseStrategy(ABC):
         self._update_strategy_state(result)
 
         # Mettre à jour les métriques si on a un game_state
-        if hasattr(self, "_last_game_state"):
+        if hasattr(self, "_last_game_state") and self._last_game_state is not None:
             self.update_metrics(result, self._last_game_state)
 
     @abstractmethod
@@ -246,7 +246,7 @@ class BaseStrategy(ABC):
 
         return fitness
 
-    def update_metrics(self, result: BetResult, game_state: GameState):
+    def update_metrics(self, result: BetResult, game_state: GameState) -> None:
         """Met à jour les métriques de performance."""
         self.metrics.total_bets += 1
         self.metrics.total_wagered += result.amount
@@ -269,13 +269,11 @@ class BaseStrategy(ABC):
             self.metrics.max_drawdown = game_state.current_drawdown
 
     # Hooks pour l'extensibilité
-    @staticmethod
-    def on_before_bet(game_state: GameState) -> None:
+    def on_before_bet(self, game_state: GameState) -> None:
         """Hook appelé avant de calculer le prochain pari."""
         _ = game_state  # Unused parameter
 
-    @staticmethod
-    def on_after_decision(decision: BetDecision, game_state: GameState) -> None:
+    def on_after_decision(self, decision: BetDecision, game_state: GameState) -> None:
         """Hook appelé après avoir pris une décision."""
         _ = decision, game_state  # Unused parameters
 

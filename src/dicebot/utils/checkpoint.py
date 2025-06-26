@@ -103,7 +103,7 @@ class CheckpointManager:
         Returns:
             List of checkpoint summaries
         """
-        checkpoints = []
+        checkpoints: list[dict[str, Any]] = []
 
         for summary_file in self.checkpoint_dir.glob("*_summary.json"):
             try:
@@ -150,7 +150,7 @@ class CheckpointManager:
 
         return deleted
 
-    def _cleanup_old_checkpoints(self, max_age_days: int = 7):
+    def _cleanup_old_checkpoints(self, max_age_days: int = 7) -> None:
         """Clean up checkpoints older than max_age_days.
 
         Args:
@@ -178,7 +178,7 @@ class CheckpointManager:
             List of recovery suggestion strings
         """
         checkpoints = self.list_checkpoints()
-        suggestions = []
+        suggestions: list[str] = []
 
         if not checkpoints:
             return ["No checkpoints available for recovery"]
@@ -233,10 +233,12 @@ class AutoCheckpoint:
         self.total_sessions = 0
         self.last_checkpoint_count = 0
 
-    def __enter__(self):
+    def __enter__(self) -> "AutoCheckpoint":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: Any
+    ) -> None:
         # Save final checkpoint if simulation completed normally
         if exc_type is None and self.completed_sessions:
             self.checkpoint_manager.create_checkpoint(
@@ -248,7 +250,7 @@ class AutoCheckpoint:
                 {"status": "completed", "total_sessions": len(self.completed_sessions)},
             )
 
-    def add_session(self, session: SessionState):
+    def add_session(self, session: SessionState) -> None:
         """Add a completed session and checkpoint if needed.
 
         Args:
@@ -274,7 +276,7 @@ class AutoCheckpoint:
 
             self.last_checkpoint_count = len(self.completed_sessions)
 
-    def set_total_sessions(self, total: int):
+    def set_total_sessions(self, total: int) -> None:
         """Set the total number of sessions expected.
 
         Args:

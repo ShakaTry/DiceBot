@@ -6,7 +6,7 @@ from dicebot.strategies.paroli import ParoliStrategy
 
 
 class TestParoliStrategy:
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation de la stratégie"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = ParoliStrategy(config, target_wins=3)
@@ -15,7 +15,7 @@ class TestParoliStrategy:
         assert strategy.target_wins == 3
         assert strategy.current_bet == Decimal("1")
 
-    def test_double_after_win(self):
+    def test_double_after_win(self) -> None:
         """Vérifie que la mise double après un gain"""
         config = StrategyConfig(base_bet=Decimal("1"), multiplier=2.0)
         strategy = ParoliStrategy(config)
@@ -36,7 +36,7 @@ class TestParoliStrategy:
         next_bet = strategy.calculate_next_bet(game_state)
         assert next_bet == Decimal("2")
 
-    def test_reset_after_loss(self):
+    def test_reset_after_loss(self) -> None:
         """Vérifie que la mise revient à la base après une perte"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = ParoliStrategy(config)
@@ -70,7 +70,7 @@ class TestParoliStrategy:
         next_bet = strategy.calculate_next_bet(game_state)
         assert next_bet == Decimal("1")
 
-    def test_reset_after_target_wins(self):
+    def test_reset_after_target_wins(self) -> None:
         """Vérifie le reset après avoir atteint l'objectif"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = ParoliStrategy(config, target_wins=3)
@@ -93,7 +93,7 @@ class TestParoliStrategy:
         next_bet = strategy.calculate_next_bet(game_state)
         assert next_bet == Decimal("1")
 
-    def test_progression_sequence(self):
+    def test_progression_sequence(self) -> None:
         """Vérifie la progression géométrique des mises"""
         config = StrategyConfig(base_bet=Decimal("0.5"), multiplier=2.0)
         strategy = ParoliStrategy(config, target_wins=4)
@@ -109,7 +109,7 @@ class TestParoliStrategy:
             result = BetResult(roll=40.0, won=True, threshold=49.5, amount=bet, payout=bet * 2)
             strategy.update_after_result(result)
 
-    def test_get_info_methods(self):
+    def test_get_info_methods(self) -> None:
         """Teste les méthodes d'information"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = ParoliStrategy(config, target_wins=5)

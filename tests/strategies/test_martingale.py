@@ -6,7 +6,7 @@ from dicebot.strategies.martingale import MartingaleStrategy
 
 
 class TestMartingaleStrategy:
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation de la stratégie"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = MartingaleStrategy(config)
@@ -15,7 +15,7 @@ class TestMartingaleStrategy:
         assert strategy.current_bet == Decimal("1")
         assert strategy.last_bet == Decimal("1")
 
-    def test_double_after_loss(self):
+    def test_double_after_loss(self) -> None:
         """Vérifie que la mise double après une perte"""
         config = StrategyConfig(base_bet=Decimal("1"), multiplier=2.0)
         strategy = MartingaleStrategy(config)
@@ -35,7 +35,7 @@ class TestMartingaleStrategy:
         next_bet = strategy.calculate_next_bet(game_state)
         assert next_bet == Decimal("2")
 
-    def test_reset_after_win(self):
+    def test_reset_after_win(self) -> None:
         """Vérifie que la mise revient à la base après un gain"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = MartingaleStrategy(config)
@@ -69,7 +69,7 @@ class TestMartingaleStrategy:
         next_bet = strategy.calculate_next_bet(game_state)
         assert next_bet == Decimal("1")
 
-    def test_max_losses_protection(self):
+    def test_max_losses_protection(self) -> None:
         """Vérifie la protection contre trop de pertes consécutives"""
         config = StrategyConfig(base_bet=Decimal("1"), max_losses=5)
         strategy = MartingaleStrategy(config)
@@ -90,7 +90,7 @@ class TestMartingaleStrategy:
         next_bet = strategy.calculate_next_bet(game_state)
         assert next_bet == Decimal("1")
 
-    def test_exponential_progression(self):
+    def test_exponential_progression(self) -> None:
         """Vérifie la progression exponentielle des mises"""
         config = StrategyConfig(base_bet=Decimal("1"), multiplier=2.0, max_losses=10)
         strategy = MartingaleStrategy(config)
@@ -118,7 +118,7 @@ class TestMartingaleStrategy:
             )
             strategy.update_after_result(result)
 
-    def test_reset_state(self):
+    def test_reset_state(self) -> None:
         """Vérifie que reset_state réinitialise correctement"""
         config = StrategyConfig(base_bet=Decimal("2"))
         strategy = MartingaleStrategy(config)

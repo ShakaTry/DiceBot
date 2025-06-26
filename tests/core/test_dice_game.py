@@ -6,12 +6,12 @@ from dicebot.core import BetResult, DiceGame, GameConfig
 
 
 class TestDiceGame:
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         game = DiceGame(use_provably_fair=False)  # Mode legacy pour tests
         assert game.house_edge == 0.01
         assert isinstance(game.config, GameConfig)
 
-    def test_calculate_win_chance(self):
+    def test_calculate_win_chance(self) -> None:
         game = DiceGame(use_provably_fair=False)
 
         # Test 2x multiplier (utiliser méthode legacy)
@@ -24,7 +24,7 @@ class TestDiceGame:
         expected = 10.0 * (1 - 0.01)  # 9.9%
         assert abs(chance - expected) < 0.001
 
-    def test_invalid_multiplier(self):
+    def test_invalid_multiplier(self) -> None:
         game = DiceGame(use_provably_fair=False)
 
         with pytest.raises(ValueError):
@@ -33,7 +33,7 @@ class TestDiceGame:
         with pytest.raises(ValueError):
             game.calculate_win_chance_from_multiplier(100.0)  # Too high
 
-    def test_roll_win(self):
+    def test_roll_win(self) -> None:
         game = DiceGame(seed=42)  # Fixed seed for reproducibility
 
         result = game.roll(Decimal("1"), 2.0)
@@ -46,7 +46,7 @@ class TestDiceGame:
         else:
             assert result.payout == Decimal("0")
 
-    def test_bet_limits(self):
+    def test_bet_limits(self) -> None:
         game = DiceGame(use_provably_fair=False)
 
         # Test minimum bet
@@ -57,7 +57,7 @@ class TestDiceGame:
         with pytest.raises(ValueError, match="Maximum bet"):
             game.roll(Decimal("10000"), 2.0)
 
-    def test_expected_value(self):
+    def test_expected_value(self) -> None:
         game = DiceGame(use_provably_fair=False)
 
         # EV should be negative due to house edge
@@ -71,7 +71,7 @@ class TestDiceGame:
         assert abs(ev_2x - Decimal("-0.01")) < Decimal("0.001")
         assert abs(ev_10x - Decimal("-0.01")) < Decimal("0.001")
 
-    def test_kelly_criterion(self):
+    def test_kelly_criterion(self) -> None:
         game = DiceGame(use_provably_fair=False)
 
         bankroll = Decimal("100")

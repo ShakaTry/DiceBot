@@ -7,7 +7,7 @@ from dicebot.money import Vault
 
 
 class TestVault:
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -15,7 +15,7 @@ class TestVault:
         assert vault.state.bankroll_balance == Decimal("15")  # 15%
         assert vault.state.total_balance == Decimal("100")
 
-    def test_deposit(self):
+    def test_deposit(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -25,7 +25,7 @@ class TestVault:
         assert vault.state.bankroll_balance == Decimal("22.5")  # 15 + 7.5
         assert vault.state.total_deposited == Decimal("150")
 
-    def test_withdraw_from_vault(self):
+    def test_withdraw_from_vault(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -35,14 +35,14 @@ class TestVault:
         assert vault.state.vault_balance == Decimal("75")
         assert vault.state.total_withdrawn == Decimal("10")
 
-    def test_withdraw_insufficient_funds(self):
+    def test_withdraw_insufficient_funds(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
         with pytest.raises(ValueError, match="Insufficient vault balance"):
             vault.withdraw_from_vault(Decimal("100"))
 
-    def test_transfer_between_vault_and_bankroll(self):
+    def test_transfer_between_vault_and_bankroll(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -56,7 +56,7 @@ class TestVault:
         assert vault.state.vault_balance == Decimal("80")
         assert vault.state.bankroll_balance == Decimal("20")
 
-    def test_allocate_session_bankroll(self):
+    def test_allocate_session_bankroll(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -68,7 +68,7 @@ class TestVault:
         session_amount = vault.allocate_session_bankroll(0.5)
         assert session_amount == Decimal("7.5")  # 50% of 15
 
-    def test_return_session_profit(self):
+    def test_return_session_profit(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -90,7 +90,7 @@ class TestVault:
         assert vault.state.vault_balance == Decimal("93.5")
         assert vault.state.bankroll_balance == Decimal("11.5")  # 16.5 - 5
 
-    def test_rebalance(self):
+    def test_rebalance(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 
@@ -104,7 +104,7 @@ class TestVault:
         assert vault.state.vault_balance == Decimal("85")
         assert vault.state.bankroll_balance == Decimal("15")
 
-    def test_get_stats(self):
+    def test_get_stats(self) -> None:
         config = VaultConfig(total_capital=Decimal("100"))
         vault = Vault(config)
 

@@ -129,3 +129,4 @@ artifacts/
 simulation-results-*/
 security-reports-*/
 dicebot-package-*/
+.templates/

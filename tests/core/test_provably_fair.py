@@ -13,7 +13,7 @@ from dicebot.core.provably_fair import BitslerVerifier, ProvablyFairGenerator
 class TestProvablyFairGenerator:
     """Test le générateur provably fair."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation du générateur."""
         generator = ProvablyFairGenerator()
 
@@ -22,7 +22,7 @@ class TestProvablyFairGenerator:
         assert generator.current_seeds.nonce == 0
         assert len(generator.seed_history) == 0
 
-    def test_initialization_with_seeds(self):
+    def test_initialization_with_seeds(self) -> None:
         """Test l'initialisation avec des seeds spécifiques."""
         server_seed = "test_server_seed"
         client_seed = "test_client_seed"
@@ -33,7 +33,7 @@ class TestProvablyFairGenerator:
         assert generator.current_seeds.client_seed == client_seed
         assert generator.current_seeds.nonce == 0
 
-    def test_server_seed_hash(self):
+    def test_server_seed_hash(self) -> None:
         """Test le calcul du hash du server seed."""
         server_seed = "test_server_seed"
         generator = ProvablyFairGenerator(server_seed, "client")
@@ -41,7 +41,7 @@ class TestProvablyFairGenerator:
         expected_hash = hashlib.sha256(server_seed.encode()).hexdigest()
         assert generator.current_seeds.server_seed_hash == expected_hash
 
-    def test_set_client_seed(self):
+    def test_set_client_seed(self) -> None:
         """Test le changement de client seed."""
         generator = ProvablyFairGenerator()
         new_client_seed = "my_custom_seed"
@@ -50,14 +50,14 @@ class TestProvablyFairGenerator:
 
         assert generator.current_seeds.client_seed == new_client_seed
 
-    def test_set_client_seed_empty_error(self):
+    def test_set_client_seed_empty_error(self) -> None:
         """Test qu'un client seed vide lève une erreur."""
         generator = ProvablyFairGenerator()
 
         with pytest.raises(ValueError, match="Client seed cannot be empty"):
             generator.set_client_seed("")
 
-    def test_generate_dice_result(self):
+    def test_generate_dice_result(self) -> None:
         """Test la génération de résultats de dés."""
         generator = ProvablyFairGenerator("server123", "client456")
 
@@ -72,7 +72,7 @@ class TestProvablyFairGenerator:
         assert generator.current_seeds.nonce == 2
         assert result1 != result2  # Probabilité très faible d'avoir le même
 
-    def test_reproducible_results(self):
+    def test_reproducible_results(self) -> None:
         """Test que les mêmes seeds produisent les mêmes résultats."""
         server_seed = "fixed_server"
         client_seed = "fixed_client"
@@ -87,7 +87,7 @@ class TestProvablyFairGenerator:
 
         assert results1 == results2
 
-    def test_rotate_seeds(self):
+    def test_rotate_seeds(self) -> None:
         """Test la rotation des seeds."""
         generator = ProvablyFairGenerator("server123", "client456")
 
@@ -116,7 +116,7 @@ class TestProvablyFairGenerator:
         assert len(generator.seed_history) == 1
         assert generator.seed_history[0] == old_seeds
 
-    def test_verify_result(self):
+    def test_verify_result(self) -> None:
         """Test la vérification de résultats."""
         generator = ProvablyFairGenerator("server123", "client456")
 
@@ -131,7 +131,7 @@ class TestProvablyFairGenerator:
         is_invalid = generator.verify_result("wrong_server", "client456", nonce, result)
         assert not is_invalid
 
-    def test_bitsler_algorithm_compatibility(self):
+    def test_bitsler_algorithm_compatibility(self) -> None:
         """Test que l'algorithme est compatible avec Bitsler."""
         # Seeds connus pour test
         server_seed = "e6bbf5eda32e178e78a2c8e73b4b8bea1c17e01ac5b8e5c0d42d2a29f4b76eb7"
@@ -163,7 +163,7 @@ class TestProvablyFairGenerator:
 class TestBitslerVerifier:
     """Test le vérificateur Bitsler."""
 
-    def test_verify_dice_result(self):
+    def test_verify_dice_result(self) -> None:
         """Test la vérification d'un résultat de dés."""
         server_seed = "test_server"
         client_seed = "test_client"
@@ -184,7 +184,7 @@ class TestBitslerVerifier:
         assert verification["nonce"] == nonce
         assert abs(verification["calculated_result"] - expected_result) < 0.005
 
-    def test_verify_invalid_result(self):
+    def test_verify_invalid_result(self) -> None:
         """Test la vérification d'un résultat invalide."""
         verification = BitslerVerifier.verify_dice_result(
             "server",
@@ -196,7 +196,7 @@ class TestBitslerVerifier:
         # Très improbable que ce soit valide
         assert not verification["is_valid"]
 
-    def test_batch_verify(self):
+    def test_batch_verify(self) -> None:
         """Test la vérification en batch."""
         server_seed = "batch_server"
         client_seed = "batch_client"
@@ -238,7 +238,7 @@ class TestBitslerVerifier:
 class TestDiceGameProvablyFair:
     """Test l'intégration provably fair dans DiceGame."""
 
-    def test_dice_game_provably_fair_enabled(self):
+    def test_dice_game_provably_fair_enabled(self) -> None:
         """Test que DiceGame utilise provably fair par défaut."""
         game = DiceGame()
 
@@ -246,7 +246,7 @@ class TestDiceGameProvablyFair:
         assert game.provably_fair is not None
         assert game.rng is None
 
-    def test_dice_game_legacy_mode(self):
+    def test_dice_game_legacy_mode(self) -> None:
         """Test le mode legacy."""
         game = DiceGame(use_provably_fair=False, seed=12345)
 
@@ -254,7 +254,7 @@ class TestDiceGameProvablyFair:
         assert game.provably_fair is None
         assert game.rng is not None
 
-    def test_roll_with_provably_fair(self):
+    def test_roll_with_provably_fair(self) -> None:
         """Test qu'un roll avec provably fair inclut les informations de seed."""
         game = DiceGame(server_seed="test_server", client_seed="test_client")
 
@@ -266,7 +266,7 @@ class TestDiceGameProvablyFair:
         assert result.nonce is not None
         assert 1.9 <= result.multiplier <= 2.1  # Tolérance pour house edge
 
-    def test_set_client_seed(self):
+    def test_set_client_seed(self) -> None:
         """Test le changement de client seed."""
         game = DiceGame(client_seed="initial")
 
@@ -275,14 +275,14 @@ class TestDiceGameProvablyFair:
         seed_info = game.get_current_seed_info()
         assert seed_info["client_seed"] == "new_seed"
 
-    def test_set_client_seed_legacy_mode_error(self):
+    def test_set_client_seed_legacy_mode_error(self) -> None:
         """Test qu'on ne peut pas changer le client seed en mode legacy."""
         game = DiceGame(use_provably_fair=False)
 
         with pytest.raises(RuntimeError, match="Provably fair mode not enabled"):
             game.set_client_seed("test")
 
-    def test_rotate_seeds(self):
+    def test_rotate_seeds(self) -> None:
         """Test la rotation des seeds."""
         game = DiceGame(server_seed="test_server", client_seed="test_client")
 
@@ -298,7 +298,7 @@ class TestDiceGameProvablyFair:
         assert old_seeds["final_nonce"] == 2
 
     @pytest.mark.skip(reason="Complex verification flow needs refactoring")
-    def test_verify_result(self):
+    def test_verify_result(self) -> None:
         """Test la vérification d'un résultat après rotation."""
         game = DiceGame(server_seed="verify_server", client_seed="verify_client")
 
@@ -314,7 +314,7 @@ class TestDiceGameProvablyFair:
         assert verification["is_valid"]
         assert abs(verification["calculated_result"] - result1.roll) < 0.01
 
-    def test_reproducible_dice_game_results(self):
+    def test_reproducible_dice_game_results(self) -> None:
         """Test que DiceGame produit des résultats reproductibles."""
         server_seed = "repro_server"
         client_seed = "repro_client"

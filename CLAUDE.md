@@ -465,12 +465,27 @@ strategy = StrategyFactory.create_from_dict(config_dict)
 - **Add CLI**: Create runner with commands (Day 7)
 - **Add Utils**: Logger and metrics (Day 5-6)
 
-### 🤖 Claude Commit Workflow (Option 2):
+### 🤖 Claude Git Workflow (Option 2):
+
+#### **Commit Workflow:**
 1. **Claude completes significant task/phase**
 2. **Claude asks**: "Commit maintenant ?"
 3. **User responds**: "Oui" or "Non/Attends"
 4. **If Yes**: Claude commits with proper message format
 5. **If No**: Continue without committing
+
+#### **Branch Workflow:**
+1. **Claude identifies new feature/phase starting**
+2. **Claude asks**: "Créer nouvelle branche ?"
+3. **User responds**: "Oui" or "Non" 
+4. **If Yes**: Claude creates branch with proper naming convention
+5. **If No**: Continue on current branch
+
+#### Branch Naming Convention:
+- `feature/phase-2-bot-architect` - New major features
+- `fix/security-issue` - Bug fixes
+- `enhance/workflow-optimization` - Improvements
+- `refactor/code-cleanup` - Code refactoring
 
 #### Commit Message Format:
 ```bash

@@ -11,7 +11,7 @@ from dicebot.strategies import StrategyConfig, StrategyFactory
 class TestDiceGameOverUnder:
     """Test le support OVER/UNDER dans DiceGame."""
 
-    def test_roll_under(self):
+    def test_roll_under(self) -> None:
         """Test d'un pari UNDER."""
         game = DiceGame(use_provably_fair=False, seed=42)
 
@@ -30,7 +30,7 @@ class TestDiceGameOverUnder:
             assert not result.won
             assert result.payout == Decimal("0")
 
-    def test_roll_over(self):
+    def test_roll_over(self) -> None:
         """Test d'un pari OVER."""
         game = DiceGame(use_provably_fair=False, seed=42)
 
@@ -48,7 +48,7 @@ class TestDiceGameOverUnder:
             assert not result.won
             assert result.payout == Decimal("0")
 
-    def test_win_chance_calculation(self):
+    def test_win_chance_calculation(self) -> None:
         """Test du calcul des probabilités OVER/UNDER."""
         game = DiceGame(use_provably_fair=False)
 
@@ -72,7 +72,7 @@ class TestDiceGameOverUnder:
         expected_over_75 = 25.0 * (1 - 0.01)  # 24.75%
         assert abs(over_75_chance - expected_over_75) < 0.001
 
-    def test_multiplier_conversion(self):
+    def test_multiplier_conversion(self) -> None:
         """Test de la conversion target <-> multiplier."""
         game = DiceGame(use_provably_fair=False)
 
@@ -89,7 +89,7 @@ class TestDiceGameOverUnder:
         # Avec house edge 1%, win_chance = 50 * 0.99 = 49.5%, donc multiplier ≈ 100/49.5 ≈ 2.02
         assert abs(multiplier_from_50 - 2.02) < 0.1
 
-    def test_edge_cases(self):
+    def test_edge_cases(self) -> None:
         """Test des cas limites."""
         game = DiceGame(use_provably_fair=False)
 
@@ -108,7 +108,7 @@ class TestDiceGameOverUnder:
         with pytest.raises(ValueError):
             game.roll(Decimal("1"), 100.0, BetType.UNDER)
 
-    def test_legacy_compatibility(self):
+    def test_legacy_compatibility(self) -> None:
         """Test que l'ancienne interface fonctionne encore."""
         game = DiceGame(use_provably_fair=False, seed=42)
 
@@ -127,7 +127,7 @@ class TestDiceGameOverUnder:
 class TestStrategyOverUnder:
     """Test le support OVER/UNDER dans les stratégies."""
 
-    def test_strategy_default_behavior(self):
+    def test_strategy_default_behavior(self) -> None:
         """Test que les stratégies utilisent les paramètres par défaut."""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = StrategyFactory.create("flat", config)
@@ -140,7 +140,7 @@ class TestStrategyOverUnder:
         assert decision.target == 50.0  # Défaut
         assert decision.amount == Decimal("1")
 
-    def test_strategy_custom_config(self):
+    def test_strategy_custom_config(self) -> None:
         """Test des stratégies avec configuration OVER/UNDER personnalisée."""
         config = StrategyConfig(
             base_bet=Decimal("1"), default_bet_type=BetType.OVER, default_target=75.0
@@ -153,7 +153,7 @@ class TestStrategyOverUnder:
         assert decision.bet_type == BetType.OVER
         assert decision.target == 75.0
 
-    def test_martingale_over_under(self):
+    def test_martingale_over_under(self) -> None:
         """Test Martingale avec OVER/UNDER."""
         config = StrategyConfig(
             base_bet=Decimal("1"),
@@ -192,7 +192,7 @@ class TestStrategyOverUnder:
         assert decision2.amount == Decimal("2")  # Doublé
         assert decision2.bet_type == BetType.UNDER  # Même type
 
-    def test_composite_strategy_over_under(self):
+    def test_composite_strategy_over_under(self) -> None:
         """Test CompositeStrategy avec OVER/UNDER."""
         from dicebot.strategies.composite import (
             CombinationMode,
@@ -230,7 +230,7 @@ class TestStrategyOverUnder:
 class TestOverUnderMath:
     """Test des calculs mathématiques OVER/UNDER."""
 
-    def test_probability_symmetry(self):
+    def test_probability_symmetry(self) -> None:
         """Test que OVER et UNDER sont symétriques."""
         game = DiceGame(use_provably_fair=False)
 
@@ -246,7 +246,7 @@ class TestOverUnderMath:
 
         assert abs(under_25 - over_75) < 0.001
 
-    def test_total_probability(self):
+    def test_total_probability(self) -> None:
         """Test que UNDER + OVER pour un même point ≈ 99% (avec house edge)."""
         game = DiceGame(use_provably_fair=False)
 
@@ -258,7 +258,7 @@ class TestOverUnderMath:
         total = under_50 + over_50
         assert abs(total - 99.0) < 0.1
 
-    def test_expected_value_negative(self):
+    def test_expected_value_negative(self) -> None:
         """Test que toutes les EV sont négatives (house edge)."""
         game = DiceGame(use_provably_fair=False)
 

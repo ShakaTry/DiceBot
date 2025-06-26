@@ -13,7 +13,7 @@ from dicebot.strategies import FlatBetting, StrategyConfig
 class TestSimulationEngine:
     """Test le moteur de simulation."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Prépare les tests."""
         self.vault_config = VaultConfig(total_capital=Decimal("100"))
         self.vault = Vault(self.vault_config)
@@ -21,7 +21,7 @@ class TestSimulationEngine:
         self.strategy = FlatBetting(StrategyConfig(base_bet=Decimal("0.001")))
         self.engine = SimulationEngine(self.vault_config, self.game.config)
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation du moteur."""
         assert self.engine.vault_config == self.vault_config
         assert self.engine.dice_game is not None
@@ -30,7 +30,7 @@ class TestSimulationEngine:
             self.engine.dice_game.provably_fair is not None or self.engine.dice_game.rng is not None
         )
 
-    def test_run_session_basic(self):
+    def test_run_session_basic(self) -> None:
         """Test l'exécution d'une session basique."""
         session_config = {"initial_balance": Decimal("10"), "max_bets": 5}
 
@@ -41,7 +41,7 @@ class TestSimulationEngine:
         assert result.game_state.bets_count > 0
         assert isinstance(result.game_state.balance, Decimal)
 
-    def test_run_session_with_seed(self):
+    def test_run_session_with_seed(self) -> None:
         """Test qu'utiliser le même seed donne des résultats reproductibles."""
         session_config = {
             "initial_balance": Decimal("10"),
@@ -63,7 +63,7 @@ class TestSimulationEngine:
             "5.0"
         )  # Variation acceptable
 
-    def test_run_session_stop_loss(self):
+    def test_run_session_stop_loss(self) -> None:
         """Test l'arrêt sur stop-loss."""
         session_config = {
             "initial_balance": Decimal("1"),
@@ -77,7 +77,7 @@ class TestSimulationEngine:
         if result.game_state.balance <= Decimal("0.5"):
             assert result.game_state.bets_count < 1000
 
-    def test_run_session_take_profit(self):
+    def test_run_session_take_profit(self) -> None:
         """Test l'arrêt sur take-profit."""
         session_config = {
             "initial_balance": Decimal("1"),
@@ -94,7 +94,7 @@ class TestSimulationEngine:
         else:
             assert result.game_state.bets_count <= 1000
 
-    def test_run_multiple_sessions_sequential(self):
+    def test_run_multiple_sessions_sequential(self) -> None:
         """Test l'exécution de plusieurs sessions en séquentiel."""
         results = self.engine.run_multiple_sessions(
             self.strategy,
@@ -108,7 +108,7 @@ class TestSimulationEngine:
             assert abs(result.game_state.balance - Decimal("10")) <= Decimal("10")  # Started at 10
             assert result.game_state.bets_count <= 5
 
-    def test_run_multiple_sessions_parallel(self):
+    def test_run_multiple_sessions_parallel(self) -> None:
         """Test l'exécution de plusieurs sessions en parallèle."""
         results = self.engine.run_multiple_sessions(
             self.strategy,
@@ -123,7 +123,7 @@ class TestSimulationEngine:
             assert abs(result.game_state.balance - Decimal("10")) <= Decimal("10")  # Started at 10
             assert result.game_state.bets_count <= 5
 
-    def test_run_multiple_sessions_strategy_reset(self):
+    def test_run_multiple_sessions_strategy_reset(self) -> None:
         """Test que la stratégie est réinitialisée entre sessions."""
         # Utiliser Martingale pour voir l'effet de reset
         from dicebot.strategies import MartingaleStrategy
@@ -140,7 +140,7 @@ class TestSimulationEngine:
         assert len(results) == 2
         # Chaque session devrait commencer avec la stratégie reset
 
-    def test_run_multiple_sessions_no_reset(self):
+    def test_run_multiple_sessions_no_reset(self) -> None:
         """Test sans réinitialisation de stratégie entre sessions."""
         from dicebot.strategies import MartingaleStrategy
 
@@ -156,7 +156,7 @@ class TestSimulationEngine:
         assert len(results) == 2
         # La stratégie devrait conserver son état entre sessions
 
-    def test_auto_parallel_detection(self):
+    def test_auto_parallel_detection(self) -> None:
         """Test la détection automatique du mode parallèle."""
         # Tester avec peu de sessions (devrait être séquentiel)
         with patch.object(self.engine, "run_multiple_sessions") as mock_run:
@@ -165,7 +165,7 @@ class TestSimulationEngine:
             # Le comportement réel dépendrait du seuil auto_parallel_threshold
             # Ce test vérifie juste la structure
 
-    def test_worker_count_calculation(self):
+    def test_worker_count_calculation(self) -> None:
         """Test le calcul du nombre de workers."""
 
         # Test avec max_workers None (devrait utiliser CPU count)
@@ -175,7 +175,7 @@ class TestSimulationEngine:
 
         assert len(results) == 4
 
-    def test_session_with_consecutive_losses_limit(self):
+    def test_session_with_consecutive_losses_limit(self) -> None:
         """Test l'arrêt sur limite de pertes consécutives."""
         session_config = {
             "initial_balance": Decimal("10"),
@@ -189,7 +189,7 @@ class TestSimulationEngine:
         # On vérifie juste que la session se termine
         assert result.game_state.bets_count >= 0
 
-    def test_invalid_session_config(self):
+    def test_invalid_session_config(self) -> None:
         """Test avec configuration de session invalide."""
         # Note: Le système est tolérant et utilise des valeurs par défaut
         # Plutôt que de lever une exception, testons qu'il fonctionne avec des valeurs par défaut
@@ -199,13 +199,13 @@ class TestSimulationEngine:
         # Devrait fonctionner avec valeur par défaut
         assert result is not None
 
-    def test_empty_sessions_list(self):
+    def test_empty_sessions_list(self) -> None:
         """Test avec 0 sessions."""
         results = self.engine.run_multiple_sessions(self.strategy, num_sessions=0)
 
         assert len(results) == 0
 
-    def test_single_session_metrics(self):
+    def test_single_session_metrics(self) -> None:
         """Test que les métriques de session sont calculées."""
         result = self.engine.run_session(
             self.strategy,
@@ -218,7 +218,7 @@ class TestSimulationEngine:
         assert hasattr(result.game_state, "consecutive_wins")
         assert hasattr(result.game_state, "consecutive_losses")
 
-    def test_parallel_vs_sequential_consistency(self):
+    def test_parallel_vs_sequential_consistency(self) -> None:
         """Test que parallèle et séquentiel donnent des résultats cohérents."""
         # Utiliser des seeds fixes pour la reproductibilité
         session_config = {"initial_balance": Decimal("10"), "max_bets": 10, "seed": 42}

@@ -6,7 +6,7 @@ from dicebot.strategies.fibonacci import FibonacciStrategy
 
 
 class TestFibonacciStrategy:
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation de la stratégie"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = FibonacciStrategy(config)
@@ -17,7 +17,7 @@ class TestFibonacciStrategy:
         assert strategy.sequence[0] == 1
         assert strategy.sequence[1] == 1
 
-    def test_sequence_limited_by_max_losses(self):
+    def test_sequence_limited_by_max_losses(self) -> None:
         """Vérifie que la séquence est limitée par max_losses"""
         config = StrategyConfig(base_bet=Decimal("1"), max_losses=5)
         strategy = FibonacciStrategy(config)
@@ -25,7 +25,7 @@ class TestFibonacciStrategy:
         assert len(strategy.sequence) == 5
         assert strategy.sequence == [1, 1, 2, 3, 5]
 
-    def test_advance_on_loss(self):
+    def test_advance_on_loss(self) -> None:
         """Vérifie l'avancement dans la séquence après une perte"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = FibonacciStrategy(config)
@@ -54,7 +54,7 @@ class TestFibonacciStrategy:
         assert strategy.current_index == 2
         assert strategy.calculate_next_bet(game_state) == Decimal("2")  # Fib[2] = 2
 
-    def test_retreat_on_win(self):
+    def test_retreat_on_win(self) -> None:
         """Vérifie le recul dans la séquence après un gain"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = FibonacciStrategy(config)
@@ -77,7 +77,7 @@ class TestFibonacciStrategy:
         assert strategy.current_index == 3  # 5 - 2 = 3
         assert strategy.calculate_next_bet(game_state) == Decimal("3")  # Fib[3] = 3
 
-    def test_retreat_at_beginning(self):
+    def test_retreat_at_beginning(self) -> None:
         """Vérifie qu'on ne peut pas reculer en dessous de 0"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = FibonacciStrategy(config)
@@ -98,7 +98,7 @@ class TestFibonacciStrategy:
         # Devrait être à 0 (pas négatif)
         assert strategy.current_index == 0
 
-    def test_max_sequence_boundary(self):
+    def test_max_sequence_boundary(self) -> None:
         """Vérifie qu'on ne dépasse pas la fin de la séquence"""
         config = StrategyConfig(base_bet=Decimal("1"), max_losses=5)
         strategy = FibonacciStrategy(config)
@@ -117,7 +117,7 @@ class TestFibonacciStrategy:
         # Devrait être au maximum de la séquence
         assert strategy.current_index == 4  # Max index pour une séquence de 5
 
-    def test_fibonacci_progression(self):
+    def test_fibonacci_progression(self) -> None:
         """Vérifie que les mises suivent bien la séquence de Fibonacci"""
         config = StrategyConfig(base_bet=Decimal("0.1"))
         strategy = FibonacciStrategy(config)
@@ -142,7 +142,7 @@ class TestFibonacciStrategy:
             )
             strategy.update_after_result(result)
 
-    def test_reset_state(self):
+    def test_reset_state(self) -> None:
         """Vérifie que reset_state réinitialise correctement"""
         config = StrategyConfig(base_bet=Decimal("2"))
         strategy = FibonacciStrategy(config)
@@ -157,7 +157,7 @@ class TestFibonacciStrategy:
         assert strategy.current_index == 0
         assert strategy.current_bet == Decimal("2")
 
-    def test_get_info_methods(self):
+    def test_get_info_methods(self) -> None:
         """Teste les méthodes d'information"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = FibonacciStrategy(config)

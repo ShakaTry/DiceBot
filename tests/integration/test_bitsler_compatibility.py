@@ -11,7 +11,7 @@ from dicebot.strategies import StrategyConfig, StrategyFactory
 class TestBitslerCompatibility:
     """Tests d'intégration vérifiant la compatibilité 100% avec Bitsler."""
 
-    def test_complete_bitsler_simulation(self):
+    def test_complete_bitsler_simulation(self) -> None:
         """Test complet simulant des paris réels Bitsler OVER/UNDER."""
         # Configuration identique à Bitsler
         game = DiceGame(
@@ -67,7 +67,7 @@ class TestBitslerCompatibility:
         assert seed_info["client_seed"] == "player_seed_456"
         assert len(seed_info["server_seed_hash"]) == 64  # SHA256 hex
 
-    def test_strategy_over_under_integration(self):
+    def test_strategy_over_under_integration(self) -> None:
         """Test intégration complète d'une stratégie avec OVER/UNDER."""
         # Stratégie mixte intelligent
         config = StrategyConfig(
@@ -127,7 +127,7 @@ class TestBitslerCompatibility:
         print(f"Win rate: {game_state.win_rate:.2%}")
 
     @pytest.mark.skip(reason="Complex verification flow needs refactoring")
-    def test_provably_fair_over_under_verification(self):
+    def test_provably_fair_over_under_verification(self) -> None:
         """Test que les résultats OVER/UNDER sont vérifiables."""
         game = DiceGame(
             use_provably_fair=True,
@@ -163,7 +163,7 @@ class TestBitslerCompatibility:
         assert abs(under_verification["calculated_result"] - under_result.roll) < 0.01
         assert abs(over_verification["calculated_result"] - over_result.roll) < 0.01
 
-    def test_house_edge_consistency(self):
+    def test_house_edge_consistency(self) -> None:
         """Test que le house edge de 1% est correctement appliqué."""
         game = DiceGame(use_provably_fair=False, seed=12345)  # Seed fixe pour reproductibilité
 
@@ -196,7 +196,7 @@ class TestBitslerCompatibility:
 
             print(f"{description}: Win chance={win_chance:.2f}%, EV={ev:.4f}")
 
-    def test_bitsler_edge_cases(self):
+    def test_bitsler_edge_cases(self) -> None:
         """Test des cas limites spécifiques à Bitsler."""
         game = DiceGame(use_provably_fair=True)
 
@@ -237,7 +237,7 @@ class TestBitslerCompatibility:
             f"Extreme multipliers: UNDER 0.01 = {extreme_under:.2f}x, OVER 99.99 = {extreme_over:.2f}x"
         )
 
-    def test_complete_workflow_demonstration(self):
+    def test_complete_workflow_demonstration(self) -> None:
         """Démonstration complète du workflow OVER/UNDER."""
         print("\n🎲 === DÉMONSTRATION COMPLÈTE DICEBOT OVER/UNDER ===")
         print("📊 Compatible 100% avec Bitsler.com")

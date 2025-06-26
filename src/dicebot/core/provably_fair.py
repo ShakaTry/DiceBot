@@ -36,7 +36,7 @@ class ProvablyFairGenerator:
     3. Modulo 10000 et division par 100 pour le résultat dice
     """
 
-    def __init__(self, server_seed: str | None = None, client_seed: str | None = None):
+    def __init__(self, server_seed: str | None = None, client_seed: str | None = None) -> None:
         """
         Initialise le générateur.
 

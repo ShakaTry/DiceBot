@@ -2,7 +2,7 @@
 Progress tracking utilities for DiceBot simulations.
 """
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from typing import Any
 
@@ -39,7 +39,7 @@ class SimulationProgress:
     @contextmanager
     def track_simulation(
         self, description: str, total_sessions: int, show_stats: bool = True
-    ) -> Iterator[tuple[TaskID, callable]]:
+    ) -> Iterator[tuple[TaskID, Callable[[Any, int], None]]]:
         """Context manager for tracking simulation progress.
 
         Args:
@@ -61,7 +61,7 @@ class SimulationProgress:
                 "sessions_completed": 0,
             }
 
-            def update_progress(session_result: Any = None, advance: int = 1):
+            def update_progress(session_result: Any = None, advance: int = 1) -> None:
                 """Update progress and optionally show live stats."""
                 self.progress.advance(task_id, advance)
 
@@ -100,7 +100,7 @@ class SimulationProgress:
     @contextmanager
     def track_comparison(
         self, strategies: list[str], sessions_per_strategy: int
-    ) -> Iterator[tuple[TaskID, callable]]:
+    ) -> Iterator[tuple[TaskID, Callable[[str | None, Any, int], None]]]:
         """Track strategy comparison progress.
 
         Args:
@@ -120,8 +120,8 @@ class SimulationProgress:
             strategy_index = 0
 
             def update_comparison(
-                strategy_name: str = None, session_result: Any = None, advance: int = 1
-            ):
+                strategy_name: str | None = None, session_result: Any = None, advance: int = 1
+            ) -> None:
                 nonlocal current_strategy, strategy_index
 
                 if strategy_name and strategy_name != current_strategy:
@@ -145,7 +145,7 @@ class ProgressManager:
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> "ProgressManager":
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.console = Console()
@@ -156,23 +156,23 @@ class ProgressManager:
     def progress(self) -> SimulationProgress:
         return self.simulation_progress
 
-    def print(self, *args, **kwargs):
+    def print(self, *args: Any, **kwargs: Any) -> None:
         """Print message to console (compatible with rich formatting)."""
         self.console.print(*args, **kwargs)
 
-    def print_warning(self, message: str):
+    def print_warning(self, message: str) -> None:
         """Print warning message."""
         self.console.print(f"⚠️  [yellow]Warning:[/yellow] {message}")
 
-    def print_error(self, message: str):
+    def print_error(self, message: str) -> None:
         """Print error message."""
         self.console.print(f"❌ [red]Error:[/red] {message}")
 
-    def print_success(self, message: str):
+    def print_success(self, message: str) -> None:
         """Print success message."""
         self.console.print(f"✅ [green]Success:[/green] {message}")
 
-    def print_info(self, message: str):
+    def print_info(self, message: str) -> None:
         """Print info message."""
         self.console.print(f"ℹ️  [blue]Info:[/blue] {message}")
 

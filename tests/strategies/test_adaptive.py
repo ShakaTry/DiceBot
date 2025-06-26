@@ -14,11 +14,11 @@ from dicebot.strategies import (
 class TestAdaptiveStrategy:
     """Test la stratégie adaptative."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Prépare les tests."""
         self.game_state = GameState(balance=Decimal("100"))
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation de la stratégie adaptative."""
         rules = [
             StrategyRule(
@@ -37,7 +37,7 @@ class TestAdaptiveStrategy:
         assert len(adaptive.rules) == 1
         assert adaptive.current_strategy is not None
 
-    def test_initial_strategy_creation(self):
+    def test_initial_strategy_creation(self) -> None:
         """Test la création de la stratégie initiale."""
         config = AdaptiveConfig(
             base_bet=Decimal("0.001"),
@@ -50,7 +50,7 @@ class TestAdaptiveStrategy:
         assert adaptive.current_strategy_name == "martingale"
         assert adaptive.current_strategy.config.max_losses == 10
 
-    def test_calculate_next_bet_delegates(self):
+    def test_calculate_next_bet_delegates(self) -> None:
         """Test que calculate_next_bet délègue à la stratégie courante."""
         config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat")
 
@@ -60,7 +60,7 @@ class TestAdaptiveStrategy:
         # Flat betting devrait retourner base_bet
         assert decision == Decimal("0.001")
 
-    def test_consecutive_losses_switch(self):
+    def test_consecutive_losses_switch(self) -> None:
         """Test le changement après pertes consécutives."""
         rules = [
             StrategyRule(
@@ -105,7 +105,7 @@ class TestAdaptiveStrategy:
         adaptive.calculate_next_bet(self.game_state)
         assert adaptive.current_strategy_name == "fibonacci"
 
-    def test_consecutive_wins_switch(self):
+    def test_consecutive_wins_switch(self) -> None:
         """Test le changement après gains consécutifs."""
         rules = [
             StrategyRule(
@@ -144,7 +144,7 @@ class TestAdaptiveStrategy:
             else:
                 assert adaptive.current_strategy_name == "paroli"
 
-    def test_drawdown_threshold_switch(self):
+    def test_drawdown_threshold_switch(self) -> None:
         """Test le changement basé sur le drawdown."""
         rules = [
             StrategyRule(
@@ -184,7 +184,7 @@ class TestAdaptiveStrategy:
         # Devrait passer à flat pour la sécurité
         assert adaptive.current_strategy_name == "flat"
 
-    def test_low_confidence_switch(self):
+    def test_low_confidence_switch(self) -> None:
         """Test le changement basé sur une faible confiance."""
         rules = [
             StrategyRule(
@@ -219,7 +219,7 @@ class TestAdaptiveStrategy:
         adaptive.calculate_next_bet(self.game_state)
         assert adaptive.current_strategy_name == "flat"
 
-    def test_balance_threshold_switch(self):
+    def test_balance_threshold_switch(self) -> None:
         """Test le changement basé sur le solde."""
         rules = [
             StrategyRule(
@@ -254,7 +254,7 @@ class TestAdaptiveStrategy:
         adaptive.calculate_next_bet(self.game_state)
         assert adaptive.current_strategy_name == "flat"
 
-    def test_cooldown_prevents_immediate_switch(self):
+    def test_cooldown_prevents_immediate_switch(self) -> None:
         """Test que le cooldown empêche un changement immédiat."""
         rules = [
             StrategyRule(
@@ -300,7 +300,7 @@ class TestAdaptiveStrategy:
         adaptive.calculate_next_bet(self.game_state)
         assert adaptive.current_strategy_name == "fibonacci"  # Pas de changement
 
-    def test_min_bets_before_switch(self):
+    def test_min_bets_before_switch(self) -> None:
         """Test le minimum de paris avant changement."""
         rules = [
             StrategyRule(
@@ -341,7 +341,7 @@ class TestAdaptiveStrategy:
         adaptive.calculate_next_bet(self.game_state)
         assert adaptive.current_strategy_name == "fibonacci"
 
-    def test_reset_state(self):
+    def test_reset_state(self) -> None:
         """Test la réinitialisation de l'état."""
         rules = [
             StrategyRule(
@@ -368,7 +368,7 @@ class TestAdaptiveStrategy:
         assert adaptive.bets_in_current_strategy == 0
         assert adaptive.last_switch_bet == 0
 
-    def test_get_name(self):
+    def test_get_name(self) -> None:
         """Test le nom de la stratégie."""
         config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat")
 

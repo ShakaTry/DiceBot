@@ -18,7 +18,7 @@ from dicebot.strategies import (
 class TestCompositeStrategy:
     """Test la stratégie composite."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Prépare les tests."""
         self.base_config = StrategyConfig(base_bet=Decimal("0.001"), max_losses=5)
 
@@ -28,7 +28,7 @@ class TestCompositeStrategy:
 
         self.game_state = GameState(balance=Decimal("100"))
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test l'initialisation de la stratégie composite."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE)
         strategies = [self.martingale, self.fibonacci]
@@ -40,14 +40,14 @@ class TestCompositeStrategy:
         assert composite.strategies[0] == self.martingale
         assert composite.strategies[1] == self.fibonacci
 
-    def test_empty_strategies_raises_error(self):
+    def test_empty_strategies_raises_error(self) -> None:
         """Test qu'une liste vide de stratégies lève une erreur."""
         config = CompositeConfig(base_bet=Decimal("0.001"))
 
         with pytest.raises(ValueError, match="At least one strategy is required"):
             CompositeStrategy(config, [])
 
-    def test_average_mode(self):
+    def test_average_mode(self) -> None:
         """Test le mode AVERAGE."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE)
         strategies = [self.martingale, self.fibonacci]
@@ -60,7 +60,7 @@ class TestCompositeStrategy:
         # Confidence is on the strategy itself, not the decision
         assert 0.0 <= composite.confidence <= 1.0
 
-    def test_weighted_mode(self):
+    def test_weighted_mode(self) -> None:
         """Test le mode WEIGHTED (pondéré par confiance)."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.WEIGHTED)
         strategies = [self.martingale, self.fibonacci]
@@ -72,7 +72,7 @@ class TestCompositeStrategy:
         # Confidence is on the strategy itself, not the decision
         assert 0.0 <= composite.confidence <= 1.0
 
-    def test_aggressive_mode(self):
+    def test_aggressive_mode(self) -> None:
         """Test le mode AGGRESSIVE (mise la plus élevée)."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AGGRESSIVE)
         strategies = [self.martingale, self.fibonacci]
@@ -93,7 +93,7 @@ class TestCompositeStrategy:
         # Devrait prendre la mise la plus élevée (Martingale après perte)
         assert bet_amount >= Decimal("0.001")
 
-    def test_conservative_mode(self):
+    def test_conservative_mode(self) -> None:
         """Test le mode CONSERVATIVE (mise la plus faible)."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.CONSERVATIVE)
         strategies = [self.martingale, self.fibonacci]
@@ -104,7 +104,7 @@ class TestCompositeStrategy:
         # Devrait prendre la mise la plus faible
         assert bet_amount == Decimal("0.001")
 
-    def test_consensus_mode(self):
+    def test_consensus_mode(self) -> None:
         """Test le mode CONSENSUS."""
         config = CompositeConfig(
             base_bet=Decimal("0.001"),
@@ -119,7 +119,7 @@ class TestCompositeStrategy:
         # Avec 2 stratégies et threshold 0.5, devrait fonctionner
         assert bet_amount > Decimal("0")
 
-    def test_rotate_mode(self):
+    def test_rotate_mode(self) -> None:
         """Test le mode ROTATE."""
         config = CompositeConfig(
             base_bet=Decimal("0.001"), mode=CombinationMode.ROTATE, rotation_interval=2
@@ -143,7 +143,7 @@ class TestCompositeStrategy:
         bet3 = composite.calculate_next_bet(self.game_state)
         assert bet3 == Decimal("0.001")
 
-    def test_update_after_result(self):
+    def test_update_after_result(self) -> None:
         """Test la mise à jour après résultat."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.AVERAGE)
         strategies = [self.martingale, self.fibonacci]
@@ -163,7 +163,7 @@ class TestCompositeStrategy:
         # Vérifier que les stratégies ont été mises à jour
         # (les détails dépendent de l'implémentation)
 
-    def test_reset_state(self):
+    def test_reset_state(self) -> None:
         """Test la réinitialisation de l'état."""
         config = CompositeConfig(base_bet=Decimal("0.001"), mode=CombinationMode.ROTATE)
         strategies = [self.martingale, self.fibonacci]
@@ -179,7 +179,7 @@ class TestCompositeStrategy:
         assert composite.current_strategy_index == 0
         assert composite.bets_since_rotation == 0
 
-    def test_get_name(self):
+    def test_get_name(self) -> None:
         """Test le nom de la stratégie."""
         config = CompositeConfig(base_bet=Decimal("0.001"))
         strategies = [self.martingale, self.fibonacci]

@@ -36,10 +36,10 @@ class ParkingConfig(StrategyConfig):
     auto_seed_rotation_after: int = 1000  # Rotation préventive
     seed_rotation_on_losses: int = 10  # Rotation après X pertes
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialise les valeurs par défaut."""
         # Assurer que base_bet est défini
-        if not hasattr(self, "base_bet") or self.base_bet is None:
+        if not hasattr(self, "base_bet"):
             self.base_bet = self.parking_bet_amount
 
 
@@ -60,11 +60,15 @@ class ParkingStrategy(BaseStrategy):
         self.parking_bets_count = 0
         self.last_seed_rotation_nonce = 0
         self.is_parking = False
-        self.base_strategy = None
+        self.base_strategy: BaseStrategy | None = None
+
+        # Créer la configuration par défaut si nécessaire
+        if config is None:
+            config = ParkingConfig(base_bet=MIN_BET_LTC)
 
         # Maintenant appeler super().__init__ qui peut appeler reset_state()
-        super().__init__(config or ParkingConfig())
-        self.config: ParkingConfig = self.config
+        super().__init__(config)
+        self.config: ParkingConfig = self.config  # Type narrowing
 
     def set_base_strategy(self, strategy: BaseStrategy) -> None:
         """Définit la stratégie de base à wrapper."""
@@ -80,9 +84,11 @@ class ParkingStrategy(BaseStrategy):
         if game_state.current_drawdown >= self.config.parking_on_drawdown_percent:
             return True
 
-        # Déléguer à la stratégie de base si elle veut attendre
+        # Déléguer à la stratégie de base si elle a une méthode should_wait
+        # (Cette méthode n'existe pas dans BaseStrategy, c'est un exemple d'extension future)
         if self.base_strategy and hasattr(self.base_strategy, "should_wait"):
-            return self.base_strategy.should_wait(game_state)
+            # Type: ignore car cette méthode n'est pas dans l'interface standard
+            return self.base_strategy.should_wait(game_state)  # type: ignore
 
         return False
 
@@ -201,8 +207,10 @@ class ParkingStrategy(BaseStrategy):
     def _update_strategy_state(self, result: BetResult) -> None:
         """Met à jour l'état après un résultat."""
         # Tracker les pertes de parking
-        if hasattr(result, "metadata") and result.metadata.get("action") == "forced_parking_bet":
-            if not result.won:
+        # Note: metadata n'est pas dans BetResult actuellement, c'est pour une extension future
+        if hasattr(result, "metadata"):
+            metadata = getattr(result, "metadata", {})
+            if metadata.get("action") == "forced_parking_bet" and not result.won:
                 # Ajouter aux pertes de parking dans GameState
                 # (nécessite accès au GameState, à implémenter dans l'intégration)
                 pass
@@ -236,14 +244,15 @@ class ParkingStrategy(BaseStrategy):
 
     def get_status(self) -> dict[str, Any]:
         """Retourne le statut actuel de la stratégie."""
-        status = {
+        status: dict[str, Any] = {
             "is_parking": self.is_parking,
             "toggles_count": self.toggles_count,
             "parking_bets_count": self.parking_bets_count,
             "can_toggle": self.can_toggle_bet_type(),
         }
 
-        if self.base_strategy:
-            status["base_strategy_status"] = self.base_strategy.get_status()
+        # Note: get_status() n'est pas dans BaseStrategy, c'est une méthode optionnelle
+        if self.base_strategy and hasattr(self.base_strategy, "get_status"):
+            status["base_strategy_status"] = self.base_strategy.get_status()  # type: ignore
 
         return status

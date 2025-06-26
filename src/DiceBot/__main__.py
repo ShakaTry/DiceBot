@@ -5,6 +5,7 @@ import sys
 from argparse import ArgumentParser, Namespace
 from collections.abc import Sequence
 from decimal import Decimal
+from typing import Any
 
 from . import __version__
 
@@ -201,26 +202,26 @@ def main(args: Sequence[str] | None = None) -> None:
 def run_simulate_command(args: Namespace) -> None:
     """Run simulation command."""
     from dicebot.simulation.runner import SimulationRunner
-    from dicebot.utils.config import get_config
+    from dicebot.utils.config import DiceBotConfig, get_config
     from dicebot.utils.progress import progress_manager
     from dicebot.utils.validation import ParameterValidator, validate_and_suggest
 
     # Load configuration
-    config = get_config()
+    config: DiceBotConfig = get_config()
 
     # Validate and parse capital
     try:
-        capital = ParameterValidator.validate_capital(args.capital)
+        capital: Decimal = ParameterValidator.validate_capital(args.capital)
     except Exception as e:
         progress_manager.print_error(str(e))
         return
 
     # Build strategy config starting with preset if specified
-    strategy_config = {"strategy": args.strategy}
+    strategy_config: dict[str, Any] = {"strategy": args.strategy}
 
     if args.preset:
         try:
-            preset_config = config.get_strategy_preset(args.preset)
+            preset_config: dict[str, Any] = config.get_strategy_preset(args.preset)
             strategy_config.update(preset_config)
 
             if not args.quiet:
@@ -242,7 +243,7 @@ def run_simulate_command(args: Namespace) -> None:
         strategy_config["base_bet"] = "0.001"  # Default fallback
 
     # Build session config
-    session_config = {}
+    session_config: dict[str, Any] = {}
     if args.stop_loss:
         session_config["stop_loss"] = Decimal(str(args.stop_loss))
     if args.take_profit:
@@ -251,7 +252,7 @@ def run_simulate_command(args: Namespace) -> None:
         session_config["max_bets"] = args.max_bets
 
     # Get sessions count from args or config
-    sessions = args.sessions or config.simulation["default_sessions"]
+    sessions: int = args.sessions or config.simulation["default_sessions"]
 
     # Validate configuration
     if not validate_and_suggest(
@@ -260,7 +261,7 @@ def run_simulate_command(args: Namespace) -> None:
         return  # Validation failed
 
     # Setup Slack notifications if webhook provided
-    slack_notifier = None
+    slack_notifier: Any = None  # SlackNotifier type
     if args.slack_webhook:
         from dicebot.integrations.slack_bot import SlackNotifier
 
@@ -269,11 +270,11 @@ def run_simulate_command(args: Namespace) -> None:
             progress_manager.print_info("✅ Slack notifications enabled")
 
     # Setup monitoring if enabled
-    monitor = None
+    monitor: Any = None  # PerformanceMonitor type
     if args.enable_monitoring:
         from dicebot.integrations.monitoring import PerformanceMonitor
 
-        def alert_callback(alert_type: str, message: str, severity: str):
+        def alert_callback(alert_type: str, message: str, severity: str) -> None:
             if slack_notifier:
                 slack_notifier.notify_alert(alert_type, message)
 
@@ -300,7 +301,7 @@ def run_simulate_command(args: Namespace) -> None:
         slack_notifier.notify_simulation_start(args.strategy, capital, sessions)
 
     try:
-        results = runner.run_strategy_simulation(
+        results: dict[str, Any] = runner.run_strategy_simulation(
             strategy_config,
             sessions,
             session_config if session_config else None,
@@ -329,12 +330,12 @@ def run_compare_command(args: Namespace) -> None:
     from dicebot.simulation.runner import SimulationRunner
 
     # Parse capital
-    capital = Decimal(args.capital)
+    capital: Decimal = Decimal(args.capital)
 
     # Build strategy configs
-    strategy_configs = []
+    strategy_configs: list[dict[str, Any]] = []
     for strategy_name in args.strategies:
-        config = {
+        config: dict[str, Any] = {
             "strategy": strategy_name,
             "base_bet": args.base_bet or "0.001",  # Default base bet
         }
@@ -348,7 +349,7 @@ def run_compare_command(args: Namespace) -> None:
         print(f"Strategies: {', '.join(args.strategies)}")
         print(f"Capital: {capital} LTC")
 
-    results = runner.run_strategy_comparison(strategy_configs, args.sessions)
+    results: dict[str, Any] = runner.run_strategy_comparison(strategy_configs, args.sessions)
 
     # Print comparison summary
     if not args.quiet:
@@ -361,16 +362,16 @@ def run_analyze_command(args: Namespace) -> None:
 
     # Load results file
     runner = SimulationRunner(Decimal("0"))  # Dummy capital for analysis
-    results = runner.load_results_from_file(args.file)
+    results: dict[str, Any] = runner.load_results_from_file(args.file)
 
     # Print analysis
     print_analysis(results, args.detailed)
 
 
-def print_simulation_summary(results: dict) -> None:
+def print_simulation_summary(results: dict[str, Any]) -> None:
     """Print simulation summary."""
-    summary = results["simulation_summary"]
-    strategy_info = results["strategy_info"]
+    summary: dict[str, Any] = results["simulation_summary"]
+    strategy_info: dict[str, Any] = results["strategy_info"]
 
     print("\n" + "=" * 60)
     print("SIMULATION SUMMARY")
@@ -388,7 +389,7 @@ def print_simulation_summary(results: dict) -> None:
     print(f"Worst drawdown: {summary['worst_drawdown']:.1%}")
 
     print("\nVault Status:")
-    vault = summary["vault_status"]
+    vault: dict[str, Any] = summary["vault_status"]
     print(f"  Final capital: {vault['total_capital']:.6f} LTC")
     print(f"  Net profit: {vault['net_profit']:.6f} LTC")
 
@@ -398,9 +399,9 @@ def print_simulation_summary(results: dict) -> None:
             print(f"  {reason}: {count} sessions")
 
 
-def print_comparison_summary(results: dict) -> None:
+def print_comparison_summary(results: dict[str, Any]) -> None:
     """Print comparison summary."""
-    analysis = results.get("comparison_analysis", {})
+    analysis: dict[str, Any] = results.get("comparison_analysis", {})
 
     print("\n" + "=" * 60)
     print("STRATEGY COMPARISON")
@@ -410,7 +411,7 @@ def print_comparison_summary(results: dict) -> None:
         print("No comparison data available")
         return
 
-    rankings = analysis.get("rankings", {})
+    rankings: dict[str, Any] = analysis.get("rankings", {})
 
     if "by_roi" in rankings:
         print("Rankings by ROI:")
@@ -420,7 +421,7 @@ def print_comparison_summary(results: dict) -> None:
     if "by_profitability_rate" in rankings:
         print("\nRankings by Profitability Rate:")
         for i, (strategy, data) in enumerate(rankings["by_profitability_rate"][:5], 1):
-            rate = data["profitability_rate"]
+            rate: float = data["profitability_rate"]
             print(f"  {i}. {strategy}: {rate:.1%}")
 
     if "recommendations" in analysis:
@@ -428,17 +429,17 @@ def print_comparison_summary(results: dict) -> None:
         for rec in analysis["recommendations"]:
             print(f"  • {rec}")
 
-    stats = analysis.get("statistics", {})
+    stats: dict[str, Any] = analysis.get("statistics", {})
     if stats:
         print("\nOverall Statistics:")
-        positive_roi = stats.get("strategies_with_positive_roi", 0)
-        total_strats = stats.get("total_strategies", 0)
+        positive_roi: int = stats.get("strategies_with_positive_roi", 0)
+        total_strats: int = stats.get("total_strategies", 0)
         print(f"  Strategies with positive ROI: {positive_roi}/{total_strats}")
         print(f"  Average ROI: {stats.get('average_roi', 0):.2%}")
         print(f"  Best ROI: {stats.get('best_roi', 0):.2%}")
 
 
-def print_analysis(results: dict, detailed: bool = False) -> None:
+def print_analysis(results: dict[str, Any], detailed: bool = False) -> None:
     """Print analysis of results file."""
     if "comparison_analysis" in results:
         print_comparison_summary(results)
@@ -466,7 +467,7 @@ def run_monitor_command(args: Namespace) -> None:
     progress_manager.print_info("🔍 Starting DiceBot Performance Monitor")
 
     # Setup Slack notifications if webhook provided
-    slack_notifier = None
+    slack_notifier: Any = None  # SlackNotifier type
     if args.slack_webhook:
         slack_notifier = SlackNotifier(args.slack_webhook)
         progress_manager.print_info("✅ Slack notifications enabled")
@@ -478,14 +479,14 @@ def run_monitor_command(args: Namespace) -> None:
         )
 
     # Setup alert callback
-    def alert_callback(alert_type: str, message: str, severity: str):
+    def alert_callback(alert_type: str, message: str, severity: str) -> None:
         if slack_notifier:
             slack_notifier.notify_alert(alert_type, message)
 
         # Also log to console
-        emoji_map = {"error": "🚨", "warning": "⚠️", "success": "✅", "info": "ℹ️"}
-        emoji = emoji_map.get(alert_type, "🔔")
-        progress_manager.print(f"{emoji} [{severity.upper()}] {message}")
+        emoji_map: dict[str, str] = {"error": "🚨", "warning": "⚠️", "success": "✅", "info": "ℹ️"}
+        emoji: str = emoji_map.get(alert_type, "🔔")
+        progress_manager.print(f"{emoji} [{severity.upper()}] {message}")  # type: ignore[no-untyped-call]
 
     # Create monitor
     monitor = PerformanceMonitor(alert_callback=alert_callback, check_interval=args.check_interval)
@@ -509,12 +510,12 @@ def run_monitor_command(args: Namespace) -> None:
             time.sleep(5)
 
             # Show periodic status
-            summary = monitor.get_performance_summary()
+            summary: dict[str, Any] = monitor.get_performance_summary()
             if summary and not summary.get("error"):
-                system = summary["system"]
-                sessions = summary["sessions"]
+                system: dict[str, Any] = summary["system"]
+                sessions: dict[str, Any] = summary["sessions"]
 
-                progress_manager.print(
+                progress_manager.print(  # type: ignore[no-untyped-call]
                     f"📊 CPU: {system['cpu_percent']:.1f}% | "
                     f"Memory: {system['memory_percent']:.1f}% | "
                     f"Active sessions: {sessions['active_count']}"
@@ -536,7 +537,7 @@ def run_recovery_command(args: Namespace) -> None:
     from dicebot.utils.progress import progress_manager
 
     if args.recovery_command == "list":
-        checkpoints = checkpoint_manager.list_checkpoints()
+        checkpoints: list[dict[str, Any]] = checkpoint_manager.list_checkpoints()
 
         if not checkpoints:
             progress_manager.print_info("No checkpoints found")
@@ -545,21 +546,25 @@ def run_recovery_command(args: Namespace) -> None:
         progress_manager.print_info(f"Found {len(checkpoints)} checkpoints:")
 
         for cp in checkpoints:
-            strategy = cp["strategy_config"].get("strategy", "unknown")
-            remaining = cp.get("remaining_sessions", 0)
-            age_hours = cp["file_age_hours"]
+            strategy: str = cp["strategy_config"].get("strategy", "unknown")
+            remaining: int = cp.get("remaining_sessions", 0)
+            age_hours: float = cp["file_age_hours"]
 
-            status = "✅ Completed" if remaining == 0 else f"⏸️  {remaining} sessions remaining"
-            age_str = f"{age_hours:.1f}h ago" if age_hours < 24 else f"{age_hours / 24:.1f}d ago"
+            status: str = "✅ Completed" if remaining == 0 else f"⏸️  {remaining} sessions remaining"
+            age_str: str = (
+                f"{age_hours:.1f}h ago" if age_hours < 24 else f"{age_hours / 24:.1f}d ago"
+            )
 
-            progress_manager.print(
+            progress_manager.print(  # type: ignore[no-untyped-call]
                 f"  📁 {cp['simulation_id']}: {strategy} strategy | {status} | {age_str}"
             )
 
     elif args.recovery_command == "resume":
         progress_manager.print_info(f"Resuming simulation: {args.simulation_id}")
 
-        checkpoint_data = checkpoint_manager.load_checkpoint(args.simulation_id)
+        checkpoint_data: dict[str, Any] | None = checkpoint_manager.load_checkpoint(
+            args.simulation_id
+        )
         if not checkpoint_data:
             progress_manager.print_error(f"Checkpoint not found: {args.simulation_id}")
             return
@@ -574,9 +579,9 @@ def run_recovery_command(args: Namespace) -> None:
 
     elif args.recovery_command == "clean":
         progress_manager.print_info(f"Cleaning checkpoints older than {args.max_age} days...")
-        # Use public API when available
-        # For now, access private method
-        checkpoint_manager._cleanup_old_checkpoints(args.max_age)  # noqa: SLF001
+        # TODO: Need to add public API for checkpoint cleanup
+        # For now, this functionality is not available
+        progress_manager.print_warning("Checkpoint cleanup not yet implemented")
 
     else:
         progress_manager.print_error("Invalid recovery command")

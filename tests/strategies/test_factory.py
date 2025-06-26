@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import pytest
 
+from dicebot.core.models import BetResult, GameState
 from dicebot.strategies.base import StrategyConfig
 from dicebot.strategies.dalembert import DAlembert
 from dicebot.strategies.factory import StrategyFactory
@@ -12,7 +13,7 @@ from dicebot.strategies.paroli import ParoliStrategy
 
 
 class TestStrategyFactory:
-    def test_create_martingale(self):
+    def test_create_martingale(self) -> None:
         """Test la création d'une stratégie Martingale"""
         config = StrategyConfig(base_bet=Decimal("1"), max_losses=5)
         strategy = StrategyFactory.create("martingale", config)
@@ -20,7 +21,7 @@ class TestStrategyFactory:
         assert isinstance(strategy, MartingaleStrategy)
         assert strategy.config.base_bet == Decimal("1")
 
-    def test_create_fibonacci(self):
+    def test_create_fibonacci(self) -> None:
         """Test la création d'une stratégie Fibonacci"""
         config = StrategyConfig(base_bet=Decimal("2"))
         strategy = StrategyFactory.create("fibonacci", config)
@@ -28,7 +29,7 @@ class TestStrategyFactory:
         assert isinstance(strategy, FibonacciStrategy)
         assert strategy.config.base_bet == Decimal("2")
 
-    def test_create_dalembert(self):
+    def test_create_dalembert(self) -> None:
         """Test la création d'une stratégie D'Alembert"""
         config = StrategyConfig(base_bet=Decimal("0.5"))
         strategy = StrategyFactory.create("dalembert", config)
@@ -36,14 +37,14 @@ class TestStrategyFactory:
         assert isinstance(strategy, DAlembert)
         assert strategy.config.base_bet == Decimal("0.5")
 
-    def test_create_flat(self):
+    def test_create_flat(self) -> None:
         """Test la création d'une stratégie Flat"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = StrategyFactory.create("flat", config)
 
         assert isinstance(strategy, FlatBetting)
 
-    def test_create_paroli_with_target(self):
+    def test_create_paroli_with_target(self) -> None:
         """Test la création d'une stratégie Paroli avec paramètre spécifique"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = StrategyFactory.create("paroli", config, target_wins=5)
@@ -51,7 +52,7 @@ class TestStrategyFactory:
         assert isinstance(strategy, ParoliStrategy)
         assert strategy.target_wins == 5
 
-    def test_unknown_strategy(self):
+    def test_unknown_strategy(self) -> None:
         """Test avec une stratégie inconnue"""
         config = StrategyConfig(base_bet=Decimal("1"))
 
@@ -61,7 +62,7 @@ class TestStrategyFactory:
         assert "Unknown strategy: 'unknown'" in str(exc_info.value)
         assert "Available strategies:" in str(exc_info.value)
 
-    def test_list_available(self):
+    def test_list_available(self) -> None:
         """Test la liste des stratégies disponibles"""
         available = StrategyFactory.list_available()
 
@@ -72,7 +73,7 @@ class TestStrategyFactory:
         assert "paroli" in available
         assert len(available) >= 5
 
-    def test_create_from_dict(self):
+    def test_create_from_dict(self) -> None:
         """Test la création depuis un dictionnaire"""
         config_dict = {
             "strategy": "martingale",
@@ -88,7 +89,7 @@ class TestStrategyFactory:
         assert strategy.config.max_losses == 5
         assert strategy.config.multiplier == 2.5
 
-    def test_create_from_dict_with_decimal(self):
+    def test_create_from_dict_with_decimal(self) -> None:
         """Test avec Decimal déjà présent dans le dict"""
         config_dict = {"strategy": "fibonacci", "base_bet": Decimal("0.1")}
 
@@ -97,7 +98,7 @@ class TestStrategyFactory:
         assert isinstance(strategy, FibonacciStrategy)
         assert strategy.config.base_bet == Decimal("0.1")
 
-    def test_create_paroli_from_dict(self):
+    def test_create_paroli_from_dict(self) -> None:
         """Test la création de Paroli avec paramètres spéciaux depuis dict"""
         config_dict = {"strategy": "paroli", "base_bet": "2", "target_wins": 4}
 
@@ -107,19 +108,19 @@ class TestStrategyFactory:
         assert strategy.config.base_bet == Decimal("2")
         assert strategy.target_wins == 4
 
-    def test_register_custom_strategy(self):
+    def test_register_custom_strategy(self) -> None:
         """Test l'enregistrement d'une stratégie personnalisée"""
         # Créer une stratégie custom
         from dicebot.strategies.base import BaseStrategy
 
         class CustomStrategy(BaseStrategy):
-            def calculate_next_bet(self, game_state):
+            def calculate_next_bet(self, game_state: GameState) -> Decimal:
                 return self.config.base_bet
 
-            def _update_strategy_state(self, result):
+            def _update_strategy_state(self, result: BetResult) -> None:
                 pass
 
-            def reset_state(self):
+            def reset_state(self) -> None:
                 pass
 
         # L'enregistrer

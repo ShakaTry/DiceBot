@@ -6,7 +6,7 @@ from dicebot.strategies.flat import FlatBetting
 
 
 class TestFlatBetting:
-    def test_constant_bet(self):
+    def test_constant_bet(self) -> None:
         """Vérifie que la mise reste constante"""
         config = StrategyConfig(base_bet=Decimal("1.5"))
         strategy = FlatBetting(config)
@@ -37,7 +37,7 @@ class TestFlatBetting:
         strategy.update_after_result(result)
         assert strategy.calculate_next_bet(game_state) == Decimal("1.5")
 
-    def test_reset_state(self):
+    def test_reset_state(self) -> None:
         """Vérifie que reset_state fonctionne"""
         config = StrategyConfig(base_bet=Decimal("2"))
         strategy = FlatBetting(config)

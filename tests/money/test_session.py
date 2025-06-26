@@ -5,7 +5,7 @@ from dicebot.money import Session, SessionConfig
 
 
 class TestSession:
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         config = SessionConfig(initial_bankroll=Decimal("10"))
         session = Session("test_session", config)
 
@@ -14,7 +14,7 @@ class TestSession:
         assert session.state.initial_bankroll == Decimal("10")
         assert session.state.game_state.balance == Decimal("10")
 
-    def test_should_stop_max_bets(self):
+    def test_should_stop_max_bets(self) -> None:
         config = SessionConfig(initial_bankroll=Decimal("10"), max_bets=5)
         session = Session("test", config)
 
@@ -32,7 +32,7 @@ class TestSession:
         assert not session.state.is_active
         assert session.state.stop_reason == "Max bets reached"
 
-    def test_should_stop_stop_loss(self):
+    def test_should_stop_stop_loss(self) -> None:
         config = SessionConfig(
             initial_bankroll=Decimal("10"),
             stop_loss=-0.5,  # -50%
@@ -53,7 +53,7 @@ class TestSession:
         assert not session.state.is_active
         assert "Stop loss triggered" in session.state.stop_reason
 
-    def test_should_stop_take_profit(self):
+    def test_should_stop_take_profit(self) -> None:
         config = SessionConfig(
             initial_bankroll=Decimal("10"),
             take_profit=0.5,  # +50%
@@ -74,7 +74,7 @@ class TestSession:
         assert not session.state.is_active
         assert "Take profit triggered" in session.state.stop_reason
 
-    def test_should_stop_consecutive_losses(self):
+    def test_should_stop_consecutive_losses(self) -> None:
         config = SessionConfig(initial_bankroll=Decimal("10"), max_consecutive_losses=3)
         session = Session("test", config)
 
@@ -92,7 +92,7 @@ class TestSession:
         assert not session.state.is_active
         assert "Max consecutive losses reached" in session.state.stop_reason
 
-    def test_process_bet(self):
+    def test_process_bet(self) -> None:
         config = SessionConfig(initial_bankroll=Decimal("10"))
         session = Session("test", config)
 
@@ -124,7 +124,7 @@ class TestSession:
         assert session.state.game_state.losses_count == 1
         assert session.state.game_state.total_wagered == Decimal("2")
 
-    def test_metrics(self):
+    def test_metrics(self) -> None:
         config = SessionConfig(initial_bankroll=Decimal("10"))
         session = Session("test", config)
 

@@ -84,7 +84,7 @@ class DiceBotConfig:
             # Try to load from default locations
             self._load_from_default_locations()
 
-    def _load_from_default_locations(self):
+    def _load_from_default_locations(self) -> None:
         """Try to load config from default locations."""
         default_locations = [
             Path.cwd() / "dicebot.yaml",
@@ -102,7 +102,7 @@ class DiceBotConfig:
                 except (OSError, yaml.YAMLError, ValueError):
                     continue  # Try next location
 
-    def load_from_file(self, config_file: Path):
+    def load_from_file(self, config_file: Path) -> None:
         """Load configuration from YAML file.
 
         Args:
@@ -122,7 +122,7 @@ class DiceBotConfig:
         except yaml.YAMLError as e:
             raise ValueError(f"Invalid YAML in config file {config_file}: {e}") from e
 
-    def _merge_config(self, base: dict, override: dict):
+    def _merge_config(self, base: dict[str, Any], override: dict[str, Any]) -> None:
         """Recursively merge configuration dictionaries."""
         for key, value in override.items():
             if key in base and isinstance(base[key], dict) and isinstance(value, dict):
@@ -130,7 +130,7 @@ class DiceBotConfig:
             else:
                 base[key] = value
 
-    def save_to_file(self, config_file: Path):
+    def save_to_file(self, config_file: Path) -> None:
         """Save current configuration to YAML file.
 
         Args:
@@ -270,7 +270,7 @@ class DiceBotConfig:
         Returns:
             List of suggestion strings
         """
-        suggestions = []
+        suggestions: list[str] = []
 
         risk_level = self.assess_strategy_risk(strategy_config, capital)
 
@@ -309,7 +309,7 @@ def get_config() -> DiceBotConfig:
     return _global_config
 
 
-def set_config(config: DiceBotConfig):
+def set_config(config: DiceBotConfig) -> None:
     """Set global configuration instance."""
     global _global_config
     _global_config = config

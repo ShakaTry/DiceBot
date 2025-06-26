@@ -20,13 +20,13 @@ class ConcreteStrategy(BaseStrategy):
 
 
 class TestBaseStrategy:
-    def test_cannot_instantiate_abstract_class(self):
+    def test_cannot_instantiate_abstract_class(self) -> None:
         """Vérifie que la classe abstraite ne peut pas être instanciée"""
         config = StrategyConfig(base_bet=Decimal("1"))
         with pytest.raises(TypeError):
             BaseStrategy(config)
 
-    def test_bet_limits_respected(self):
+    def test_bet_limits_respected(self) -> None:
         """Vérifie que les limites min/max sont respectées"""
         config = StrategyConfig(
             base_bet=Decimal("1"), min_bet=Decimal("0.1"), max_bet=Decimal("10")
@@ -45,7 +45,7 @@ class TestBaseStrategy:
         bet = strategy._apply_limits(Decimal("5"), Decimal("3"))
         assert bet == Decimal("3")
 
-    def test_insufficient_balance(self):
+    def test_insufficient_balance(self) -> None:
         """Vérifie le comportement avec balance insuffisante"""
         config = StrategyConfig(base_bet=Decimal("1"), min_bet=Decimal("1"))
         strategy = ConcreteStrategy(config)
@@ -57,7 +57,7 @@ class TestBaseStrategy:
         assert decision.reason == "Insufficient balance"
         assert decision.amount == Decimal("0")
 
-    def test_bet_below_minimum_after_limits(self):
+    def test_bet_below_minimum_after_limits(self) -> None:
         """Vérifie le comportement quand la mise devient trop petite après limites"""
         config = StrategyConfig(base_bet=Decimal("10"), min_bet=Decimal("5"))
         strategy = ConcreteStrategy(config)
@@ -69,7 +69,7 @@ class TestBaseStrategy:
         assert decision.skip is True
         assert decision.reason == "Insufficient balance"
 
-    def test_valid_bet_decision(self):
+    def test_valid_bet_decision(self) -> None:
         """Vérifie qu'une décision valide est prise dans des conditions normales"""
         config = StrategyConfig(base_bet=Decimal("1"), default_multiplier=2.5)
         strategy = ConcreteStrategy(config)
@@ -85,7 +85,7 @@ class TestBaseStrategy:
         assert decision.target > 0
         assert decision.reason is None
 
-    def test_get_name(self):
+    def test_get_name(self) -> None:
         """Vérifie que le nom de la stratégie est correctement extrait"""
         config = StrategyConfig(base_bet=Decimal("1"))
         strategy = ConcreteStrategy(config)

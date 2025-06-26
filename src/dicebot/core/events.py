@@ -56,7 +56,7 @@ class Event:
     data: dict[str, Any]
     source: str | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.timestamp is None:
             self.timestamp = datetime.now()
 
@@ -65,7 +65,7 @@ class Event:
 class BetPlacedEvent(Event):
     """Événement quand un pari est placé."""
 
-    def __init__(self, decision: BetDecision, game_state: GameState, strategy_name: str):
+    def __init__(self, decision: BetDecision, game_state: GameState, strategy_name: str) -> None:
         super().__init__(
             type=EventType.BET_PLACED,
             timestamp=datetime.now(),
@@ -82,7 +82,7 @@ class BetPlacedEvent(Event):
 class BetResolvedEvent(Event):
     """Événement quand un pari est résolu."""
 
-    def __init__(self, result: BetResult, game_state: GameState, strategy_name: str):
+    def __init__(self, result: BetResult, game_state: GameState, strategy_name: str) -> None:
         super().__init__(
             type=EventType.BET_RESOLVED,
             timestamp=datetime.now(),
@@ -99,7 +99,7 @@ class BetResolvedEvent(Event):
 class StreakEvent(Event):
     """Événement de série (gains/pertes)."""
 
-    def __init__(self, streak_type: str, length: int, game_state: GameState):
+    def __init__(self, streak_type: str, length: int, game_state: GameState) -> None:
         event_type = EventType.WINNING_STREAK if streak_type == "win" else EventType.LOSING_STREAK
         super().__init__(
             type=event_type,
@@ -128,7 +128,7 @@ class EventListener(ABC):
 class EventBus:
     """Bus d'événements pour la communication entre composants."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._listeners: dict[EventType, list[EventListener]] = defaultdict(list)
         self._callbacks: dict[EventType, list[Callable[[Event], None]]] = defaultdict(list)
         self._history: list[Event] = []

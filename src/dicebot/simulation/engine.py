@@ -3,7 +3,7 @@ Simulation engine for running dice game simulations with strategies.
 """
 
 import uuid
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 from decimal import Decimal
 from multiprocessing import cpu_count
 from typing import Any
@@ -15,6 +15,7 @@ from ..core.models import GameConfig, GameState, SessionState, VaultConfig
 # Note: Using SessionState from models.py instead of a separate SessionManager
 from ..money.vault import Vault
 from ..strategies.base import BaseStrategy
+from ..utils.logger import JSONLinesLogger
 
 
 class SimulationEngine:
@@ -25,7 +26,7 @@ class SimulationEngine:
         vault_config: VaultConfig,
         game_config: GameConfig | None = None,
         event_bus: EventBus | None = None,
-        logger=None,
+        logger: JSONLinesLogger | None = None,
     ):
         """Initialize the simulation engine.
 
@@ -40,7 +41,7 @@ class SimulationEngine:
         from ..core.events import event_bus as global_event_bus
 
         self.event_bus = event_bus or global_event_bus
-        self.logger = logger
+        self.logger: JSONLinesLogger | None = logger
 
         # Initialize components
         self.vault = Vault(vault_config)
@@ -95,7 +96,7 @@ class SimulationEngine:
                 # Check stop conditions
                 should_stop, stop_reason = session_state.should_stop()
                 if should_stop:
-                    session_state.end_session(stop_reason)
+                    session_state.end_session(stop_reason or "unknown")
                     break
 
                 # Check duration limit
@@ -108,9 +109,10 @@ class SimulationEngine:
 
                 # Add current nonce to game state metadata
                 if self.dice_game.is_provably_fair_enabled:
-                    game_state.metadata["current_nonce"] = (
-                        self.dice_game.provably_fair.current_seeds.nonce
-                    )
+                    if self.dice_game.provably_fair:
+                        game_state.metadata["current_nonce"] = (
+                            self.dice_game.provably_fair.current_seeds.nonce
+                        )
 
                 # Get bet decision from strategy
                 decision = strategy.decide_bet(game_state)
@@ -138,6 +140,8 @@ class SimulationEngine:
                                     "old_nonce": game_state.metadata.get("current_nonce", 0),
                                     "new_server_seed_hash": (
                                         self.dice_game.provably_fair.current_seeds.server_seed_hash
+                                        if self.dice_game.provably_fair
+                                        else None
                                     ),
                                     "seed_rotations_count": (game_state.seed_rotations_count),
                                 },
@@ -145,7 +149,7 @@ class SimulationEngine:
 
                         # Notify strategy of seed change
                         if hasattr(strategy, "on_seed_change"):
-                            strategy.on_seed_change()
+                            strategy.on_seed_change()  # type: ignore[attr-defined]
                         continue
 
                     elif decision.action == "toggle_bet_type":
@@ -266,7 +270,7 @@ class SimulationEngine:
             )
 
         # Sequential execution for small batches or when parallel is disabled
-        sessions = []
+        sessions: list[SessionState] = []
 
         for i in range(num_sessions):
             if reset_strategy_between_sessions and i > 0:
@@ -302,7 +306,7 @@ class SimulationEngine:
         batch_size = max(1, num_sessions // max_workers)
 
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            futures = []
+            futures: list[Future[list[SessionState]]] = []
 
             for batch_start in range(0, num_sessions, batch_size):
                 batch_end = min(batch_start + batch_size, num_sessions)
@@ -324,20 +328,22 @@ class SimulationEngine:
             for future in as_completed(futures):
                 try:
                     batch_results = future.result()
-                    sessions.extend(batch_results)
+                    sessions.extend(batch_results)  # type: ignore[arg-type]
                 except Exception as e:
                     print(f"Batch failed with error: {e}")
 
         # Update our vault with final results (simplified)
-        for session in sessions:
-            initial_balance = session.game_state.session_start_balance
-            final_balance = session.game_state.balance
-            self.vault.return_session_profit(initial_balance, final_balance)
+        for session in sessions:  # type: ignore[assignment]
+            if isinstance(session, SessionState):
+                initial_balance = session.game_state.session_start_balance
+                final_balance = session.game_state.balance
+                if initial_balance is not None and final_balance is not None:
+                    self.vault.return_session_profit(initial_balance, final_balance)
 
         # Store in our history
-        self.session_history.extend(sessions)
+        self.session_history.extend(sessions)  # type: ignore[arg-type]
 
-        return sessions[:num_sessions]  # Ensure we don't return more than requested
+        return sessions[:num_sessions]  # type: ignore[return-value]
 
     def get_simulation_summary(self) -> dict[str, Any]:
         """Get summary statistics for all completed sessions.
@@ -359,7 +365,7 @@ class SimulationEngine:
         )
 
         # Get stop reasons
-        stop_reasons = {}
+        stop_reasons: dict[str, int] = {}
         for session in self.session_history:
             reason = session.stop_reason or "unknown"
             stop_reasons[reason] = stop_reasons.get(reason, 0) + 1
@@ -386,7 +392,7 @@ class SimulationEngine:
             "stop_reasons": stop_reasons,
             "average_max_drawdown": float(avg_max_drawdown),
             "worst_drawdown": float(worst_drawdown),
-            "vault_status": self.vault.get_stats(),
+            "vault_status": self.vault.get_stats(),  # type: ignore[no-untyped-call]
         }
 
     def reset_engine(self) -> None:
@@ -415,7 +421,7 @@ class SimulationEngine:
         Returns:
             List of dictionaries containing session data
         """
-        data = []
+        data: list[dict[str, Any]] = []
 
         for session in self.session_history:
             session_data = {
@@ -442,8 +448,10 @@ class SimulationEngine:
                 "peak_balance": float(session.peak_balance),
                 "lowest_balance": float(session.lowest_balance),
                 "bets_per_minute": session.game_state.bets_per_minute,
-                "stop_loss": float(session.stop_loss) if session.stop_loss else None,
-                "take_profit": float(session.take_profit) if session.take_profit else None,
+                "stop_loss": float(session.stop_loss) if session.stop_loss is not None else None,  # type: ignore[arg-type]
+                "take_profit": float(session.take_profit)
+                if session.take_profit is not None
+                else None,  # type: ignore[arg-type]
                 "max_bets": session.max_bets,
             }
             data.append(session_data)
@@ -482,7 +490,7 @@ def _run_session_batch(
     fresh_strategy = StrategyFactory.create_from_dict(strategy_config)
 
     # Run the sessions
-    sessions = []
+    sessions: list[SessionState] = []
     for i in range(num_sessions):
         if reset_strategy_between_sessions and i > 0:
             fresh_strategy.reset_state()

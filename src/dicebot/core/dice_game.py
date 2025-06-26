@@ -8,6 +8,11 @@ from .provably_fair import ProvablyFairGenerator
 
 
 class DiceGame:
+    config: GameConfig
+    house_edge: float
+    provably_fair: ProvablyFairGenerator | None
+    rng: random.Random | None
+
     def __init__(
         self,
         config: GameConfig | None = None,
@@ -15,7 +20,7 @@ class DiceGame:
         use_provably_fair: bool = True,
         server_seed: str | None = None,
         client_seed: str | None = None,
-    ):
+    ) -> None:
         """
         Initialise le jeu de dés.
 
@@ -148,12 +153,14 @@ class DiceGame:
                 multiplier=multiplier,
                 bet_type=bet_type,
                 target=target,
-                server_seed_hash=seed_info["server_seed_hash"],
-                client_seed=seed_info["client_seed"],
-                nonce=seed_info["nonce"] - 1,  # Le nonce a été incrémenté dans generate_dice_result
+                server_seed_hash=str(seed_info["server_seed_hash"]),
+                client_seed=str(seed_info["client_seed"]),
+                nonce=int(seed_info["nonce"])
+                - 1,  # Le nonce a été incrémenté dans generate_dice_result
             )
         else:
             # Mode legacy pour tests
+            assert self.rng is not None
             roll_value = self.rng.random() * 100
 
             # Déterminer la victoire selon le type de pari
@@ -319,9 +326,9 @@ class DiceGame:
                 from .provably_fair import BitslerVerifier
 
                 return BitslerVerifier.verify_dice_result(
-                    seed_info["server_seed"],
-                    bet_result.client_seed,
-                    bet_result.nonce,
+                    str(seed_info["server_seed"]),
+                    bet_result.client_seed or "",
+                    bet_result.nonce or 0,
                     bet_result.roll,
                 )
 

@@ -60,7 +60,7 @@ class AdaptiveStrategy(BaseStrategy):
         self.rules = config.rules
 
         # Initialize attributes that reset_state() will use
-        self.current_strategy = None
+        self.current_strategy: BaseStrategy | None = None
         self.current_strategy_name = config.initial_strategy
         self.switch_history: list[tuple[int, str, str, str]] = []
         self.bets_since_switch = 0
@@ -96,11 +96,14 @@ class AdaptiveStrategy(BaseStrategy):
         self._check_switch_conditions(game_state)
 
         # Utiliser la stratégie courante
+        if self.current_strategy is None:
+            return self.config.base_bet
         return self.current_strategy.calculate_next_bet(game_state)
 
     def _update_strategy_state(self, result: BetResult) -> None:
         """Met à jour l'état de la stratégie courante."""
-        self.current_strategy.update_after_result(result)
+        if self.current_strategy is not None:
+            self.current_strategy.update_after_result(result)
         self.bets_since_switch += 1
         self.bets_in_current_strategy += 1  # For test compatibility
 
@@ -172,6 +175,8 @@ class AdaptiveStrategy(BaseStrategy):
             return roi >= rule.threshold
 
         elif rule.condition == SwitchCondition.LOW_CONFIDENCE:
+            if self.current_strategy is None:
+                return False
             return self.current_strategy.confidence <= rule.threshold
 
         elif rule.condition == SwitchCondition.BALANCE_THRESHOLD:
@@ -232,8 +237,10 @@ class AdaptiveStrategy(BaseStrategy):
 
     def on_winning_streak(self, streak_length: int, game_state: GameState) -> None:
         """Propage l'événement à la stratégie courante."""
-        self.current_strategy.on_winning_streak(streak_length, game_state)
+        if self.current_strategy is not None:
+            self.current_strategy.on_winning_streak(streak_length, game_state)
 
     def on_losing_streak(self, streak_length: int, game_state: GameState) -> None:
         """Propage l'événement à la stratégie courante."""
-        self.current_strategy.on_losing_streak(streak_length, game_state)
+        if self.current_strategy is not None:
+            self.current_strategy.on_losing_streak(streak_length, game_state)

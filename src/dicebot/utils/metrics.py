@@ -393,13 +393,13 @@ class SessionAnalyzer:
             return {"error": "No bet history available"}
 
         # Calculate cumulative metrics over time
-        cumulative_profit = []
-        cumulative_bets = []
-        rolling_win_rate = []
-        balance_history = []
+        cumulative_profit: list[float] = []
+        cumulative_bets: list[int] = []
+        rolling_win_rate: list[float] = []
+        balance_history: list[float] = []
 
         current_profit = Decimal("0")
-        current_balance = self.game_state.session_start_balance
+        current_balance = self.game_state.session_start_balance or self.game_state.balance
         window_size = min(20, len(self.game_state.bet_history))  # 20-bet rolling window
 
         for i, bet in enumerate(self.game_state.bet_history):
@@ -432,7 +432,10 @@ class SessionAnalyzer:
                 "cumulative_bets": cumulative_bets,
                 "balance_history": balance_history,
                 "rolling_win_rate": rolling_win_rate,
-                "timestamps": [bet.timestamp.isoformat() for bet in self.game_state.bet_history],
+                "timestamps": [
+                    bet.timestamp.isoformat() if bet.timestamp else ""
+                    for bet in self.game_state.bet_history
+                ],
             },
             "trend_analysis": {
                 "profit_trend_slope": self._calculate_trend_slope(cumulative_profit),
@@ -567,7 +570,9 @@ class MultiSessionAnalyzer:
             "comparison_summary": self._generate_comparison_summary(strategy_metrics, rankings),
         }
 
-    def _create_strategy_rankings(self, strategy_metrics: dict[str, dict]) -> dict[str, list]:
+    def _create_strategy_rankings(
+        self, strategy_metrics: dict[str, dict[str, Any]]
+    ) -> dict[str, list[str]]:
         """Create rankings for different metrics.
 
         Args:
@@ -610,7 +615,7 @@ class MultiSessionAnalyzer:
         return rankings
 
     def _generate_comparison_summary(
-        self, strategy_metrics: dict, rankings: dict
+        self, strategy_metrics: dict[str, Any], rankings: dict[str, Any]
     ) -> dict[str, Any]:
         """Generate comparison summary and recommendations.
 

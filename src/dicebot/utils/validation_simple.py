@@ -34,7 +34,7 @@ class ParameterValidator:
         Returns:
             Dict avec les avertissements trouvés
         """
-        warnings = {}
+        warnings: dict[str, str] = {}
 
         try:
             strategy_name = config.get("strategy", "unknown")

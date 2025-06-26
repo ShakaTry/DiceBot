@@ -48,7 +48,7 @@ class SimulationRunner:
         num_sessions: int = 100,
         session_config: dict[str, Any] | None = None,
         save_results: bool = True,
-        parallel: bool = None,
+        parallel: bool | None = None,
         max_workers: int | None = None,
         show_progress: bool = True,
         enable_detailed_logs: bool = False,
@@ -114,7 +114,8 @@ class SimulationRunner:
             description = f"Running {strategy_name} strategy"
             with progress_manager.progress.track_simulation(
                 description, num_sessions, show_stats=True
-            ) as (task_id, update_fn):
+            ) as progress_data:
+                _task_id, update_fn = progress_data  # type: ignore[misc]
                 if parallel:
                     # For parallel execution, we can't track individual sessions
                     sessions = engine.run_multiple_sessions(
@@ -127,7 +128,7 @@ class SimulationRunner:
                     update_fn(advance=num_sessions)  # Update all at once
                 else:
                     # For sequential execution, track each session
-                    sessions = []
+                    sessions: list[Any] = []
                     for i in range(num_sessions):
                         if i > 0:
                             strategy.reset_state()
@@ -184,7 +185,7 @@ class SimulationRunner:
 
         # Save to file if requested
         if save_results:
-            self._save_strategy_results(strategy_name, results)
+            self._save_strategy_results(strategy_name, results)  # type: ignore[arg-type]
 
         # Close logger if it was created
         if logger:
@@ -262,7 +263,7 @@ class SimulationRunner:
         self.comparison_results = final_results
 
         if save_results:
-            self._save_comparison_results(final_results)
+            self._save_comparison_results(final_results)  # type: ignore[arg-type]
 
         return final_results
 
@@ -323,7 +324,7 @@ class SimulationRunner:
                     "strategy_fitness": results["strategy_info"]["strategy_fitness"],
                 }
 
-                sweep_results.append(sweep_result)
+                sweep_results.append(sweep_result)  # type: ignore[arg-type]
 
                 # Progress indicator
                 print(f"Completed parameter combination {i + 1}/{len(param_combinations)}")
@@ -334,12 +335,12 @@ class SimulationRunner:
 
         # Analyze results
         best_result = (
-            max(sweep_results, key=lambda x: x["strategy_fitness"]) if sweep_results else None
+            max(sweep_results, key=lambda x: x["strategy_fitness"]) if sweep_results else None  # type: ignore[arg-type]
         )
 
         final_results = {
             "sweep_results": sweep_results,
-            "best_parameters": best_result["parameter_combination"] if best_result else None,
+            "best_parameters": best_result["parameter_combination"] if best_result else None,  # type: ignore[index]
             "best_performance": best_result if best_result else None,
             "parameter_ranges": parameter_ranges,
             "metadata": {
@@ -352,11 +353,11 @@ class SimulationRunner:
         }
 
         if save_results:
-            self._save_sweep_results(final_results)
+            self._save_sweep_results(final_results)  # type: ignore[arg-type]
 
         return final_results
 
-    def _analyze_strategy_comparison(self, summaries: dict[str, dict]) -> dict[str, Any]:
+    def _analyze_strategy_comparison(self, summaries: dict[str, dict[str, Any]]) -> dict[str, Any]:
         """Analyze comparison results between strategies."""
         if not summaries:
             return {}
@@ -396,7 +397,7 @@ class SimulationRunner:
 
         return analysis
 
-    def _generate_strategy_recommendations(self, rankings: dict) -> list[str]:
+    def _generate_strategy_recommendations(self, rankings: dict[str, Any]) -> list[str]:
         """Generate strategy recommendations based on rankings."""
         recommendations = []
 
@@ -422,7 +423,9 @@ class SimulationRunner:
 
         return recommendations
 
-    def _generate_parameter_combinations(self, parameter_ranges: dict[str, list]) -> list[dict]:
+    def _generate_parameter_combinations(
+        self, parameter_ranges: dict[str, list[Any]]
+    ) -> list[dict[str, Any]]:
         """Generate all combinations of parameters."""
         import itertools
 
@@ -435,7 +438,7 @@ class SimulationRunner:
 
         return combinations
 
-    def _save_strategy_results(self, strategy_name: str, results: dict) -> None:
+    def _save_strategy_results(self, strategy_name: str, results: dict[str, Any]) -> None:
         """Save strategy results to file."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"strategy_{strategy_name}_{timestamp}.json"
@@ -446,7 +449,7 @@ class SimulationRunner:
 
         print(f"Strategy results saved to: {filepath}")
 
-    def _save_comparison_results(self, results: dict) -> None:
+    def _save_comparison_results(self, results: dict[str, Any]) -> None:
         """Save comparison results to file."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"strategy_comparison_{timestamp}.json"
@@ -457,7 +460,7 @@ class SimulationRunner:
 
         print(f"Comparison results saved to: {filepath}")
 
-    def _save_sweep_results(self, results: dict) -> None:
+    def _save_sweep_results(self, results: dict[str, Any]) -> None:
         """Save parameter sweep results to file."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"parameter_sweep_{timestamp}.json"

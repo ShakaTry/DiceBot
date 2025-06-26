@@ -45,7 +45,7 @@ class BetResult:
     threshold: float
     amount: Decimal
     payout: Decimal
-    timestamp: datetime = None
+    timestamp: datetime | None = None
 
     # Informations OVER/UNDER (compatibles Bitsler)
     bet_type: BetType = BetType.UNDER
@@ -59,7 +59,7 @@ class BetResult:
     # Pour vérification ultérieure
     multiplier: float | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.timestamp is None:
             self.timestamp = datetime.now()
 
@@ -94,8 +94,8 @@ class GameState:
     losses_count: int = 0
     total_wagered: Decimal = Decimal("0")
     total_profit: Decimal = Decimal("0")
-    max_balance: Decimal = None
-    min_balance: Decimal = None
+    max_balance: Decimal | None = None
+    min_balance: Decimal | None = None
     consecutive_wins: int = 0
     consecutive_losses: int = 0
 
@@ -127,7 +127,7 @@ class GameState:
     # Metadata flexible pour stocker des informations supplémentaires
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.max_balance is None:
             self.max_balance = self.balance
         if self.min_balance is None:
@@ -137,7 +137,7 @@ class GameState:
         if self.session_start_time is None:
             self.session_start_time = datetime.now()
 
-    def update(self, result: BetResult):
+    def update(self, result: BetResult) -> None:
         self.bets_count += 1
         self.total_wagered += result.amount
 
@@ -164,6 +164,8 @@ class GameState:
             self.max_consecutive_losses = max(self.max_consecutive_losses, self.consecutive_losses)
 
         # Mettre à jour les balances min/max
+        assert self.max_balance is not None
+        assert self.min_balance is not None
         self.max_balance = max(self.max_balance, self.balance)
         self.min_balance = min(self.min_balance, self.balance)
 
@@ -234,7 +236,7 @@ class GameState:
     @property
     def session_roi(self) -> float:
         """ROI de la session en cours."""
-        if self.session_start_balance == 0:
+        if self.session_start_balance is None or self.session_start_balance == 0:
             return 0.0
         profit = self.balance - self.session_start_balance
         return float(profit / self.session_start_balance)
@@ -277,11 +279,11 @@ class SessionState:
     lowest_balance: Decimal = field(init=False)
     total_session_time: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.peak_balance = self.game_state.balance
         self.lowest_balance = self.game_state.balance
 
-    def update(self, result: BetResult):
+    def update(self, result: BetResult) -> None:
         """Met à jour l'état avec un nouveau résultat."""
         self.game_state.update(result)
         self.peak_balance = max(self.peak_balance, self.game_state.balance)
@@ -307,7 +309,7 @@ class SessionState:
 
         return False, None
 
-    def end_session(self, reason: str):
+    def end_session(self, reason: str) -> None:
         """Termine la session."""
         self.ended_at = datetime.now()
         self.stop_reason = reason

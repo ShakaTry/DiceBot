@@ -78,9 +78,9 @@ class ParameterValidator:
         Raises:
             ValidationError: If configuration is invalid
         """
-        errors = []
-        warnings = []
-        suggestions = []
+        errors: list[str] = []
+        warnings: list[str] = []
+        suggestions: list[str] = []
 
         strategy_name = strategy_config.get("strategy")
         if not strategy_name:
@@ -173,8 +173,8 @@ class ParameterValidator:
         Returns:
             Dictionary of validation results
         """
-        warnings = []
-        suggestions = []
+        warnings: list[str] = []
+        suggestions: list[str] = []
 
         # Validate stop_loss
         if "stop_loss" in session_config:

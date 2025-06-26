@@ -6,13 +6,12 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from typing import Any
 
-from rich.console import Console
-from rich.progress import (
+from rich.console import Console  # type: ignore[import-untyped]
+from rich.progress import (  # type: ignore[import-untyped]
     BarColumn,
     MofNCompleteColumn,
     Progress,
     SpinnerColumn,
-    TaskID,
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
@@ -22,9 +21,9 @@ from rich.progress import (
 class SimulationProgress:
     """Enhanced progress tracking for simulations."""
 
-    def __init__(self, console: Console | None = None):
-        self.console = console or Console()
-        self.progress = Progress(
+    def __init__(self, console: Any = None):
+        self.console: Any = console or Console()
+        self.progress: Any = Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             BarColumn(),
@@ -39,7 +38,7 @@ class SimulationProgress:
     @contextmanager
     def track_simulation(
         self, description: str, total_sessions: int, show_stats: bool = True
-    ) -> Iterator[tuple[TaskID, Callable[[Any, int], None]]]:
+    ) -> Iterator[tuple[Any, Callable[[Any, int], None]]]:
         """Context manager for tracking simulation progress.
 
         Args:
@@ -51,10 +50,10 @@ class SimulationProgress:
             Tuple of (task_id, update_function)
         """
         with self.progress:
-            task_id = self.progress.add_task(description, total=total_sessions)
+            task_id: Any = self.progress.add_task(description, total=total_sessions)
 
             # Statistics tracking
-            stats = {
+            stats: dict[str, Any] = {
                 "profitable_sessions": 0,
                 "total_profit": 0.0,
                 "avg_roi": 0.0,
@@ -100,7 +99,7 @@ class SimulationProgress:
     @contextmanager
     def track_comparison(
         self, strategies: list[str], sessions_per_strategy: int
-    ) -> Iterator[tuple[TaskID, Callable[[str | None, Any, int], None]]]:
+    ) -> Iterator[tuple[Any, Callable[[str | None, Any, int], None]]]:
         """Track strategy comparison progress.
 
         Args:
@@ -114,10 +113,10 @@ class SimulationProgress:
         description = f"Comparing {len(strategies)} strategies"
 
         with self.progress:
-            task_id = self.progress.add_task(description, total=total_sessions)
+            task_id: Any = self.progress.add_task(description, total=total_sessions)
 
-            current_strategy = ""
-            strategy_index = 0
+            current_strategy: str = ""
+            strategy_index: int = 0
 
             def update_comparison(
                 strategy_name: str | None = None, session_result: Any = None, advance: int = 1
@@ -143,7 +142,9 @@ class SimulationProgress:
 class ProgressManager:
     """Global progress manager for DiceBot operations."""
 
-    _instance = None
+    _instance: "ProgressManager | None" = None
+    console: Any
+    simulation_progress: Any
 
     def __new__(cls) -> "ProgressManager":
         if cls._instance is None:
@@ -153,7 +154,7 @@ class ProgressManager:
         return cls._instance
 
     @property
-    def progress(self) -> SimulationProgress:
+    def progress(self) -> Any:
         return self.simulation_progress
 
     def print(self, *args: Any, **kwargs: Any) -> None:

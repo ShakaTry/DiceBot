@@ -231,7 +231,7 @@ class BitslerVerifier:
         # Extraire le nombre valide
         generator = ProvablyFairGenerator()
         # Access private method for verification
-        number = generator._extract_valid_number(seed_hash)  # noqa: SLF001
+        number = generator._extract_valid_number(seed_hash)  # type: ignore[misc]  # noqa: SLF001
         calculated_result = (number % 10000) / 100
 
         # Vérifier
@@ -251,7 +251,7 @@ class BitslerVerifier:
         }
 
     @staticmethod
-    def batch_verify(results: list[dict]) -> dict[str, Any]:
+    def batch_verify(results: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Vérifie une liste de résultats en batch.
 
@@ -263,7 +263,7 @@ class BitslerVerifier:
         """
         total = len(results)
         valid = 0
-        invalid_results = []
+        invalid_results: list[dict[str, Any]] = []
 
         for i, result in enumerate(results):
             verification = BitslerVerifier.verify_dice_result(

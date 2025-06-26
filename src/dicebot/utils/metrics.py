@@ -6,10 +6,13 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Any
 
-import numpy as np
-from scipy import stats
+import numpy as np  # type: ignore[import-untyped]
+from scipy import stats  # type: ignore[import-untyped]
 
 from ..core.models import BetResult, SessionState
+
+# Type aliases for numpy
+NumpyArray = Any
 
 
 class PerformanceMetrics:
@@ -32,14 +35,14 @@ class PerformanceMetrics:
         if len(returns) < 2:
             return 0.0
 
-        returns_array = np.array(returns)
-        excess_returns = returns_array - (risk_free_rate / periods_per_year)
+        returns_array: NumpyArray = np.array(returns)  # type: ignore[misc]
+        excess_returns: NumpyArray = returns_array - (risk_free_rate / periods_per_year)  # type: ignore[misc]
 
         if np.std(excess_returns) == 0:
             return 0.0
 
-        sharpe = np.mean(excess_returns) / np.std(excess_returns)
-        return sharpe * np.sqrt(periods_per_year)
+        sharpe: Any = np.mean(excess_returns) / np.std(excess_returns)
+        return float(sharpe * np.sqrt(periods_per_year))
 
     @staticmethod
     def calculate_sortino_ratio(
@@ -58,19 +61,19 @@ class PerformanceMetrics:
         if len(returns) < 2:
             return 0.0
 
-        returns_array = np.array(returns)
-        excess_returns = returns_array - target_return
-        downside_returns = excess_returns[excess_returns < 0]
+        returns_array: Any = np.array(returns)
+        excess_returns: Any = returns_array - target_return
+        downside_returns: Any = excess_returns[excess_returns < 0]
 
         if len(downside_returns) == 0:
             return float("inf") if np.mean(excess_returns) > 0 else 0.0
 
-        downside_deviation = np.sqrt(np.mean(downside_returns**2))
+        downside_deviation: Any = np.sqrt(np.mean(downside_returns**2))
 
         if downside_deviation == 0:
             return 0.0
 
-        return np.mean(excess_returns) / downside_deviation * np.sqrt(periods_per_year)
+        return float(np.mean(excess_returns) / downside_deviation * np.sqrt(periods_per_year))
 
     @staticmethod
     def calculate_calmar_ratio(
@@ -110,7 +113,7 @@ class PerformanceMetrics:
         if not returns:
             return 0.0
 
-        return np.percentile(returns, confidence_level * 100)
+        return float(np.percentile(returns, confidence_level * 100))
 
     @staticmethod
     def calculate_expected_shortfall(returns: list[float], confidence_level: float = 0.05) -> float:
@@ -127,13 +130,13 @@ class PerformanceMetrics:
             return 0.0
 
         var = PerformanceMetrics.calculate_value_at_risk(returns, confidence_level)
-        returns_array = np.array(returns)
-        tail_returns = returns_array[returns_array <= var]
+        returns_array: Any = np.array(returns)
+        tail_returns: Any = returns_array[returns_array <= var]
 
         if len(tail_returns) == 0:
             return var
 
-        return np.mean(tail_returns)
+        return float(np.mean(tail_returns))
 
     @staticmethod
     def calculate_maximum_drawdown_duration(
@@ -155,7 +158,7 @@ class PerformanceMetrics:
         max_dd_bets = 0
         max_dd_duration = timedelta(0)
         current_dd_start_bet = 0
-        current_dd_start_time = None
+        current_dd_start_time: Any = None
         in_drawdown = False
 
         for i, bet in enumerate(bet_history):
@@ -170,7 +173,7 @@ class PerformanceMetrics:
                 # New peak, end of drawdown
                 if in_drawdown and current_dd_start_time:
                     dd_bets = i - current_dd_start_bet
-                    dd_duration = bet.timestamp - current_dd_start_time
+                    dd_duration: timedelta = bet.timestamp - current_dd_start_time
 
                     if dd_bets > max_dd_bets:
                         max_dd_bets = dd_bets
@@ -191,7 +194,7 @@ class PerformanceMetrics:
         # Check final drawdown if still ongoing
         if in_drawdown and current_dd_start_time and bet_history:
             final_dd_bets = len(bet_history) - current_dd_start_bet
-            final_dd_duration = bet_history[-1].timestamp - current_dd_start_time
+            final_dd_duration: timedelta = bet_history[-1].timestamp - current_dd_start_time
 
             if final_dd_bets > max_dd_bets:
                 max_dd_bets = final_dd_bets
@@ -288,8 +291,8 @@ class SessionAnalyzer:
             "current_drawdown": float(self.game_state.current_drawdown),
             "sharpe_ratio": self.game_state.sharpe_ratio,
             "bets_per_minute": self.game_state.bets_per_minute,
-            "initial_balance": float(self.game_state.session_start_balance),
-            "final_balance": float(self.game_state.balance),
+            "initial_balance": float(self.game_state.session_start_balance or 0),
+            "final_balance": float(self.game_state.balance or 0),
             "peak_balance": float(self.session.peak_balance),
             "lowest_balance": float(self.session.lowest_balance),
             "stop_reason": self.session.stop_reason,
@@ -305,7 +308,7 @@ class SessionAnalyzer:
             return {"error": "No bet history available"}
 
         # Calculate returns
-        returns = []
+        returns: list[float] = []
         for bet in self.game_state.bet_history:
             if bet.won:
                 profit = bet.payout - bet.amount
@@ -352,7 +355,11 @@ class SessionAnalyzer:
                 "largest_bet": float(max(bet.amount for bet in self.game_state.bet_history)),
                 "smallest_bet": float(min(bet.amount for bet in self.game_state.bet_history)),
                 "average_win_payout": (
-                    float(np.mean([bet.payout for bet in self.game_state.bet_history if bet.won]))
+                    float(
+                        np.mean(
+                            [float(bet.payout) for bet in self.game_state.bet_history if bet.won]
+                        )
+                    )
                     if any(bet.won for bet in self.game_state.bet_history)
                     else 0
                 ),
@@ -374,8 +381,8 @@ class SessionAnalyzer:
                 ),
             },
             "returns_analysis": {
-                "mean_return": np.mean(returns) if returns else 0,
-                "std_return": np.std(returns) if returns else 0,
+                "mean_return": float(np.mean(returns)) if returns else 0,
+                "std_return": float(np.std(returns)) if returns else 0,
                 "skewness": float(stats.skew(returns)) if len(returns) > 2 else 0,
                 "kurtosis": float(stats.kurtosis(returns)) if len(returns) > 3 else 0,
                 "min_return": min(returns) if returns else 0,
@@ -399,7 +406,7 @@ class SessionAnalyzer:
         balance_history: list[float] = []
 
         current_profit = Decimal("0")
-        current_balance = self.game_state.session_start_balance or self.game_state.balance
+        current_balance: Any = self.game_state.session_start_balance or self.game_state.balance
         window_size = min(20, len(self.game_state.bet_history))  # 20-bet rolling window
 
         for i, bet in enumerate(self.game_state.bet_history):
@@ -439,8 +446,8 @@ class SessionAnalyzer:
             },
             "trend_analysis": {
                 "profit_trend_slope": self._calculate_trend_slope(cumulative_profit),
-                "balance_volatility": np.std(balance_history) if balance_history else 0,
-                "win_rate_stability": np.std(rolling_win_rate) if rolling_win_rate else 0,
+                "balance_volatility": float(np.std(balance_history)) if balance_history else 0,
+                "win_rate_stability": float(np.std(rolling_win_rate)) if rolling_win_rate else 0,
             },
         }
 
@@ -456,8 +463,8 @@ class SessionAnalyzer:
         if len(values) < 2:
             return 0.0
 
-        x = np.arange(len(values))
-        slope, _, _, _, _ = stats.linregress(x, values)
+        x: Any = np.arange(len(values))
+        slope: Any = stats.linregress(x, values)[0]
         return float(slope)
 
 
@@ -490,9 +497,9 @@ class MultiSessionAnalyzer:
         profitable_sessions = sum(1 for s in self.sessions if s.game_state.total_profit > 0)
 
         # Session-level metrics
-        session_profits = [float(s.game_state.total_profit) for s in self.sessions]
-        session_rois = [s.game_state.session_roi for s in self.sessions]
-        session_durations = [s.total_session_time for s in self.sessions]
+        session_profits: list[float] = [float(s.game_state.total_profit) for s in self.sessions]
+        session_rois: list[float] = [s.game_state.session_roi for s in self.sessions]
+        session_durations: list[float] = [s.total_session_time for s in self.sessions]
 
         return {
             "aggregate_performance": {
@@ -510,25 +517,25 @@ class MultiSessionAnalyzer:
                 "profitability_rate": profitable_sessions / len(self.sessions),
             },
             "session_statistics": {
-                "average_session_profit": np.mean(session_profits),
-                "median_session_profit": np.median(session_profits),
-                "std_session_profit": np.std(session_profits),
+                "average_session_profit": float(np.mean(session_profits)),
+                "median_session_profit": float(np.median(session_profits)),
+                "std_session_profit": float(np.std(session_profits)),
                 "best_session_profit": max(session_profits),
                 "worst_session_profit": min(session_profits),
-                "average_session_roi": np.mean(session_rois),
-                "median_session_roi": np.median(session_rois),
-                "std_session_roi": np.std(session_rois),
-                "average_session_duration_minutes": np.mean(session_durations) / 60,
-                "median_session_duration_minutes": np.median(session_durations) / 60,
+                "average_session_roi": float(np.mean(session_rois)),
+                "median_session_roi": float(np.median(session_rois)),
+                "std_session_roi": float(np.std(session_rois)),
+                "average_session_duration_minutes": float(np.mean(session_durations)) / 60,
+                "median_session_duration_minutes": float(np.median(session_durations)) / 60,
             },
             "risk_analysis": {
-                "profit_volatility": np.std(session_profits),
-                "roi_volatility": np.std(session_rois),
+                "profit_volatility": float(np.std(session_profits)),
+                "roi_volatility": float(np.std(session_rois)),
                 "max_session_drawdown": max(
                     float(s.game_state.max_drawdown) for s in self.sessions
                 ),
-                "average_session_drawdown": np.mean(
-                    [float(s.game_state.max_drawdown) for s in self.sessions]
+                "average_session_drawdown": float(
+                    np.mean([float(s.game_state.max_drawdown) for s in self.sessions])
                 ),
                 "sessions_with_significant_loss": sum(
                     1 for s in self.sessions if s.game_state.session_roi < -0.1
@@ -551,7 +558,7 @@ class MultiSessionAnalyzer:
         if not strategy_groups:
             return {"error": "No strategy groups provided"}
 
-        strategy_metrics = {}
+        strategy_metrics: dict[str, dict[str, Any]] = {}
 
         for strategy_name, sessions in strategy_groups.items():
             if not sessions:
@@ -581,9 +588,9 @@ class MultiSessionAnalyzer:
         Returns:
             Rankings by different criteria
         """
-        strategies = list(strategy_metrics.keys())
+        strategies: list[str] = list(strategy_metrics.keys())
 
-        rankings = {
+        rankings: dict[str, list[str]] = {
             "by_total_profit": sorted(
                 strategies,
                 key=lambda s: strategy_metrics[s]["aggregate_performance"]["total_profit"],

@@ -5,6 +5,7 @@ Slack integration for DiceBot notifications and remote control.
 import json
 import logging
 import os
+from collections.abc import Callable
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
@@ -25,8 +26,8 @@ class SlackNotifier:
         Args:
             webhook_url: Slack webhook URL
         """
-        self.webhook_url = webhook_url
-        self.logger = logging.getLogger(__name__)
+        self.webhook_url: str = webhook_url
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     def send_notification(self, message: str, color: str = "good") -> bool:
         """Send a notification to Slack.
@@ -39,7 +40,7 @@ class SlackNotifier:
             True if successful, False otherwise
         """
         try:
-            payload = {
+            payload: dict[str, Any] = {
                 "attachments": [
                     {
                         "color": color,
@@ -49,7 +50,7 @@ class SlackNotifier:
                 ]
             }
 
-            response = requests.post(self.webhook_url, json=payload, timeout=10)
+            response: requests.Response = requests.post(self.webhook_url, json=payload, timeout=10)
             response.raise_for_status()
             return True
 
@@ -70,14 +71,14 @@ class SlackNotifier:
 
     def notify_simulation_complete(self, results: dict[str, Any]) -> bool:
         """Notify simulation completion with results."""
-        strategy = results.get("strategy_name", "Unknown")
-        sessions = results.get("sessions_run", 0)
-        profit = results.get("total_profit", 0)
-        win_rate = results.get("win_rate", 0)
-        roi = results.get("roi", 0)
+        strategy: str = results.get("strategy_name", "Unknown")
+        sessions: int = results.get("sessions_run", 0)
+        profit: float = results.get("total_profit", 0)
+        win_rate: float = results.get("win_rate", 0)
+        roi: float = results.get("roi", 0)
 
-        color = "good" if profit > 0 else "danger"
-        profit_emoji = "📈" if profit > 0 else "📉"
+        color: str = "good" if profit > 0 else "danger"
+        profit_emoji: str = "📈" if profit > 0 else "📉"
 
         message = (
             f"✅ **DiceBot Simulation Complete**\n"
@@ -92,19 +93,19 @@ class SlackNotifier:
 
     def notify_alert(self, alert_type: str, message: str) -> bool:
         """Send alert notification."""
-        emoji_map = {"error": "🚨", "warning": "⚠️", "success": "✅", "info": "ℹ️"}
+        emoji_map: dict[str, str] = {"error": "🚨", "warning": "⚠️", "success": "✅", "info": "ℹ️"}
 
-        color_map = {
+        color_map: dict[str, str] = {
             "error": "danger",
             "warning": "warning",
             "success": "good",
             "info": "good",
         }
 
-        emoji = emoji_map.get(alert_type, "🔔")
-        color = color_map.get(alert_type, "warning")
+        emoji: str = emoji_map.get(alert_type, "🔔")
+        color: str = color_map.get(alert_type, "warning")
 
-        full_message = f"{emoji} **DiceBot Alert**\n{message}"
+        full_message: str = f"{emoji} **DiceBot Alert**\n{message}"
         return self.send_notification(full_message, color)
 
 
@@ -121,15 +122,17 @@ class SlackBot:
             signing_secret: Slack signing secret for verification
             github_client: Optional GitHub client for issue management
         """
-        self.client = WebClient(token=bot_token)
-        self.signing_secret = signing_secret
-        self.logger = logging.getLogger(__name__)
+        self.client: WebClient = WebClient(token=bot_token)
+        self.signing_secret: str = signing_secret
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
         # GitHub integration
-        self.github_bridge = SlackGitHubBridge(github_client) if github_client else None
+        self.github_bridge: SlackGitHubBridge | None = (
+            SlackGitHubBridge(github_client) if github_client else None
+        )
 
         # Command handlers
-        self.commands = {
+        self.commands: dict[str, Callable[[str, str], None]] = {
             "/dicebot-status": self.handle_status,
             "/dicebot-simulate": self.handle_simulate,
             "/dicebot-stop": self.handle_stop,
@@ -143,11 +146,11 @@ class SlackBot:
             # Get system status
             import psutil
 
-            cpu_percent = psutil.cpu_percent(interval=1)
+            cpu_percent: float = psutil.cpu_percent(interval=1)
             memory = psutil.virtual_memory()
             disk = psutil.disk_usage("/")
 
-            status_message = (
+            status_message: str = (
                 f"🤖 **DiceBot Status**\n"
                 f"💻 CPU: {cpu_percent:.1f}%\n"
                 f"🧠 Memory: {memory.percent:.1f}% ({memory.used // 1024**3}GB/{memory.total // 1024**3}GB)\n"
@@ -166,15 +169,15 @@ class SlackBot:
         """Handle simulate command."""
         try:
             # Parse command parameters
-            args = text.split() if text else []
+            args: list[str] = text.split() if text else []
 
             # Default parameters
-            strategy = "fibonacci"
-            capital = "100"
-            sessions = "10"
+            strategy: str = "fibonacci"
+            capital: str = "100"
+            sessions: str = "10"
 
             # Parse arguments
-            i = 0
+            i: int = 0
             while i < len(args):
                 if args[i] == "--strategy" and i + 1 < len(args):
                     strategy = args[i + 1]
@@ -218,7 +221,7 @@ class SlackBot:
                 return
 
             # Find latest result files
-            json_files = list(betlog_dir.rglob("*.json"))
+            json_files: list[Any] = list(betlog_dir.rglob("*.json"))
             if not json_files:
                 self.send_message(channel, "📂 No result files found")
                 return
@@ -227,24 +230,24 @@ class SlackBot:
 
             # Read and format results
             with open(latest_file) as f:
-                results = json.load(f)
+                results: dict[str, Any] = json.load(f)
 
-            message = self.format_results(results, latest_file.name)
+            message: str = self.format_results(results, latest_file.name)
             self.send_message(channel, message)
 
         except Exception as e:
             self.logger.error(f"Results command failed: {e}")
             self.send_message(channel, f"❌ Failed to get results: {e}")
 
-    def format_results(self, results: dict, filename: str) -> str:
+    def format_results(self, results: dict[str, Any], filename: str) -> str:
         """Format simulation results for Slack."""
-        strategy = results.get("strategy_name", "Unknown")
-        sessions = results.get("sessions_run", 0)
-        profit = results.get("total_profit", 0)
-        win_rate = results.get("win_rate", 0)
-        roi = results.get("roi", 0)
+        strategy: str = results.get("strategy_name", "Unknown")
+        sessions: int = results.get("sessions_run", 0)
+        profit: float = results.get("total_profit", 0)
+        win_rate: float = results.get("win_rate", 0)
+        roi: float = results.get("roi", 0)
 
-        profit_emoji = "📈" if profit > 0 else "📉"
+        profit_emoji: str = "📈" if profit > 0 else "📉"
 
         return (
             f"📊 **Latest Results: {filename}**\n"
@@ -274,14 +277,14 @@ class SlackBot:
             f"⏰ Simulation scheduled: {strategy} strategy with {capital} LTC capital",
         )
 
-    def verify_request(self, headers: dict, body: str) -> bool:
+    def verify_request(self, headers: dict[str, Any], body: str) -> bool:
         """Verify Slack request signature."""
         import hashlib
         import hmac
 
         try:
-            timestamp = headers.get("X-Slack-Request-Timestamp", "")
-            signature = headers.get("X-Slack-Signature", "")
+            timestamp: str = headers.get("X-Slack-Request-Timestamp", "")
+            signature: str = headers.get("X-Slack-Signature", "")
 
             if not timestamp or not signature:
                 return False

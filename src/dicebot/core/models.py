@@ -197,7 +197,7 @@ class GameState:
         if len(self.bet_history) < 2:
             return 0.0
 
-        returns = []
+        returns: list[float] = []
         for i in range(1, len(self.bet_history)):
             bet = self.bet_history[i]
             profit = (bet.payout - bet.amount) if bet.won else -bet.amount

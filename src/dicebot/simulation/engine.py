@@ -337,7 +337,7 @@ class SimulationEngine:
             if isinstance(session, SessionState):
                 initial_balance = session.game_state.session_start_balance
                 final_balance = session.game_state.balance
-                if initial_balance is not None and final_balance is not None:
+                if initial_balance is not None:
                     self.vault.return_session_profit(initial_balance, final_balance)
 
         # Store in our history
@@ -432,7 +432,9 @@ class SimulationEngine:
                 "ended_at": session.ended_at.isoformat() if session.ended_at else None,
                 "stop_reason": session.stop_reason,
                 "duration_seconds": session.total_session_time,
-                "initial_balance": float(session.game_state.session_start_balance),
+                "initial_balance": float(session.game_state.session_start_balance)
+                if session.game_state.session_start_balance is not None
+                else 0.0,
                 "final_balance": float(session.game_state.balance),
                 "total_profit": float(session.game_state.total_profit),
                 "total_wagered": float(session.game_state.total_wagered),

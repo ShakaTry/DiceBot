@@ -116,7 +116,9 @@ class TestDiceGameOverUnder:
         result = game.roll_legacy(Decimal("1"), 2.0)
 
         assert result.bet_type == BetType.UNDER
-        assert abs(result.multiplier - 2.0) < 0.1  # Tolérance pour approximations
+        assert (
+            result.multiplier is not None and abs(result.multiplier - 2.0) < 0.1
+        )  # Tolérance pour approximations
         assert result.target > 0
 
         # Expected value legacy

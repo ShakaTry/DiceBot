@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+from ..core.models import GameState
 from .adaptive import AdaptiveConfig, AdaptiveStrategy, StrategyRule, SwitchCondition
 from .composite import CompositeStrategy
 from .factory import StrategyFactory
@@ -143,14 +144,14 @@ def create_event_aware_strategy():
     class EventAwareMartingale(MartingaleStrategy):
         """Martingale qui ajuste son comportement selon les événements."""
 
-        def on_winning_streak(self, streak_length: int, game_state):
+        def on_winning_streak(self, streak_length: int, game_state: GameState) -> None:
             """Réduit l'agressivité après une série de gains."""
             if streak_length >= 5:
                 # Réduire temporairement le multiplier
                 self.config.multiplier = 1.5
                 self.confidence *= 0.9
 
-        def on_losing_streak(self, streak_length: int, game_state):
+        def on_losing_streak(self, streak_length: int, game_state: GameState) -> None:
             """Devient plus conservateur après trop de pertes."""
             if streak_length >= 7:
                 # Forcer un reset

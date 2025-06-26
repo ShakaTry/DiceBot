@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
+from typing import Any
 
 from ..core.models import VaultConfig
 
@@ -134,7 +135,7 @@ class Vault:
         """Check if vault has enough funds to start a session."""
         return self.allocate_session_bankroll() > Decimal("0")
 
-    def get_stats(self) -> dict:
+    def get_stats(self) -> dict[str, Any]:
         return {
             "vault_balance": float(self.state.vault_balance),
             "bankroll_balance": float(self.state.bankroll_balance),

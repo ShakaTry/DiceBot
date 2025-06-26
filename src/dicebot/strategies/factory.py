@@ -55,14 +55,31 @@ class StrategyFactory:
             target_wins = kwargs["target_wins"]
             if not isinstance(target_wins, int) or target_wins < 1:
                 raise ValueError("target_wins must be a positive integer")
-            return strategy_class(config, target_wins=target_wins)
+            # ParoliStrategy a sa propre signature: __init__(config, target_wins)
+            # Créer l'instance avec les bons paramètres pour éviter l'erreur pyright
+            from .paroli import ParoliStrategy
+
+            return ParoliStrategy(config, target_wins)
 
         # CompositeStrategy nécessite une liste de stratégies
         if name == "composite" and "strategies" in kwargs:
-            strategies = kwargs["strategies"]
-            if not isinstance(strategies, list) or not strategies:
+            strategies_list = kwargs["strategies"]
+            if not isinstance(strategies_list, list) or not strategies_list:
                 raise ValueError("composite strategy requires a non-empty list of strategies")
-            return strategy_class(config, strategies)
+            # Vérifier que c'est une liste de BaseStrategy
+            for i, strategy in enumerate(strategies_list):
+                if not isinstance(strategy, BaseStrategy):
+                    raise ValueError(f"Element at index {i} is not a BaseStrategy instance")
+            # CompositeStrategy a sa propre signature: __init__(config, strategies)
+            # Créer l'instance avec les bons paramètres pour éviter l'erreur pyright
+            from .composite import CompositeConfig, CompositeStrategy
+
+            # Convertir StrategyConfig en CompositeConfig si nécessaire
+            if not isinstance(config, CompositeConfig):
+                composite_config = CompositeConfig(**config.__dict__)
+            else:
+                composite_config = config
+            return CompositeStrategy(composite_config, strategies_list)
 
         # AdaptiveStrategy a déjà sa configuration spécialisée
         if name == "adaptive":
@@ -90,10 +107,10 @@ class StrategyFactory:
             Instance de la stratégie
         """
         # Extraire le nom de la stratégie
-        strategy_name = config_dict.pop("strategy")
+        strategy_name: str = config_dict.pop("strategy")
 
         # Extraire les paramètres spécifiques à certaines stratégies
-        special_params = {}
+        special_params: dict[str, Any] = {}
         if strategy_name == "paroli" and "target_wins" in config_dict:
             special_params["target_wins"] = config_dict.pop("target_wins")
 
@@ -265,13 +282,13 @@ class StrategyFactory:
             raise ValueError("At least one strategy is required for composite")
 
         # Créer les sous-stratégies
-        sub_strategies = []
+        sub_strategies: list[BaseStrategy] = []
         for strategy_name, strategy_config in strategies:
             sub_strategy = cls.create_from_dict({"strategy": strategy_name, **strategy_config})
             sub_strategies.append(sub_strategy)
 
         # Configurer la stratégie composite
-        composite_config = base_config or {}
+        composite_config: dict[str, Any] = base_config or {}
 
         # Utiliser la base_bet de la première stratégie si non spécifiée
         if "base_bet" not in composite_config:

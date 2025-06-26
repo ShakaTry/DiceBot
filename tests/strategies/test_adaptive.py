@@ -16,7 +16,7 @@ class TestAdaptiveStrategy:
 
     def setup_method(self) -> None:
         """Prépare les tests."""
-        self.game_state = GameState(balance=Decimal("100"))
+        self.game_state: GameState = GameState(balance=Decimal("100"))
 
     def test_initialization(self) -> None:
         """Test l'initialisation de la stratégie adaptative."""
@@ -28,9 +28,11 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules)
+        config: AdaptiveConfig = AdaptiveConfig(
+            base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules
+        )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         assert adaptive.initial_strategy == "flat"
         assert adaptive.current_strategy_name == "flat"
@@ -39,22 +41,23 @@ class TestAdaptiveStrategy:
 
     def test_initial_strategy_creation(self) -> None:
         """Test la création de la stratégie initiale."""
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="martingale",
             initial_config={"max_losses": 10},
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         assert adaptive.current_strategy_name == "martingale"
+        assert adaptive.current_strategy is not None
         assert adaptive.current_strategy.config.max_losses == 10
 
     def test_calculate_next_bet_delegates(self) -> None:
         """Test que calculate_next_bet délègue à la stratégie courante."""
-        config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat")
+        config: AdaptiveConfig = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat")
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
         decision = adaptive.calculate_next_bet(self.game_state)
 
         # Flat betting devrait retourner base_bet
@@ -70,14 +73,14 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="flat",
             rules=rules,
             min_bets_before_switch=1,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         # État initial
         assert adaptive.current_strategy_name == "flat"
@@ -115,14 +118,14 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="flat",
             rules=rules,
             min_bets_before_switch=1,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         win_result = BetResult(
             amount=Decimal("0.001"),
@@ -154,14 +157,14 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="martingale",
             rules=rules,
             min_bets_before_switch=1,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         # Initialiser le peak_balance en appelant calculate_next_bet d'abord
         adaptive.calculate_next_bet(self.game_state)
@@ -194,16 +197,17 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="martingale",
             rules=rules,
             min_bets_before_switch=1,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         # Forcer une faible confiance
+        assert adaptive.current_strategy is not None
         adaptive.current_strategy.confidence = 0.2
 
         loss_result = BetResult(
@@ -229,14 +233,14 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="martingale",
             rules=rules,
             min_bets_before_switch=1,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         # Simuler un solde bas
         self.game_state.balance = Decimal("40")
@@ -271,14 +275,14 @@ class TestAdaptiveStrategy:
             ),
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="flat",
             rules=rules,
             min_bets_before_switch=1,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         loss_result = BetResult(
             amount=Decimal("0.001"),
@@ -310,14 +314,14 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(
+        config: AdaptiveConfig = AdaptiveConfig(
             base_bet=Decimal("0.001"),
             initial_strategy="flat",
             rules=rules,
             min_bets_before_switch=3,
         )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         loss_result = BetResult(
             amount=Decimal("0.001"),
@@ -351,9 +355,11 @@ class TestAdaptiveStrategy:
             )
         ]
 
-        config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules)
+        config: AdaptiveConfig = AdaptiveConfig(
+            base_bet=Decimal("0.001"), initial_strategy="flat", rules=rules
+        )
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
 
         # Changer l'état
         adaptive.current_strategy_name = "fibonacci"
@@ -370,9 +376,9 @@ class TestAdaptiveStrategy:
 
     def test_get_name(self) -> None:
         """Test le nom de la stratégie."""
-        config = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat")
+        config: AdaptiveConfig = AdaptiveConfig(base_bet=Decimal("0.001"), initial_strategy="flat")
 
-        adaptive = AdaptiveStrategy(config)
+        adaptive: AdaptiveStrategy = AdaptiveStrategy(config)
         name = adaptive.get_name()
 
         assert "Adaptive" in name

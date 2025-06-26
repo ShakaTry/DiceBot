@@ -82,7 +82,7 @@ class SimulationRunner:
         vault_config = VaultConfig(total_capital=self.total_capital)
 
         # Create logger if detailed logging is enabled
-        logger = None
+        logger: JSONLinesLogger | None = None
         if enable_detailed_logs:
             # Create unique log file name with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -92,7 +92,7 @@ class SimulationRunner:
             from ..utils.logger import LogType
 
             # Determine log type based on strategy
-            log_type = None
+            log_type: Any | None = None
             if "composite" in strategy_name.lower():
                 log_type = LogType.STRATEGY_COMPOSITE
             elif "adaptive" in strategy_name.lower():
@@ -185,7 +185,7 @@ class SimulationRunner:
 
         # Save to file if requested
         if save_results:
-            self._save_strategy_results(strategy_name, results)  # type: ignore[arg-type]
+            self._save_strategy_results(strategy_name, results)
 
         # Close logger if it was created
         if logger:
@@ -215,8 +215,8 @@ class SimulationRunner:
         Returns:
             Dictionary with comparison results
         """
-        comparison_results = {}
-        strategy_summaries = {}
+        comparison_results: dict[str, Any] = {}
+        strategy_summaries: dict[str, dict[str, Any]] = {}
 
         # Run simulation for each strategy
         for config in strategy_configs:
@@ -263,7 +263,7 @@ class SimulationRunner:
         self.comparison_results = final_results
 
         if save_results:
-            self._save_comparison_results(final_results)  # type: ignore[arg-type]
+            self._save_comparison_results(final_results)
 
         return final_results
 
@@ -291,7 +291,7 @@ class SimulationRunner:
         Returns:
             Dictionary with sweep results
         """
-        sweep_results = []
+        sweep_results: list[dict[str, Any]] = []
 
         # Generate all parameter combinations
         param_combinations = self._generate_parameter_combinations(parameter_ranges)
@@ -324,7 +324,7 @@ class SimulationRunner:
                     "strategy_fitness": results["strategy_info"]["strategy_fitness"],
                 }
 
-                sweep_results.append(sweep_result)  # type: ignore[arg-type]
+                sweep_results.append(sweep_result)
 
                 # Progress indicator
                 print(f"Completed parameter combination {i + 1}/{len(param_combinations)}")
@@ -334,13 +334,13 @@ class SimulationRunner:
                 continue
 
         # Analyze results
-        best_result = (
-            max(sweep_results, key=lambda x: x["strategy_fitness"]) if sweep_results else None  # type: ignore[arg-type]
+        best_result: dict[str, Any] | None = (
+            max(sweep_results, key=lambda x: x["strategy_fitness"]) if sweep_results else None
         )
 
         final_results = {
             "sweep_results": sweep_results,
-            "best_parameters": best_result["parameter_combination"] if best_result else None,  # type: ignore[index]
+            "best_parameters": best_result["parameter_combination"] if best_result else None,
             "best_performance": best_result if best_result else None,
             "parameter_ranges": parameter_ranges,
             "metadata": {
@@ -353,7 +353,7 @@ class SimulationRunner:
         }
 
         if save_results:
-            self._save_sweep_results(final_results)  # type: ignore[arg-type]
+            self._save_sweep_results(final_results)
 
         return final_results
 
@@ -399,7 +399,7 @@ class SimulationRunner:
 
     def _generate_strategy_recommendations(self, rankings: dict[str, Any]) -> list[str]:
         """Generate strategy recommendations based on rankings."""
-        recommendations = []
+        recommendations: list[str] = []
 
         # Best overall performer
         if rankings["by_roi"]:
@@ -432,7 +432,7 @@ class SimulationRunner:
         keys = list(parameter_ranges.keys())
         values = list(parameter_ranges.values())
 
-        combinations = []
+        combinations: list[dict[str, Any]] = []
         for combo in itertools.product(*values):
             combinations.append(dict(zip(keys, combo, strict=False)))
 

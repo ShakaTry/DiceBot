@@ -51,6 +51,7 @@ class TestSession:
             session.process_bet(result)
 
         assert not session.state.is_active
+        assert session.state.stop_reason is not None
         assert "Stop loss triggered" in session.state.stop_reason
 
     def test_should_stop_take_profit(self) -> None:
@@ -72,6 +73,7 @@ class TestSession:
             session.process_bet(result)
 
         assert not session.state.is_active
+        assert session.state.stop_reason is not None
         assert "Take profit triggered" in session.state.stop_reason
 
     def test_should_stop_consecutive_losses(self) -> None:
@@ -90,6 +92,7 @@ class TestSession:
             session.process_bet(result)
 
         assert not session.state.is_active
+        assert session.state.stop_reason is not None
         assert "Max consecutive losses reached" in session.state.stop_reason
 
     def test_process_bet(self) -> None:

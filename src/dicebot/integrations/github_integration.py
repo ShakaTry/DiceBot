@@ -17,15 +17,15 @@ class GitHubIssue:
 
     title: str
     body: str
-    labels: list[str] = None
-    assignees: list[str] = None
+    labels: list[str] | None = None
+    assignees: list[str] | None = None
     milestone: int | None = None
 
 
 class GitHubClient:
     """GitHub API client for issue management."""
 
-    def __init__(self, token: str, owner: str, repo: str):
+    def __init__(self, token: str, owner: str, repo: str) -> None:
         """Initialize GitHub client.
 
         Args:
@@ -58,7 +58,7 @@ class GitHubClient:
         try:
             url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues"
 
-            payload = {"title": issue.title, "body": issue.body}
+            payload: dict[str, Any] = {"title": issue.title, "body": issue.body}
 
             if issue.labels:
                 payload["labels"] = issue.labels
@@ -90,7 +90,7 @@ class GitHubClient:
             return {"success": False, "error": error_msg}
 
     def get_issues(
-        self, state: str = "open", labels: str = None, limit: int = 10
+        self, state: str = "open", labels: str | None = None, limit: int = 10
     ) -> dict[str, Any]:
         """Get repository issues.
 
@@ -105,7 +105,7 @@ class GitHubClient:
         try:
             url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues"
 
-            params = {
+            params: dict[str, Any] = {
                 "state": state,
                 "per_page": min(limit, 100),  # GitHub API limit
                 "sort": "updated",
@@ -130,7 +130,7 @@ class GitHubClient:
             self.logger.error(error_msg)
             return {"success": False, "error": error_msg}
 
-    def close_issue(self, issue_number: int, comment: str = None) -> dict[str, Any]:
+    def close_issue(self, issue_number: int, comment: str | None = None) -> dict[str, Any]:
         """Close a GitHub issue.
 
         Args:
@@ -149,7 +149,7 @@ class GitHubClient:
 
             # Close the issue
             url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues/{issue_number}"
-            payload = {"state": "closed"}
+            payload: dict[str, str] = {"state": "closed"}
 
             response = requests.patch(url, headers=self.headers, json=payload, timeout=30)
             response.raise_for_status()
@@ -181,7 +181,7 @@ class GitHubClient:
         """
         try:
             url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues/{issue_number}/comments"
-            payload = {"body": comment}
+            payload: dict[str, str] = {"body": comment}
 
             response = requests.post(url, headers=self.headers, json=payload, timeout=30)
             response.raise_for_status()
@@ -239,7 +239,7 @@ class GitHubClient:
         """
         try:
             url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues/{issue_number}/labels"
-            payload = {"labels": labels}
+            payload: dict[str, list[str]] = {"labels": labels}
 
             response = requests.post(url, headers=self.headers, json=payload, timeout=30)
             response.raise_for_status()
@@ -258,7 +258,7 @@ class GitHubClient:
 class SlackGitHubBridge:
     """Bridge between Slack and GitHub for issue management."""
 
-    def __init__(self, github_client: GitHubClient):
+    def __init__(self, github_client: GitHubClient) -> None:
         """Initialize Slack-GitHub bridge.
 
         Args:
@@ -283,7 +283,7 @@ class SlackGitHubBridge:
         # /issue comment #42 "Comment text"
         # /issue show #42
 
-        parts = text.strip().split()
+        parts: list[str] = text.strip().split()
         if not parts:
             return {"action": "help"}
 
@@ -322,7 +322,7 @@ class SlackGitHubBridge:
         body = quoted_parts[1] if len(quoted_parts) > 1 else ""
 
         # Extract labels if any
-        labels = []
+        labels: list[str] = []
         label_match = re.search(r"--labels?\s+([^\s]+)", text)
         if label_match:
             labels = [label.strip() for label in label_match.group(1).split(",")]
@@ -423,7 +423,7 @@ class SlackGitHubBridge:
             return "❌ Issue title cannot be empty"
 
         # Create issue body with Slack user attribution
-        body_parts = []
+        body_parts: list[str] = []
         if command.get("body"):
             body_parts.append(command["body"])
 
@@ -462,7 +462,7 @@ class SlackGitHubBridge:
         if not issues:
             return f"📂 No {state} issues found"
 
-        lines = [f"📋 **{state.title()} Issues ({len(issues)}):**"]
+        lines: list[str] = [f"📋 **{state.title()} Issues ({len(issues)}):**"]
 
         for issue in issues[:10]:  # Limit to 10 for Slack readability
             state_emoji = "🟢" if issue["state"] == "open" else "🔴"

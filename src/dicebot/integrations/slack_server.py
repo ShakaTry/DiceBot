@@ -4,9 +4,10 @@ Flask server for handling Slack events and slash commands.
 
 import json
 import logging
+from collections.abc import Callable
 from typing import Any
 
-from flask import Flask, jsonify, request
+from flask import Flask, Response, jsonify, request
 
 from .slack_bot import SlackBot
 
@@ -29,16 +30,16 @@ class SlackServer:
         # Register routes
         self._register_routes()
 
-    def _register_routes(self):
+    def _register_routes(self) -> None:
         """Register Flask routes."""
 
         @self.app.route("/health", methods=["GET"])
-        def health_check():
+        def health_check() -> Response:  # type: ignore[misc]
             """Health check endpoint."""
             return jsonify({"status": "healthy", "service": "dicebot-slack"})
 
         @self.app.route("/slack/events", methods=["POST"])
-        def handle_slack_events():
+        def handle_slack_events() -> Response | tuple[Response, int]:  # type: ignore[misc]
             """Handle Slack events (messages, mentions, etc.)."""
             try:
                 # Verify request
@@ -46,7 +47,7 @@ class SlackServer:
                     return jsonify({"error": "Invalid request"}), 401
 
                 # Parse event data
-                event_data = request.get_json()
+                event_data: dict[str, Any] = request.get_json() or {}
 
                 # Handle URL verification challenge
                 if event_data.get("type") == "url_verification":
@@ -63,7 +64,7 @@ class SlackServer:
                 return jsonify({"error": "Internal server error"}), 500
 
         @self.app.route("/slack/commands", methods=["POST"])
-        def handle_slack_commands():
+        def handle_slack_commands() -> Response | tuple[Response, int]:  # type: ignore[misc]
             """Handle Slack slash commands."""
             try:
                 # Verify request
@@ -71,7 +72,7 @@ class SlackServer:
                     return jsonify({"error": "Invalid request"}), 401
 
                 # Parse command data
-                command_data = request.form.to_dict()
+                command_data: dict[str, str] = request.form.to_dict()
 
                 # Extract command info
                 command = command_data.get("command", "")
@@ -89,7 +90,7 @@ class SlackServer:
                 return jsonify({"response_type": "ephemeral", "text": f"❌ Command failed: {e}"})
 
         @self.app.route("/slack/interactive", methods=["POST"])
-        def handle_slack_interactive():
+        def handle_slack_interactive() -> Response | tuple[Response, int]:  # type: ignore[misc]
             """Handle Slack interactive components (buttons, modals, etc.)."""
             try:
                 # Verify request
@@ -97,7 +98,7 @@ class SlackServer:
                     return jsonify({"error": "Invalid request"}), 401
 
                 # Parse payload
-                payload = json.loads(request.form.get("payload", "{}"))
+                payload: dict[str, Any] = json.loads(request.form.get("payload", "{}"))
 
                 # Handle interactive component
                 response = self._handle_interactive_component(payload)
@@ -111,8 +112,8 @@ class SlackServer:
     def _verify_slack_request(self) -> bool:
         """Verify Slack request signature."""
         try:
-            headers = dict(request.headers)
-            body = request.get_data(as_text=True)
+            headers: dict[str, Any] = dict(request.headers)
+            body: str = request.get_data(as_text=True)
 
             return self.slack_bot.verify_request(headers, body)
 
@@ -122,8 +123,8 @@ class SlackServer:
 
     def _handle_event_callback(self, event_data: dict[str, Any]) -> None:
         """Handle Slack event callback."""
-        event = event_data.get("event", {})
-        event_type = event.get("type")
+        event: dict[str, Any] = event_data.get("event", {})
+        event_type: str | None = event.get("type")
 
         if event_type == "app_mention":
             # Bot was mentioned
@@ -134,27 +135,28 @@ class SlackServer:
 
     def _handle_mention(self, event: dict[str, Any]) -> None:
         """Handle bot mention."""
-        channel = event.get("channel")
-        user = event.get("user")
-        text = event.get("text", "")
+        channel: str | None = event.get("channel")
+        user: str | None = event.get("user")
+        text: str = event.get("text", "")
 
         # Remove bot mention from text
         text = self._clean_mention_text(text)
 
         # Send status if just mentioned without command
         if not text.strip():
-            self.slack_bot.handle_status(channel, user)
+            if channel and user:
+                self.slack_bot.handle_status(channel, user)
         else:
             # Try to parse as a command
-            if text.startswith("status"):
+            if text.startswith("status") and channel and user:
                 self.slack_bot.handle_status(channel, user)
-            elif text.startswith("simulate"):
+            elif text.startswith("simulate") and channel and user:
                 self.slack_bot.handle_simulate(channel, user, text[8:].strip())
-            elif text.startswith("results"):
+            elif text.startswith("results") and channel and user:
                 self.slack_bot.handle_results(channel, user)
-            elif text.startswith("issue"):
+            elif text.startswith("issue") and channel and user:
                 self.slack_bot.handle_github_issue(channel, user, text[5:].strip())
-            else:
+            elif channel:
                 self.slack_bot.send_message(
                     channel,
                     "🤖 Hi! I'm DiceBot. Try:\n• `@dicebot status`\n• `@dicebot simulate --strategy fibonacci`\n• `@dicebot issue list`",
@@ -180,7 +182,7 @@ class SlackServer:
         """Handle slash command and return response."""
 
         # Map slash commands to bot methods
-        command_handlers = {
+        command_handlers: dict[str, Callable[[], dict[str, Any]]] = {
             "/dicebot-status": lambda: self._execute_and_respond(
                 self.slack_bot.handle_status, channel, user
             ),
@@ -198,14 +200,14 @@ class SlackServer:
             ),
         }
 
-        handler = command_handlers.get(command)
+        handler: Callable[[], dict[str, Any]] | None = command_handlers.get(command)
 
         if handler:
             return handler()
         else:
             return {"response_type": "ephemeral", "text": f"❌ Unknown command: {command}"}
 
-    def _execute_and_respond(self, handler_func, *args) -> dict[str, Any]:
+    def _execute_and_respond(self, handler_func: Callable[..., None], *args: Any) -> dict[str, Any]:
         """Execute handler and return appropriate response."""
         try:
             # Execute the handler (it sends message directly to Slack)
@@ -223,22 +225,23 @@ class SlackServer:
 
     def _handle_interactive_component(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Handle interactive components (buttons, etc.)."""
-        component_type = payload.get("type")
+        component_type: str | None = payload.get("type")
 
         if component_type == "block_actions":
             # Handle button clicks
-            actions = payload.get("actions", [])
+            actions: list[dict[str, Any]] = payload.get("actions", [])
             for action in actions:
-                action_id = action.get("action_id")
+                action_id: str | None = action.get("action_id")
 
                 if action_id == "simulate_quick":
                     # Quick simulate button
-                    channel = payload.get("channel", {}).get("id")
-                    user = payload.get("user", {}).get("name")
+                    channel: str | None = payload.get("channel", {}).get("id")
+                    user: str | None = payload.get("user", {}).get("name")
 
-                    self.slack_bot.handle_simulate(
-                        channel, user, "--strategy fibonacci --preset conservative"
-                    )
+                    if channel and user:
+                        self.slack_bot.handle_simulate(
+                            channel, user, "--strategy fibonacci --preset conservative"
+                        )
 
                     return {"text": "🎲 Quick simulation started!"}
 

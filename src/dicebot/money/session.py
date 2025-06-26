@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 
 from ..core.constants import (
     DEFAULT_MAX_BETS_PER_SESSION,
@@ -53,7 +54,7 @@ class SessionState:
 
 
 class Session:
-    def __init__(self, session_id: str, config: SessionConfig):
+    def __init__(self, session_id: str, config: SessionConfig) -> None:
         self.config = config
         self.state = SessionState(
             session_id=session_id,
@@ -117,10 +118,10 @@ class Session:
         self.state.final_bankroll = self.state.game_state.balance
         self.state.stop_reason = reason or "Manual stop"
 
-    def get_metrics(self) -> dict:
+    def get_metrics(self) -> dict[str, Any]:
         game_state = self.state.game_state
 
-        metrics = {
+        metrics: dict[str, Any] = {
             "session_id": self.state.session_id,
             "is_active": self.state.is_active,
             "start_time": self.state.start_time.isoformat(),
@@ -139,12 +140,18 @@ class Session:
             "losses_count": game_state.losses_count,
             "win_rate": game_state.win_rate,
             "total_wagered": float(game_state.total_wagered),
-            "max_balance": float(game_state.max_balance),
-            "min_balance": float(game_state.min_balance),
+            "max_balance": float(game_state.max_balance)
+            if game_state.max_balance is not None
+            else 0.0,
+            "min_balance": float(game_state.min_balance)
+            if game_state.min_balance is not None
+            else 0.0,
             "max_drawdown": (
                 float((game_state.max_balance - game_state.min_balance) / game_state.max_balance)
-                if game_state.max_balance > 0
-                else 0
+                if game_state.max_balance is not None
+                and game_state.min_balance is not None
+                and game_state.max_balance > 0
+                else 0.0
             ),
             "consecutive_wins_max": game_state.consecutive_wins,
             "consecutive_losses_max": game_state.consecutive_losses,

@@ -57,8 +57,8 @@ class Event:
     source: str | None = None
 
     def __post_init__(self) -> None:
-        if self.timestamp is None:
-            self.timestamp = datetime.now()
+        # timestamp is required in dataclass, this check is no longer needed
+        pass
 
 
 @dataclass

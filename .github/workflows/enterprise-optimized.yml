@@ -54,7 +54,7 @@ jobs:
     
     steps:
     - name: 📂 Checkout
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       with:
         fetch-depth: 0
         
@@ -77,13 +77,13 @@ jobs:
         
     - name: 🐍 Setup Python + Enterprise Cache
       if: steps.changes.outputs.has-changes == 'true'
-      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
     - name: 📦 Enterprise Dependencies Cache
       if: steps.changes.outputs.has-changes == 'true'
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: |
           ~/.cache/pip
@@ -145,7 +145,7 @@ jobs:
         
     - name: 📊 Coverage Upload
       if: steps.changes.outputs.has-changes == 'true'
-      uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         file: ./coverage.xml
         fail_ci_if_error: false
@@ -181,7 +181,7 @@ jobs:
         
     - name: 📤 Upload CI Artifacts
       if: always() && steps.changes.outputs.has-changes == 'true'
-      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: enterprise-ci-${{ github.run_number }}
         path: |
@@ -209,7 +209,7 @@ jobs:
       
     steps:
     - name: 📂 Checkout
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       
     - name: 🚀 Production Deployment
       run: |

@@ -37,7 +37,7 @@ jobs:
     
     steps:
     - name: 📂 Checkout
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       with:
         fetch-depth: 0
         
@@ -60,13 +60,13 @@ jobs:
         
     - name: 🐍 Setup Python + Fast Cache
       if: steps.changes.outputs.has-changes == 'true'
-      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
     - name: ⚡ Ultra-Fast Dependencies Cache
       if: steps.changes.outputs.has-changes == 'true'
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: |
           ~/.cache/pip
@@ -141,7 +141,7 @@ jobs:
         
     - name: 💬 PR Comment
       if: always() && github.event_name == 'pull_request' && steps.changes.outputs.has-changes == 'true'
-      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
       with:
         script: |
           const quality = '${{ steps.quality-check.outputs.passed }}' === 'true' ? '✅' : '❌';
